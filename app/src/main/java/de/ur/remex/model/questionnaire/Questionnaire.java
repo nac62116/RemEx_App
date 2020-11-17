@@ -1,4 +1,7 @@
-package de.ur.remex;
+package de.ur.remex.model.questionnaire;
+
+import de.ur.remex.model.Step;
+import de.ur.remex.model.StepType;
 
 public class Questionnaire extends Step {
 

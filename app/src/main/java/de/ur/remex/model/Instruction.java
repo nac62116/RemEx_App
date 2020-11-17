@@ -1,4 +1,4 @@
-package de.ur.remex;
+package de.ur.remex.model;
 
 public class Instruction extends Step {
 
@@ -12,5 +12,21 @@ public class Instruction extends Step {
     public Instruction() {
         type = StepType.INSTRUCTION;
         isFinished = false;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    public String getText() {
+        return text;
     }
 }

@@ -1,4 +1,4 @@
-package de.ur.remex;
+package de.ur.remex.model;
 
 public abstract class Step {
 
@@ -21,5 +21,9 @@ public abstract class Step {
 
     public Step getNextStep() {
         return nextStep;
+    }
+
+    public StepType getType() {
+        return type;
     }
 }

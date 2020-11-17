@@ -1,4 +1,4 @@
-package de.ur.remex;
+package de.ur.remex.model.questionnaire;
 
 public class Answer {
 
