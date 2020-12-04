@@ -1,8 +1,6 @@
 package de.ur.remex.view;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,8 +10,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.Observer;
 
 import de.ur.remex.R;
+import de.ur.remex.utilities.ActivityEvent;
 import de.ur.remex.utilities.ActivityObservable;
 import de.ur.remex.utilities.Config;
+
+// TODO: Image and video support
 
 public class InstructionActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -34,11 +35,11 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void getIntentExtras() {
-        if (getIntent().getStringExtra("header") != null) {
-            header = getIntent().getStringExtra("header");
+        if (getIntent().getStringExtra(Config.INSTRUCTION_HEADER_KEY) != null) {
+            header = getIntent().getStringExtra(Config.INSTRUCTION_HEADER_KEY);
         }
-        if (getIntent().getStringExtra("text") != null) {
-            text = getIntent().getStringExtra("text");
+        if (getIntent().getStringExtra(Config.INSTRUCTION_TEXT_KEY) != null) {
+            text = getIntent().getStringExtra(Config.INSTRUCTION_TEXT_KEY);
         }
     }
 
@@ -50,25 +51,26 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
         if (header != null) {
             headerTextView.setText(header);
         }
+        else {
+            headerTextView.setVisibility(View.GONE);
+        }
         if (text != null) {
             bodyTextView.setText(text);
         }
-    }
-
-    public Context getContext() {
-        return this;
+        else {
+            bodyTextView.setVisibility(View.GONE);
+        }
     }
 
     public void addObserver(Observer observer) {
-        Log.e("InstructionActivity", "observerAdded");
         observable.addObserver(observer);
     }
 
     @Override
     public void onClick(View v) {
         if (v.equals(nextButton)) {
-            // Notify Experiment Controller
-            observable.notifyExperimentController(Config.EVENT_NEXT_STEP);
+            ActivityEvent event = new ActivityEvent(this, Config.EVENT_NEXT_STEP, null);
+            observable.notifyExperimentController(event);
         }
     }
 }

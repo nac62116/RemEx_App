@@ -1,4 +1,4 @@
-package de.ur.remex.model;
+package de.ur.remex.model.experiment;
 
 public enum StepType {
     INSTRUCTION,

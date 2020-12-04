@@ -1,4 +1,4 @@
-package de.ur.remex.model;
+package de.ur.remex.model.experiment;
 
 import java.util.ArrayList;
 
@@ -21,13 +21,26 @@ public class Experiment {
         this.startTimeInMillis = startTimeInMillis;
     }
 
+    public long getStartTimeInMillis() {
+        return startTimeInMillis;
+    }
+
     public void addSurvey(Survey survey) {
         surveys.add(survey);
     }
 
-    public Survey getSurveyByName(String name) {
+    public Survey getSurveyById(int id) {
         for (Survey survey: surveys) {
-            if (survey.getName().equals(name)) {
+            if (survey.getId() == id) {
+                return survey;
+            }
+        }
+        return null;
+    }
+
+    public Survey getFirstSurvey() {
+        for (Survey survey: surveys) {
+            if (survey.getPreviousSurvey() == null) {
                 return survey;
             }
         }

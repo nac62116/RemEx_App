@@ -4,8 +4,8 @@ import java.util.Observable;
 
 public class ActivityObservable extends Observable {
 
-    public void notifyExperimentController(String eventType){
+    public void notifyExperimentController(ActivityEvent event){
         super.setChanged();
-        super.notifyObservers(eventType);
+        super.notifyObservers(event);
     }
 }

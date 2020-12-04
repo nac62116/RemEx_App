@@ -1,4 +1,4 @@
-package de.ur.remex.model;
+package de.ur.remex.model.experiment;
 
 public abstract class Step {
 
@@ -7,11 +7,11 @@ public abstract class Step {
     protected Step previousStep;
     protected Step nextStep;
 
-    public void setPreviousStep(Step previousStep) {
+    protected void setPreviousStep(Step previousStep) {
         this.previousStep = previousStep;
     }
 
-    public void setNextStep(Step nextStep) {
+    protected void setNextStep(Step nextStep) {
         this.nextStep = nextStep;
     }
 

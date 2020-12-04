@@ -5,4 +5,13 @@
     <string name="header">Header</string>
     <string name="text">Text</string>
     <string name="next">Next</string>
+
+    <!-- Error messages -->
+    <string name="fos_alert_title">Fehler beim Speichern</string>
+    <string name="fos_alert_text">Die Speicherung im Internal Storage konnte nur teilweise oder gar nicht durchgeführt werden. Bitte den Support kontaktieren.</string>
+    <string name="fis_alert_title">Fehler beim Laden</string>
+    <string name="fis_alert_text">Das Laden aus dem Internal Storage konnte nur teilweise oder gar nicht durchgeführt werden. Bitte den Support kontaktieren.</string>
+    <string name="buffered_reader_alert_title">Fehler beim Lesen</string>
+    <string name="buffered_reader_alert_text">Das Lesen der Datei aus dem Internal Storage konnte nur teilweise oder gar nicht durchgeführt werden. Bitte den Support kontaktieren.</string>
+
 </resources>

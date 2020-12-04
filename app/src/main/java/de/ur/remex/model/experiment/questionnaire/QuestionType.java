@@ -1,4 +1,4 @@
-package de.ur.remex.model.questionnaire;
+package de.ur.remex.model.experiment.questionnaire;
 
 public enum QuestionType {
     LIKERT,

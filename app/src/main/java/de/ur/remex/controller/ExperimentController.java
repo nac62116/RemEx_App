@@ -4,16 +4,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import java.util.Calendar;
 import java.util.Observable;
 import java.util.Observer;
 
-import de.ur.remex.model.Experiment;
-import de.ur.remex.model.Instruction;
-import de.ur.remex.model.Step;
-import de.ur.remex.model.StepType;
-import de.ur.remex.model.Survey;
+import de.ur.remex.model.experiment.Experiment;
+import de.ur.remex.model.experiment.Instruction;
+import de.ur.remex.model.experiment.Step;
+import de.ur.remex.model.experiment.StepType;
+import de.ur.remex.model.experiment.Survey;
+import de.ur.remex.utilities.ActivityEvent;
 import de.ur.remex.utilities.Config;
+import de.ur.remex.utilities.ExperimentAlarmManager;
 import de.ur.remex.view.InstructionActivity;
+import de.ur.remex.view.SurveyEntranceActivity;
 
 public class ExperimentController implements Observer {
 
@@ -24,54 +28,70 @@ public class ExperimentController implements Observer {
     // Views
     private Context currentContext;
     private InstructionActivity instructionActivity;
+    private SurveyEntranceActivity surveyEntranceActivity;
+    // Utilities
+    private ExperimentAlarmManager alarmManager;
 
     public ExperimentController(Context context) {
         currentContext = context;
-        loadExperiment();
+        alarmManager = new ExperimentAlarmManager(context);
         instructionActivity = new InstructionActivity();
+        surveyEntranceActivity = new SurveyEntranceActivity();
         instructionActivity.addObserver(this);
+        surveyEntranceActivity.addObserver(this);
     }
 
-    // TODO: The experiment object will be created by the experiment editor Interface in the future
-    private void loadExperiment() {
-        currentExperiment = new Experiment("Test Experiment", "Experimentgroup", 15);
+    public void startExperiment(Experiment experiment) {
 
-        Survey survey1 = new Survey("Survey +5 Min", 5, 3);
-        Survey survey2 = new Survey("Survey +10 Min", 10, 3);
+        // TODO: set start time in CreateVPActivity
+        Calendar c = Calendar.getInstance();
+        experiment.setStartTimeInMillis(c.getTimeInMillis());
 
-        for (int i = 0; i < 3; i++) {
-            Instruction instruction1 = new Instruction();
-            instruction1.setHeader("header1_" + i);
-            instruction1.setText("text1_" + i);
-            survey1.addStep(instruction1);
-            Instruction instruction2 = new Instruction();
-            instruction2.setHeader("header2_" + i);
-            instruction2.setText("text2_" + i);
-            survey2.addStep(instruction1);
+        currentExperiment = experiment;
+
+        currentSurvey = currentExperiment.getFirstSurvey();
+        if (currentSurvey.isRelative()) {
+            alarmManager.setRelativeSurveyAlarm(currentSurvey.getId(),
+                    currentExperiment.getStartTimeInMillis(),
+                    currentSurvey.getRelativeStartTimeInMillis());
         }
-
-        currentExperiment.addSurvey(survey1);
-        currentExperiment.addSurvey(survey2);
+        else {
+            alarmManager.setAbsoluteSurveyAlarm(currentSurvey.getId(),
+                    currentExperiment.getStartTimeInMillis(),
+                    currentSurvey.getAbsoluteStartAtHour(),
+                    currentSurvey.getAbsoluteStartAtMinute(),
+                    currentSurvey.getAbsoluteStartDaysOffset());
+        }
     }
 
-    public void startExperiment() {
-        currentSurvey = currentExperiment.getSurveyByName("Survey +5 Min");
-        currentStep = currentSurvey.getFirstStep();
-        if (currentStep.getType() == StepType.INSTRUCTION) {
-            Instruction instruction = (Instruction) currentStep;
-            Intent intent = new Intent(currentContext, InstructionActivity.class);
-            intent.putExtra("header", instruction.getHeader());
-            intent.putExtra("text", instruction.getText());
-            currentContext.startActivity(intent);
-        }
-        currentContext = instructionActivity.getContext();
+    public void stopExperiment() {
+        // TODO: Cancel all alarms
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        Log.e("ExperimentController", "notified");
-        if (arg.equals(Config.EVENT_NEXT_STEP)) {
-            Log.e("ExperimentController", "eventCaptured");
+        ActivityEvent event = (ActivityEvent) arg;
+        currentContext = event.getContext();
+        if (event.getType().equals(Config.EVENT_NEXT_STEP)) {
+            Log.e("ExperimentController", "EVENT_NEXT_STEP");
+        }
+        else if (event.getType().equals(Config.EVENT_SURVEY_STARTED)) {
+            Log.e("ExperimentController", "EVENT_SURVEY_STARTED");
+            // TODO: Start survey timer
+            currentStep = currentSurvey.getFirstStep();
+            if (currentStep.getType().equals(StepType.INSTRUCTION)) {
+                Instruction instruction = (Instruction) currentStep;
+                Intent intent = new Intent(currentContext, InstructionActivity.class);
+                intent.putExtra(Config.INSTRUCTION_HEADER_KEY, instruction.getHeader());
+                intent.putExtra(Config.INSTRUCTION_TEXT_KEY, instruction.getText());
+                currentContext.startActivity(intent);
+            }
+            else if (currentStep.getType().equals(StepType.BREATHING_EXERCISE)) {
+                // TODO: BreathingActivity
+            }
+            else if (currentStep.getType().equals(StepType.QUESTIONNAIRE)) {
+                // TODO: QuestionnaireActivity
+            }
         }
     }
 }
