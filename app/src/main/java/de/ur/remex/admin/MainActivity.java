@@ -1,4 +1,4 @@
-package de.ur.remex.view;
+package de.ur.remex.admin;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import de.ur.remex.R;
@@ -43,21 +44,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Survey survey1 = new Survey(1, "Survey1 +1 Min", 60 * 1000, 3);
         Survey survey2 = new Survey(2, "Survey2 +1 Min", 60 * 1000, 3);
+
+        ArrayList<Instruction> instructions = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            Instruction instruction = new Instruction();
+            instruction.setHeader("header1_" + i);
+            instruction.setText("text1_" + i);
+            instructions.add(instruction);
+        }
+        for (int i=0; i < instructions.size(); i++) {
+            Instruction currInstruction = instructions.get(i);
+            Instruction prevInstruction;
+            Instruction nextInstruction;
+            if (i==0) {
+                nextInstruction = instructions.get(i+1);
+                currInstruction.setPreviousStep(null);
+                currInstruction.setNextStep(nextInstruction);
+            }
+            else if (i == instructions.size()-1) {
+                prevInstruction = instructions.get(i-1);
+                currInstruction.setPreviousStep(prevInstruction);
+                currInstruction.setNextStep(null);
+            }
+            else {
+                prevInstruction = instructions.get(i - 1);
+                nextInstruction = instructions.get(i + 1);
+                currInstruction.setPreviousStep(prevInstruction);
+                currInstruction.setNextStep(nextInstruction);
+            }
+            survey1.addStep(currInstruction);
+            survey2.addStep(currInstruction);
+        }
+
         survey1.setPreviousSurvey(null);
         survey1.setNextSurvey(survey2);
         survey2.setPreviousSurvey(survey1);
         survey2.setNextSurvey(null);
-
-        for (int i = 0; i < 3; i++) {
-            Instruction instruction1 = new Instruction();
-            instruction1.setHeader("header1_" + i);
-            instruction1.setText("text1_" + i);
-            survey1.addStep(instruction1);
-            Instruction instruction2 = new Instruction();
-            instruction2.setHeader("header2_" + i);
-            instruction2.setText("text2_" + i);
-            survey2.addStep(instruction1);
-        }
 
         experiment.addSurvey(survey1);
         experiment.addSurvey(survey2);

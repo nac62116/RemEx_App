@@ -7,11 +7,11 @@ public abstract class Step {
     protected Step previousStep;
     protected Step nextStep;
 
-    protected void setPreviousStep(Step previousStep) {
+    public void setPreviousStep(Step previousStep) {
         this.previousStep = previousStep;
     }
 
-    protected void setNextStep(Step nextStep) {
+    public void setNextStep(Step nextStep) {
         this.nextStep = nextStep;
     }
 

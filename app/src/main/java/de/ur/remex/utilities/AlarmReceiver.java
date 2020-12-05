@@ -14,7 +14,9 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
+import de.ur.remex.Config;
 import de.ur.remex.R;
+import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.view.SurveyEntranceActivity;
 
 public class AlarmReceiver extends BroadcastReceiver {

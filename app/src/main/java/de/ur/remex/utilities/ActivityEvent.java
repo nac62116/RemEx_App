@@ -5,12 +5,12 @@ import android.content.Context;
 public class ActivityEvent {
 
     private String type;
-    private String data;
+    private String experimentData;
     private Context context;
 
     public ActivityEvent(Context context, String type, String data) {
         this.context = context;
-        this.data = data;
+        this.experimentData = data;
         this.type = type;
     }
 
@@ -18,8 +18,8 @@ public class ActivityEvent {
         return type;
     }
 
-    public String getData() {
-        return data;
+    public String getExperimentData() {
+        return experimentData;
     }
 
     public Context getContext() {

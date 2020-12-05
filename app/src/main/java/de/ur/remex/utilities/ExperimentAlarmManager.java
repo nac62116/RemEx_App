@@ -8,6 +8,8 @@ import android.util.Log;
 
 import java.util.Calendar;
 
+import de.ur.remex.Config;
+
 import static android.content.Context.ALARM_SERVICE;
 
 public class ExperimentAlarmManager {

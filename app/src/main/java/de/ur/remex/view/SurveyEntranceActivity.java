@@ -9,7 +9,7 @@ import java.util.Observer;
 import de.ur.remex.R;
 import de.ur.remex.utilities.ActivityEvent;
 import de.ur.remex.utilities.ActivityObservable;
-import de.ur.remex.utilities.Config;
+import de.ur.remex.Config;
 
 public class SurveyEntranceActivity extends AppCompatActivity {
 
