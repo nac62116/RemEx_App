@@ -85,4 +85,8 @@ public class Survey {
     public Step getFirstStep() {
         return steps.get(0);
     }
+
+    public int getMaxDurationInMin() {
+        return maxDurationInMin;
+    }
 }

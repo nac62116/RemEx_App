@@ -14,8 +14,10 @@ import static android.content.Context.ALARM_SERVICE;
 
 public class ExperimentAlarmManager {
 
-    Context context;
-    AlarmManager alarmManager;
+    private Context context;
+    private AlarmManager alarmManager;
+    private static final int NOTIFICATION_TIMEOUT_ID = -1;
+
 
     public ExperimentAlarmManager(Context context) {
         this.context = context;
@@ -55,6 +57,30 @@ public class ExperimentAlarmManager {
     public void cancelSurveyAlarm(int surveyId) {
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, surveyId, intent, PendingIntent.FLAG_ONE_SHOT);
+        alarmManager.cancel(pendingIntent);
+    }
+
+    public void setSurveyTimeoutAlarm(int surveyId, int maxDurationInMin) {
+        Calendar c = Calendar.getInstance();
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.putExtra(Config.ALARM_PURPOSE_KEY, Config.PURPOSE_SURVEY_TIMEOUT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, surveyId, intent, PendingIntent.FLAG_ONE_SHOT);
+        long alarmTimeInMillis = maxDurationInMin * 60 * 1000 + c.getTimeInMillis();
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
+    }
+
+    public void setNotificationTimeoutAlarm(int notificationDurationInMin) {
+        Calendar c = Calendar.getInstance();
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.putExtra(Config.ALARM_PURPOSE_KEY, Config.PURPOSE_NOTIFICATION_TIMEOUT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NOTIFICATION_TIMEOUT_ID, intent, PendingIntent.FLAG_ONE_SHOT);
+        long alarmTimeInMillis = notificationDurationInMin * 60 * 1000 + c.getTimeInMillis();
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
+    }
+
+    public void cancelNotificationTimeoutAlarm() {
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NOTIFICATION_TIMEOUT_ID, intent, PendingIntent.FLAG_ONE_SHOT);
         alarmManager.cancel(pendingIntent);
     }
 }

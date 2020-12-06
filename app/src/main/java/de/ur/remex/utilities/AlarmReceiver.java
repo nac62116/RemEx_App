@@ -14,14 +14,16 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
+import java.util.Observer;
+
 import de.ur.remex.Config;
 import de.ur.remex.R;
-import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.view.SurveyEntranceActivity;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
     private final static String CHANNEL_ID = "expReminder";
+    private static Observable observable = new Observable();
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -30,12 +32,22 @@ public class AlarmReceiver extends BroadcastReceiver {
         if (purpose != null) {
             // Creating notification for a survey
             if (purpose.equals(Config.PURPOSE_SURVEY_NOTIFY)) {
-                createNotification(context);
+                createNotification(context, intent);
+                Event event = new Event(null, Config.EVENT_NOTIFICATION_CREATED, null);
+                observable.notifyExperimentController(event);
+            }
+            else if (purpose.equals(Config.PURPOSE_SURVEY_TIMEOUT)) {
+                Event event = new Event(null, Config.EVENT_SURVEY_TIMEOUT, null);
+                observable.notifyExperimentController(event);
+            }
+            else if (purpose.equals(Config.PURPOSE_NOTIFICATION_TIMEOUT)) {
+                Event event = new Event(null, Config.EVENT_NOTIFICATION_TIMEOUT, null);
+                observable.notifyExperimentController(event);
             }
         }
     }
 
-    private void createNotification(Context context) {
+    private void createNotification(Context context, Intent intent) {
 
         // TODO: Make current experiment accessible via Admin Screen with Local Storage value
 
@@ -43,10 +55,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "RemEx: Notification");
         wakeLock.acquire(1000);
-
-        // Create Notification
-        // TODO: Get NotificationTimeInMs from current Experiment
-        int notificationTimeInMs = 60 * 1000;
 
         Uri sound = Uri.parse("android.resource://" + context.getPackageName() + "/raw/notification_clock");
 
@@ -62,7 +70,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                         .bigText(Config.NOTIFICATION_TEXT))
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
-                .setTimeoutAfter(notificationTimeInMs)
                 .setChannelId(CHANNEL_ID);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -95,5 +102,9 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
 
         notificationManager.notify(0, builder.build());
+    }
+
+    public void addObserver(Observer observer) {
+        observable.addObserver(observer);
     }
 }

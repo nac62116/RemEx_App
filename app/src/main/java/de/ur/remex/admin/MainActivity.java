@@ -40,10 +40,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // TODO: The experiment object will be created by the experiment editor Interface in the future
     private void createExperiment() {
-        experiment = new Experiment("Test Experiment", "Experimentgroup", 15);
+        experiment = new Experiment("Test Experiment", "Experimentgroup", 1);
 
         Survey survey1 = new Survey(1, "Survey1 +1 Min", 60 * 1000, 3);
-        Survey survey2 = new Survey(2, "Survey2 +1 Min", 60 * 1000, 3);
+        Survey survey2 = new Survey(2, "Survey2 +2 Min", 2 * 60 * 1000, 3);
 
         ArrayList<Instruction> instructions = new ArrayList<>();
         for (int i = 0; i < 5; i++) {

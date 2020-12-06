@@ -46,4 +46,12 @@ public class Experiment {
         }
         return null;
     }
+
+    public int getNotificationDurationInMin() {
+        return notificationDurationInMin;
+    }
+
+    public void setNotificationDurationInMin(int notificationDurationInMin) {
+        this.notificationDurationInMin = notificationDurationInMin;
+    }
 }

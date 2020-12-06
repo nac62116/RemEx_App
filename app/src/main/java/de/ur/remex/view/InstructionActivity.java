@@ -10,15 +10,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.Observer;
 
 import de.ur.remex.R;
-import de.ur.remex.utilities.ActivityEvent;
-import de.ur.remex.utilities.ActivityObservable;
+import de.ur.remex.utilities.Event;
+import de.ur.remex.utilities.Observable;
 import de.ur.remex.Config;
 
 // TODO: Image and video support
 
 public class InstructionActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static ActivityObservable observable = new ActivityObservable();
+    private static Observable observable = new Observable();
 
     private String header;
     private String text;
@@ -69,7 +69,7 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
         if (v.equals(nextButton)) {
-            ActivityEvent event = new ActivityEvent(this, Config.EVENT_NEXT_STEP, null);
+            Event event = new Event(this, Config.EVENT_NEXT_STEP, null);
             observable.notifyExperimentController(event);
         }
     }

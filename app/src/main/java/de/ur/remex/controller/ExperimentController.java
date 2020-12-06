@@ -1,8 +1,10 @@
 package de.ur.remex.controller;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.Observable;
@@ -14,7 +16,8 @@ import de.ur.remex.model.experiment.Step;
 import de.ur.remex.model.experiment.StepType;
 import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.storage.InternalStorage;
-import de.ur.remex.utilities.ActivityEvent;
+import de.ur.remex.utilities.AlarmReceiver;
+import de.ur.remex.utilities.Event;
 import de.ur.remex.Config;
 import de.ur.remex.utilities.ExperimentAlarmManager;
 import de.ur.remex.admin.MainActivity;
@@ -34,6 +37,7 @@ public class ExperimentController implements Observer {
     private SurveyEntranceActivity surveyEntranceActivity;
     // Utilities
     private ExperimentAlarmManager alarmManager;
+    private AlarmReceiver alarmReceiver;
 
     public ExperimentController(Context context) {
         currentContext = context;
@@ -41,8 +45,10 @@ public class ExperimentController implements Observer {
         storage = new InternalStorage();
         instructionActivity = new InstructionActivity();
         surveyEntranceActivity = new SurveyEntranceActivity();
+        alarmReceiver = new AlarmReceiver();
         instructionActivity.addObserver(this);
         surveyEntranceActivity.addObserver(this);
+        alarmReceiver.addObserver(this);
     }
 
     public void startExperiment(Experiment experiment) {
@@ -53,19 +59,11 @@ public class ExperimentController implements Observer {
 
         currentExperiment = experiment;
         currentSurvey = currentExperiment.getFirstSurvey();
-        setSurveyAlarm(currentSurvey, true);
+        setSurveyAlarm(currentSurvey, currentExperiment.getStartTimeInMillis());
     }
 
-    private void setSurveyAlarm(Survey survey, boolean isFirstSurvey) {
+    private void setSurveyAlarm(Survey survey, long referenceTime) {
         if (survey.isRelative()) {
-            long referenceTime;
-            if (isFirstSurvey) {
-                referenceTime = currentExperiment.getStartTimeInMillis();
-            }
-            else {
-                Calendar c = Calendar.getInstance();
-                referenceTime = c.getTimeInMillis();
-            }
             alarmManager.setRelativeSurveyAlarm(survey.getId(),
                     referenceTime,
                     survey.getRelativeStartTimeInMillis());
@@ -80,16 +78,21 @@ public class ExperimentController implements Observer {
     }
 
     public void stopExperiment() {
-        alarmManager.cancelSurveyAlarm(currentSurvey.getId());
+        if (currentSurvey != null) {
+            alarmManager.cancelSurveyAlarm(currentSurvey.getId());
+        }
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        ActivityEvent event = (ActivityEvent) arg;
-        currentContext = event.getContext();
+        Event event = (Event) arg;
+        if (event.getContext() != null) {
+            currentContext = event.getContext();
+        }
         if (event.getType().equals(Config.EVENT_SURVEY_STARTED)) {
             Log.e("ExperimentController", "EVENT_SURVEY_STARTED");
-            // TODO: Start survey timer (cancel in prepareNextSurvey())
+            alarmManager.cancelNotificationTimeoutAlarm();
+            alarmManager.setSurveyTimeoutAlarm(currentSurvey.getId(), currentSurvey.getMaxDurationInMin());
             currentStep = currentSurvey.getFirstStep();
             navigateTo(currentStep);
         }
@@ -105,10 +108,34 @@ public class ExperimentController implements Observer {
             }
             else {
                 Log.e("ExperimentController", "EVENT_SURVEY_FINISHED");
+                alarmManager.cancelSurveyAlarm(currentSurvey.getId());
                 updateProgress();
-                prepareNextSurvey();
-                exitApp(currentContext);
+                Calendar c = Calendar.getInstance();
+                prepareNextSurvey(c.getTimeInMillis());
+                exitApp();
             }
+        }
+        else if (event.getType().equals(Config.EVENT_SURVEY_TIMEOUT)) {
+            Log.e("ExperimentController", "EVENT_SURVEY_TIMEOUT");
+            Toast toast = Toast.makeText(currentContext, Config.MESSAGE_SURVEY_TIMEOUT, Toast.LENGTH_LONG);
+            toast.show();
+            Calendar c = Calendar.getInstance();
+            prepareNextSurvey(c.getTimeInMillis());
+            exitApp();
+        }
+        else if (event.getType().equals(Config.EVENT_NOTIFICATION_CREATED)) {
+            Log.e("ExperimentController", "EVENT_NOTIFICATION_CREATED");
+            alarmManager.setNotificationTimeoutAlarm(currentExperiment.getNotificationDurationInMin());
+        }
+        else if (event.getType().equals(Config.EVENT_NOTIFICATION_TIMEOUT)) {
+            Log.e("ExperimentController", "EVENT_NOTIFICATION_TIMEOUT");
+            // Cancel Notifications
+            NotificationManager notificationManager = (NotificationManager) currentContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancelAll();
+            // Prepare next survey
+            Calendar c = Calendar.getInstance();
+            long referenceTime = c.getTimeInMillis() - currentExperiment.getNotificationDurationInMin() * 60 * 1000;
+            prepareNextSurvey(referenceTime);
         }
     }
 
@@ -116,17 +143,19 @@ public class ExperimentController implements Observer {
         // TODO: Update Progress in Internal Storage
     }
 
-    private void exitApp(Context context) {
-        Intent intent = new Intent(context, MainActivity.class);
+    private void exitApp() {
+        Intent intent = new Intent(currentContext, MainActivity.class);
         intent.putExtra(Config.EXIT_APP_KEY, true);
-        context.startActivity(intent);
+        currentContext.startActivity(intent);
     }
 
-    private void prepareNextSurvey() {
-        // TODO: Cancel survey timer (start in update())
+    private void prepareNextSurvey(long referenceTime) {
         currentSurvey = currentSurvey.getNextSurvey();
         if (currentSurvey != null) {
-            setSurveyAlarm(currentSurvey, false);
+            setSurveyAlarm(currentSurvey, referenceTime);
+        }
+        else {
+            Log.e("ExperimentController", "EVENT_EXPERIMENT_FINISHED");
         }
     }
 
