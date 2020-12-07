@@ -42,14 +42,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void createExperiment() {
         experiment = new Experiment("Test Experiment", "Experimentgroup", 1);
 
-        Survey survey1 = new Survey(1, "Survey1 +1 Min", 60 * 1000, 3);
-        Survey survey2 = new Survey(2, "Survey2 +2 Min", 2 * 60 * 1000, 3);
+        Survey survey1 = new Survey(1, "Survey1 +1 Min", 0, 3);
+        Survey survey2 = new Survey(2, "Survey2 +2 Min", 60 * 1000, 3);
 
         ArrayList<Instruction> instructions = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             Instruction instruction = new Instruction();
             instruction.setHeader("header1_" + i);
-            instruction.setText("text1_" + i);
+            instruction.setText("Super, vielen Dank. Deine aktive Teilnahme wird vermerkt. Toll gemacht! Denke daran, dass die zwei Tage der Befragung am Smartphone nun vorbei sind und dein Besuch am Lehrstuhl für Kinder- und Jugendpsychiatrie und -psychotherapie bevorsteht.");
+            instruction.setImageFileName("salivette1");
             instructions.add(instruction);
         }
         for (int i=0; i < instructions.size(); i++) {

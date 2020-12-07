@@ -8,7 +8,7 @@
     <string name="start_experiment">Start Experiment</string>
     <string name="header">Header</string>
     <string name="text">Text</string>
-    <string name="next">Next</string>
+    <string name="weiter">Weiter</string>
     <string name="admin_login_header">Login</string>
     <string name="admin_login_input_hint">Passwort</string>
     <string name="admin_login_buttontext">Weiter</string>
@@ -76,5 +76,6 @@
     <string name="csv_not_saved_alert_text">Die CSV-Datei der aktuellen Versuchsperson wurde noch nicht gespeichert. Trotzdem Fortfahren?</string>
     <string name="ja">Ja</string>
     <string name="nein">Nein</string>
+    <string name="instruction_image_content_description">Bild zur Instruktion</string>
 
 </resources>

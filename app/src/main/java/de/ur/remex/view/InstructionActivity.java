@@ -1,8 +1,11 @@
 package de.ur.remex.view;
 
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,8 +25,10 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
 
     private String header;
     private String text;
+    private String imageFileName;
     private TextView headerTextView;
     private TextView bodyTextView;
+    private ImageView imageView;
     private Button nextButton;
 
     @Override
@@ -41,10 +46,14 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
         if (getIntent().getStringExtra(Config.INSTRUCTION_TEXT_KEY) != null) {
             text = getIntent().getStringExtra(Config.INSTRUCTION_TEXT_KEY);
         }
+        if (getIntent().getStringExtra(Config.INSTRUCTION_IMAGE_KEY) != null) {
+            imageFileName = getIntent().getStringExtra(Config.INSTRUCTION_IMAGE_KEY);
+        }
     }
 
     private void initViews() {
         headerTextView = findViewById(R.id.instructionHeader);
+        imageView = findViewById(R.id.instructionImageView);
         bodyTextView = findViewById(R.id.instructionText);
         nextButton = findViewById(R.id.instructionNextButton);
         nextButton.setOnClickListener(this);
@@ -59,6 +68,13 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
         }
         else {
             bodyTextView.setVisibility(View.GONE);
+        }
+        if (imageFileName != null) {
+            Uri image = Uri.parse("android.resource://" + this.getPackageName() + "/drawable/" + imageFileName);
+            imageView.setImageURI(image);
+        }
+        else {
+            imageView.setVisibility(View.GONE);
         }
     }
 

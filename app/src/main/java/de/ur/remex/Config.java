@@ -19,7 +19,7 @@ public class Config {
     public static final String ALARM_PURPOSE_KEY = "purpose";
     public static final String INSTRUCTION_HEADER_KEY = "instructionHeader";
     public static final String INSTRUCTION_TEXT_KEY = "instructionText";
-    public static final String NOTIFICATION_DURATION_IN_MIN_KEY = "notificationDuration";
+    public static final String INSTRUCTION_IMAGE_KEY = "instructionImage";
 
     // Alarm purposes
     public static final String PURPOSE_SURVEY_NOTIFY = "surveyNotification";

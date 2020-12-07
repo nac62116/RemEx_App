@@ -3,6 +3,7 @@ package de.ur.remex.model.experiment;
 public class Instruction extends Step {
 
     private String header;
+    // Max characters: 360 (with image), 570 (without image)
     private String text;
     private String imageFileName;
     private String videoFileName;
@@ -28,5 +29,13 @@ public class Instruction extends Step {
 
     public String getText() {
         return text;
+    }
+
+    public String getImageFileName() {
+        return imageFileName;
+    }
+
+    public void setImageFileName(String imageFileName) {
+        this.imageFileName = imageFileName;
     }
 }

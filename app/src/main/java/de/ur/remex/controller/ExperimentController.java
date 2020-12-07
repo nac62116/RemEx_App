@@ -59,23 +59,10 @@ public class ExperimentController implements Observer {
 
         currentExperiment = experiment;
         currentSurvey = currentExperiment.getFirstSurvey();
-        setSurveyAlarm(currentSurvey, currentExperiment.getStartTimeInMillis());
+        setSurveyAlarm(currentExperiment.getStartTimeInMillis());
     }
 
-    private void setSurveyAlarm(Survey survey, long referenceTime) {
-        if (survey.isRelative()) {
-            alarmManager.setRelativeSurveyAlarm(survey.getId(),
-                    referenceTime,
-                    survey.getRelativeStartTimeInMillis());
-        }
-        else {
-            alarmManager.setAbsoluteSurveyAlarm(survey.getId(),
-                    currentExperiment.getStartTimeInMillis(),
-                    survey.getAbsoluteStartAtHour(),
-                    survey.getAbsoluteStartAtMinute(),
-                    survey.getAbsoluteStartDaysOffset());
-        }
-    }
+
 
     public void stopExperiment() {
         if (currentSurvey != null) {
@@ -152,10 +139,25 @@ public class ExperimentController implements Observer {
     private void prepareNextSurvey(long referenceTime) {
         currentSurvey = currentSurvey.getNextSurvey();
         if (currentSurvey != null) {
-            setSurveyAlarm(currentSurvey, referenceTime);
+            setSurveyAlarm(referenceTime);
         }
         else {
             Log.e("ExperimentController", "EVENT_EXPERIMENT_FINISHED");
+        }
+    }
+
+    private void setSurveyAlarm(long referenceTime) {
+        if (currentSurvey.isRelative()) {
+            alarmManager.setRelativeSurveyAlarm(currentSurvey.getId(),
+                    referenceTime,
+                    currentSurvey.getRelativeStartTimeInMillis());
+        }
+        else {
+            alarmManager.setAbsoluteSurveyAlarm(currentSurvey.getId(),
+                    currentExperiment.getStartTimeInMillis(),
+                    currentSurvey.getAbsoluteStartAtHour(),
+                    currentSurvey.getAbsoluteStartAtMinute(),
+                    currentSurvey.getAbsoluteStartDaysOffset());
         }
     }
 
@@ -166,6 +168,7 @@ public class ExperimentController implements Observer {
             Intent intent = new Intent(currentContext, InstructionActivity.class);
             intent.putExtra(Config.INSTRUCTION_HEADER_KEY, instruction.getHeader());
             intent.putExtra(Config.INSTRUCTION_TEXT_KEY, instruction.getText());
+            intent.putExtra(Config.INSTRUCTION_IMAGE_KEY, instruction.getImageFileName());
             currentContext.startActivity(intent);
         }
         else if (nextStep.getType().equals(StepType.BREATHING_EXERCISE)) {
