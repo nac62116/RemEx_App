@@ -77,5 +77,9 @@
     <string name="ja">Ja</string>
     <string name="nein">Nein</string>
     <string name="instruction_image_content_description">Bild zur Instruktion</string>
+    <string name="bitte_warten">Bitte warten</string>
+    <string name="du_wirst_automatisch_weitergeleitet">Du wirst automatisch weitergeleitet.</string>
+    <string name="atem_bung">Atemübung</string>
+    <string name="breathing_circle_content_description">Kreis für die Atemübung</string>
 
 </resources>

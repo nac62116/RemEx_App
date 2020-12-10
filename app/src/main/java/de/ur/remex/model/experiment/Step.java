@@ -1,7 +1,11 @@
 package de.ur.remex.model.experiment;
 
+import androidx.annotation.NonNull;
+
 public abstract class Step {
 
+    protected int id;
+    protected int waitForId;
     protected String name;
     protected StepType type;
     protected Step previousStep;
@@ -11,12 +15,12 @@ public abstract class Step {
         this.previousStep = previousStep;
     }
 
-    public void setNextStep(Step nextStep) {
-        this.nextStep = nextStep;
-    }
-
     public Step getPreviousStep() {
         return previousStep;
+    }
+
+    public void setNextStep(Step nextStep) {
+        this.nextStep = nextStep;
     }
 
     public Step getNextStep() {
@@ -25,5 +29,21 @@ public abstract class Step {
 
     public StepType getType() {
         return type;
+    }
+
+    public void setId(int stepId) {
+        this.id = stepId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setWaitForId(int stepId) {
+        this.waitForId = stepId;
+    }
+
+    public int getWaitForId() {
+        return waitForId;
     }
 }

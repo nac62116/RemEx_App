@@ -89,4 +89,10 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
             observable.notifyExperimentController(event);
         }
     }
+
+    // Disabling the OS-Back Button
+    @Override
+    public void onBackPressed() {
+        //
+    }
 }

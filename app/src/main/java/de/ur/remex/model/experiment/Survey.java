@@ -1,17 +1,21 @@
 package de.ur.remex.model.experiment;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 
 public class Survey {
 
     private int id;
     private String name;
-    // All start parameters are calculated relative to the previous Survey
+    // Calculated relative to a given time (f.e. last survey finish, experimentStart, etc..)
     private long relativeStartTimeInMillis;
     private boolean isRelative;
     private int absoluteStartAtHour;
     private int absoluteStartAtMinute;
+    // Offset relative to experiment start day
     private int absoluteStartDaysOffset;
+    // Calculate min maxDuration
     private int maxDurationInMin;
     private Survey previousSurvey;
     private Survey nextSurvey;
@@ -88,5 +92,14 @@ public class Survey {
 
     public int getMaxDurationInMin() {
         return maxDurationInMin;
+    }
+
+    public Step getStepById(int stepId) {
+        for (Step step: steps) {
+            if (step.getId() == stepId) {
+                return step;
+            }
+        }
+        return null;
     }
 }
