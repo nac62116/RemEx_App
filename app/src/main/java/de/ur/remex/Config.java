@@ -15,6 +15,7 @@ public class Config {
     public static final String EVENT_NOTIFICATION_TIMEOUT = "notificationTimeoutEvent";
     public static final String EVENT_STEP_TIMER = "stepTimeoutEvent";
     public static final String EVENT_WAITING_ROOM_ENTERED = "waitingRoomEntered";
+    public static final String EVENT_NEXT_QUESTION = "eventNextQuestion";
 
     // Intent Extra Keys
     public static final String EXIT_APP_KEY = "exitApp";
@@ -51,4 +52,15 @@ public class Config {
     public static final String BREATHING_NEUTRAL_TEXT = "Entspannen";
     public static final int BREATHING_GONG_LENGTH_SEC = 2;
     public static final int BREATHING_TIMER_FREQUENCY_MS = 50; // Value to set the fps for the moving circle (f.e. 50ms = 20fps)
+
+    // File Names
+    public static final String FILE_NAME_ID = "vpId";
+    public static final String FILE_NAME_GROUP = "vpGroup";
+    public static final String FILE_NAME_CSV = "csv";
+    public static final String FILE_NAME_PROGRESS = "progress";
+    public static final String FILE_NAME_SURVEY_ENTRANCE = "surveyEntrance";
+
+    // File Values
+    public static final String SURVEY_ENTRANCE_OPENED = "surveyEntranceOpened";
+    public static final String SURVEY_ENTRANCE_CLOSED = "surveyEntranceClosed";
 }

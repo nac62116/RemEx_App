@@ -21,14 +21,11 @@ import de.ur.remex.Config;
 
 public class InstructionActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static Observable observable = new Observable();
+    private static final Observable observable = new Observable();
 
     private String header;
     private String text;
     private String imageFileName;
-    private TextView headerTextView;
-    private TextView bodyTextView;
-    private ImageView imageView;
     private Button nextButton;
 
     @Override
@@ -52,9 +49,9 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void initViews() {
-        headerTextView = findViewById(R.id.instructionHeader);
-        imageView = findViewById(R.id.instructionImageView);
-        bodyTextView = findViewById(R.id.instructionText);
+        TextView headerTextView = findViewById(R.id.instructionHeader);
+        ImageView imageView = findViewById(R.id.instructionImageView);
+        TextView bodyTextView = findViewById(R.id.instructionText);
         nextButton = findViewById(R.id.instructionNextButton);
         nextButton.setOnClickListener(this);
         if (header != null) {

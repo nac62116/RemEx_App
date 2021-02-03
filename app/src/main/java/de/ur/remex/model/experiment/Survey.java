@@ -1,11 +1,10 @@
 package de.ur.remex.model.experiment;
 
-import androidx.annotation.NonNull;
-
 import java.util.ArrayList;
 
 public class Survey {
 
+    // Id must have an unique value excluding 0 -> RemEx Interface
     private int id;
     private String name;
     // Calculated relative to a given time (f.e. last survey finish, experimentStart, etc..)
@@ -17,12 +16,10 @@ public class Survey {
     private int absoluteStartDaysOffset;
     // Calculate min maxDuration
     private int maxDurationInMin;
-    private Survey previousSurvey;
     private Survey nextSurvey;
     private ArrayList<Step> steps;
 
-    public Survey(int id, String name, int relativeStartTimeInMillis, int maxDurationInMin) {
-        this.id = id;
+    public Survey(String name, int relativeStartTimeInMillis, int maxDurationInMin) {
         this.name = name;
         this.relativeStartTimeInMillis = relativeStartTimeInMillis;
         isRelative = true;
@@ -30,9 +27,8 @@ public class Survey {
         steps = new ArrayList<>();
     }
 
-    public Survey(int id, String name, int absoluteStartAtHour, int absoluteStartAtMinute,
+    public Survey(String name, int absoluteStartAtHour, int absoluteStartAtMinute,
                   int absoluteStartDaysOffset, int maxDurationInMin) {
-        this.id = id;
         this.name = name;
         this.absoluteStartAtHour = absoluteStartAtHour;
         this.absoluteStartAtMinute = absoluteStartAtMinute;
@@ -40,14 +36,6 @@ public class Survey {
         isRelative = false;
         this.maxDurationInMin = maxDurationInMin;
         steps = new ArrayList<>();
-    }
-
-    public void setPreviousSurvey(Survey previousSurvey) {
-        this.previousSurvey = previousSurvey;
-    }
-
-    public Survey getPreviousSurvey() {
-        return previousSurvey;
     }
 
     public void setNextSurvey(Survey nextSurvey) {
@@ -82,24 +70,36 @@ public class Survey {
         steps.add(step);
     }
 
-    public int getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
     public Step getFirstStep() {
         return steps.get(0);
     }
 
+    public ArrayList<Step> getSteps() {
+        return steps;
+    }
+
     public int getMaxDurationInMin() {
         return maxDurationInMin;
     }
 
-    public Step getStepById(int stepId) {
+    public Step getStepById(int id) {
         for (Step step: steps) {
-            if (step.getId() == stepId) {
+            if (step.getId() == id) {
                 return step;
             }
         }
         return null;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

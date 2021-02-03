@@ -9,11 +9,18 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
+import de.ur.remex.Config;
 import de.ur.remex.R;
 
 public class InternalStorage {
 
-    public void saveFileContent(Context context, String fileName, String content) {
+    private final Context context;
+
+    public InternalStorage(Context context) {
+        this.context = context;
+    }
+
+    public void saveFileContent(String fileName, String content) {
         try (FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE)) {
             fos.write(content.getBytes());
         }
@@ -27,7 +34,7 @@ public class InternalStorage {
         }
     }
 
-    public String getFileContent(Context context, String fileName) {
+    public String getFileContent(String fileName) {
         FileInputStream fis;
         InputStreamReader inputStreamReader;
         String content;

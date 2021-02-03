@@ -5,14 +5,12 @@ import java.util.ArrayList;
 public class Experiment {
 
     private String name;
-    private String group;
     private long startTimeInMillis;
     private int notificationDurationInMin;
     private ArrayList<Survey> surveys;
 
-    public Experiment(String name, String group, int notificationDurationInMin) {
+    public Experiment(String name, int notificationDurationInMin) {
         this.name = name;
-        this.group = group;
         this.notificationDurationInMin = notificationDurationInMin;
         surveys = new ArrayList<>();
     }
@@ -29,22 +27,15 @@ public class Experiment {
         surveys.add(survey);
     }
 
-    public Survey getSurveyById(int id) {
-        for (Survey survey: surveys) {
-            if (survey.getId() == id) {
-                return survey;
-            }
+    public Survey getFirstSurvey() {
+        if (!surveys.isEmpty()) {
+            return surveys.get(0);
         }
         return null;
     }
 
-    public Survey getFirstSurvey() {
-        for (Survey survey: surveys) {
-            if (survey.getPreviousSurvey() == null) {
-                return survey;
-            }
-        }
-        return null;
+    public ArrayList<Survey> getSurveys() {
+        return surveys;
     }
 
     public int getNotificationDurationInMin() {

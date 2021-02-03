@@ -16,7 +16,7 @@ public class ExperimentAlarmManager {
 
     private static final String SURVEY_ID_SUFFIX = "0";
     private static final String STEP_ID_SUFFIX = "1";
-    private Context context;
+    private final Context context;
     private static final int NOTIFICATION_TIMEOUT_ID = -1;
 
 
@@ -106,4 +106,5 @@ public class ExperimentAlarmManager {
         long alarmTimeInMillis = stepDurationInMin * 60 * 1000 + c.getTimeInMillis();
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
     }
+
 }

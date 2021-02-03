@@ -20,18 +20,22 @@ public class AlarmReceiver extends BroadcastReceiver {
         if (purpose != null) {
             // Creating notification for a survey
             Event event = null;
-            if (purpose.equals(Config.PURPOSE_SURVEY_ALARM)) {
-                event = new Event(null, Config.EVENT_SURVEY_ALARM, null);
-            }
-            else if (purpose.equals(Config.PURPOSE_SURVEY_TIMEOUT)) {
-                event = new Event(null, Config.EVENT_SURVEY_TIMEOUT, null);
-            }
-            else if (purpose.equals(Config.PURPOSE_NOTIFICATION_TIMEOUT)) {
-                event = new Event(null, Config.EVENT_NOTIFICATION_TIMEOUT, null);
-            }
-            else if (purpose.equals(Config.PURPOSE_STEP_TIMER)) {
-                int stepId = intent.getIntExtra(Config.STEP_ID_KEY, 0);
-                event = new Event(null, Config.EVENT_STEP_TIMER, Integer.toString(stepId));
+            switch (purpose) {
+                case Config.PURPOSE_SURVEY_ALARM:
+                    event = new Event(null, Config.EVENT_SURVEY_ALARM, null);
+                    break;
+                case Config.PURPOSE_SURVEY_TIMEOUT:
+                    event = new Event(null, Config.EVENT_SURVEY_TIMEOUT, null);
+                    break;
+                case Config.PURPOSE_NOTIFICATION_TIMEOUT:
+                    event = new Event(null, Config.EVENT_NOTIFICATION_TIMEOUT, null);
+                    break;
+                case Config.PURPOSE_STEP_TIMER:
+                    int stepId = intent.getIntExtra(Config.STEP_ID_KEY, 0);
+                    event = new Event(null, Config.EVENT_STEP_TIMER, Integer.toString(stepId));
+                    break;
+                default:
+                    break;
             }
             if (event != null) {
                 observable.notifyExperimentController(event);

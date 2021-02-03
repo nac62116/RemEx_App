@@ -14,7 +14,7 @@ import de.ur.remex.Config;
 
 public class WaitingRoomActivity extends AppCompatActivity {
 
-    private static Observable observable = new Observable();
+    private static final Observable observable = new Observable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

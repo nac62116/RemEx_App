@@ -21,7 +21,7 @@ import de.ur.remex.utilities.Observable;
 
 public class BreathingExerciseActivity extends AppCompatActivity {
 
-    private static Observable observable = new Observable();
+    private static final Observable observable = new Observable();
 
     // Instruction and discharge
     private TextView instructionHeaderView;
@@ -32,7 +32,6 @@ public class BreathingExerciseActivity extends AppCompatActivity {
     private TextView timeTextView;
     private TextView circleTextView;
     private ImageView breathingCircleView;
-    private Button breathingNextButton;
     private MediaPlayer mediaPlayer;
     private int progressCounterInMillis;
     private boolean isInhaling;
@@ -79,7 +78,7 @@ public class BreathingExerciseActivity extends AppCompatActivity {
         circleTextView = findViewById(R.id.circleText);
         timeTextView = findViewById(R.id.breathingHeader);
         breathingCircleView = findViewById(R.id.breathCircle);
-        breathingNextButton = findViewById(R.id.breathingNextButton);
+        Button breathingNextButton = findViewById(R.id.breathingNextButton);
         mediaPlayer = null;
         breathingNextButton.setVisibility(View.INVISIBLE);
         String duration;

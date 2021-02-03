@@ -1,23 +1,15 @@
 package de.ur.remex.model.experiment;
 
-import androidx.annotation.NonNull;
-
 public abstract class Step {
 
+    // Id must have an unique value excluding 0 -> RemEx Interface
     protected int id;
-    protected int waitForId;
-    protected String name;
+    private String name;
     protected StepType type;
+    protected int waitForStep;
+    // Only needed if back button gets implemented.
     protected Step previousStep;
     protected Step nextStep;
-
-    public void setPreviousStep(Step previousStep) {
-        this.previousStep = previousStep;
-    }
-
-    public Step getPreviousStep() {
-        return previousStep;
-    }
 
     public void setNextStep(Step nextStep) {
         this.nextStep = nextStep;
@@ -31,19 +23,19 @@ public abstract class Step {
         return type;
     }
 
-    public void setId(int stepId) {
-        this.id = stepId;
+    public void setWaitForStep(int stepId) {
+        this.waitForStep = stepId;
+    }
+
+    public int getWaitForStep() {
+        return waitForStep;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getId() {
         return id;
-    }
-
-    public void setWaitForId(int stepId) {
-        this.waitForId = stepId;
-    }
-
-    public int getWaitForId() {
-        return waitForId;
     }
 }
