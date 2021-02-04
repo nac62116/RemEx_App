@@ -1,14 +1,20 @@
 package de.ur.remex;
 
 // Class for shared values
-public class Config {
+
+// Can't be extended
+public final class Config {
+
+    private Config() {
+        // Can't be instantiated
+    }
 
     // General app settings
     public static final int ADMIN_TIMEOUT_MIN = 3;
     public static final String MESSAGE_SURVEY_TIMEOUT = "Zeit abgelaufen.\nBefragung beendet.";
 
     // Event types
-    public static final String EVENT_NEXT_STEP = "nextStep";
+    static final String EVENT_NEXT_STEP = "nextStep";
     public static final String EVENT_SURVEY_STARTED = "surveyStarted";
     public static final String EVENT_SURVEY_TIMEOUT = "surveyTimeoutEvent";
     public static final String EVENT_SURVEY_ALARM = "surveyAlarmEvent";
