@@ -21,7 +21,7 @@ import de.ur.remex.utilities.Observable;
 
 public class BreathingExerciseActivity extends AppCompatActivity {
 
-    private static final Observable observable = new Observable();
+    private static final Observable OBSERVABLE = new Observable();
 
     // Instruction and discharge
     private TextView instructionHeaderView;
@@ -213,12 +213,13 @@ public class BreathingExerciseActivity extends AppCompatActivity {
         instructionTextView.setText(dischargeText);
         instructionNextButton.setOnClickListener(v -> {
             Event event = new Event(this, Config.EVENT_NEXT_STEP, null);
-            observable.notifyExperimentController(event);
+            OBSERVABLE.notifyExperimentController(event);
         });
     }
 
     public void addObserver(Observer observer) {
-        observable.addObserver(observer);
+        OBSERVABLE.deleteObservers();
+        OBSERVABLE.addObserver(observer);
     }
 
     // Disabling the OS-Back Button

@@ -8,14 +8,14 @@ import android.util.Log;
 import java.util.Observer;
 
 import de.ur.remex.Config;
+import de.ur.remex.admin.LoginActivity;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
-    private static Observable observable = new Observable();
+    private static final Observable OBSERVABLE = new Observable();
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.e("AlarmReceiver", "Alarm received");
         String purpose = intent.getStringExtra(Config.ALARM_PURPOSE_KEY);
         if (purpose != null) {
             // Creating notification for a survey
@@ -34,16 +34,24 @@ public class AlarmReceiver extends BroadcastReceiver {
                     int stepId = intent.getIntExtra(Config.STEP_ID_KEY, 0);
                     event = new Event(null, Config.EVENT_STEP_TIMER, Integer.toString(stepId));
                     break;
+                case Config.PURPOSE_ADMIN_TIMEOUT:
+                    Log.e("AlarmReceiver", "EVENT_ADMIN_TIMEOUT");
+                    Intent destinationIntent = new Intent(context, LoginActivity.class);
+                    destinationIntent.putExtra(Config.EXIT_APP_KEY, true);
+                    destinationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(destinationIntent);
+                    break;
                 default:
                     break;
             }
             if (event != null) {
-                observable.notifyExperimentController(event);
+                OBSERVABLE.notifyExperimentController(event);
             }
         }
     }
 
     public void addObserver(Observer observer) {
-        observable.addObserver(observer);
+        OBSERVABLE.deleteObservers();
+        OBSERVABLE.addObserver(observer);
     }
 }

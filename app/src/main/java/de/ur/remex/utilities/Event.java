@@ -4,9 +4,9 @@ import android.content.Context;
 
 public class Event {
 
-    private String type;
-    private String data;
-    private Context context;
+    private final String type;
+    private final String data;
+    private final Context context;
 
     public Event(Context activityContext, String type, String data) {
         this.context = activityContext;

@@ -1,58 +1,215 @@
 package de.ur.remex.admin;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Observer;
 
+import de.ur.remex.Config;
 import de.ur.remex.R;
 import de.ur.remex.controller.ExperimentController;
-import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
 import de.ur.remex.model.experiment.Experiment;
 import de.ur.remex.model.experiment.Instruction;
 import de.ur.remex.model.experiment.Survey;
+import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
 import de.ur.remex.model.experiment.breathingExercise.BreathingMode;
-import de.ur.remex.model.experiment.questionnaire.Answer;
-import de.ur.remex.model.experiment.questionnaire.DateQuestion;
-import de.ur.remex.model.experiment.questionnaire.DaysQuestion;
-import de.ur.remex.model.experiment.questionnaire.DaytimeQuestion;
-import de.ur.remex.model.experiment.questionnaire.HoursQuestion;
-import de.ur.remex.model.experiment.questionnaire.LikertQuestion;
-import de.ur.remex.model.experiment.questionnaire.MinutesQuestion;
-import de.ur.remex.model.experiment.questionnaire.MultipleChoiceQuestion;
-import de.ur.remex.model.experiment.questionnaire.Question;
-import de.ur.remex.model.experiment.questionnaire.Questionnaire;
-import de.ur.remex.model.experiment.questionnaire.SingleChoiceQuestion;
-import de.ur.remex.model.experiment.questionnaire.TextQuestion;
+import de.ur.remex.model.storage.InternalStorage;
+import de.ur.remex.utilities.Event;
+import de.ur.remex.utilities.ExperimentAlarmManager;
+import de.ur.remex.utilities.Observable;
 
-// General TODOS
-// TODO: Disable Back Buttons
+// TODO: Make password changeable
+// TODO: Implement Activity Lifecycle funtionality (Home Button, etc...)
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class AdminActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button startExperimentButton;
-    private Experiment experiment;
-    private ExperimentController experimentController;
+    private Button currentVPButton;
+    private Button createVPButton;
+    private Button testRunButton;
+    private Button loadExperimentButton;
+    private Button logoutButton;
+
+    private static final Observable OBSERVABLE = new Observable();
+
+    // Request code for creating a CSV document.
+    private static final int CREATE_CSV_FILE = 1;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        createExperiment();
-        initViews();
+        setContentView(R.layout.activity_admin);
+        // Check for create CSV request
+        boolean createCsv = this.getIntent().getBooleanExtra(Config.CREATE_CSV_KEY, false);
+        if (createCsv) {
+            createCsv();
+        }
+        // Check for start experiment request
+        boolean startExperiment = this.getIntent().getBooleanExtra(Config.START_EXPERIMENT_KEY, false);
+        if (startExperiment) {
+            startExperiment();
+        }
+        initAdminScreen();
     }
 
-    private void initViews() {
-        startExperimentButton = findViewById(R.id.startExperimentButton);
-        startExperimentButton.setOnClickListener(this);
+    private void startExperiment() {
+        // Create new ExperimentController and start experiment
+        Experiment experiment = createExperiment();
+        long startTimeInMs = this.getIntent().getLongExtra(Config.START_TIME_MS_KEY, 0);
+        ExperimentController experimentController = new ExperimentController(this);
+        experimentController.startExperiment(experiment, startTimeInMs);
+    }
+
+    private void createCsv() {
+        Event event = new Event(null, Config.EVENT_CSV_REQUEST, null);
+        OBSERVABLE.notifyExperimentController(event);
+        saveCsvExternalStorage();
+    }
+
+    public void saveCsvExternalStorage() {
+        InternalStorage storage = new InternalStorage(this);
+        String vpId = storage.getFileContent(Config.FILE_NAME_ID);
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/csv");
+        intent.putExtra(Intent.EXTRA_TITLE, vpId + ".csv");
+        startActivityForResult(intent, CREATE_CSV_FILE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        super.onActivityResult(requestCode, resultCode, resultData);
+        if (requestCode == CREATE_CSV_FILE && resultCode == Activity.RESULT_OK) {
+            InternalStorage storage = new InternalStorage(this);
+            String csv = storage.getFileContent(Config.FILE_NAME_CSV);
+
+            // The resultData contains a URI for the document or directory that
+            // the user selected.
+            if (resultData != null) {
+                boolean success = false;
+                Uri uri = resultData.getData();
+                if (uri != null) {
+                    // Writing csv in selected uri
+                    success = writeInFile(uri, csv);
+                }
+                if (success) {
+                    storage.saveFileContent(Config.FILE_NAME_CSV_STATUS, Config.CSV_SAVED);
+                    Toast toast = Toast.makeText(this, Config.CSV_SAVED_TOAST, Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            }
+            else {
+                // AlertDialog: resultData == null
+                new AlertDialog.Builder(this)
+                        .setTitle(Config.EXTERNAL_WRITE_ALERT_TITLE)
+                        .setMessage(Config.EXTERNAL_WRITE_ALERT_MESSAGE)
+                        .setPositiveButton(Config.OK, null)
+                        .show();
+            }
+        }
+    }
+
+    private boolean writeInFile(@NonNull Uri uri, @NonNull String text) {
+        OutputStream outputStream;
+        try {
+            outputStream = getContentResolver().openOutputStream(uri);
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream));
+            bw.write(text);
+            bw.flush();
+            bw.close();
+        }
+        catch (IOException e) {
+            // AlertDialog: I/O Exception
+            new AlertDialog.Builder(this)
+                    .setTitle(Config.EXTERNAL_WRITE_ALERT_TITLE)
+                    .setMessage(Config.EXTERNAL_WRITE_ALERT_MESSAGE)
+                    .setPositiveButton(Config.OK, null)
+                    .show();
+            return false;
+        }
+        return true;
+    }
+
+    private void initAdminScreen() {
+        currentVPButton = findViewById(R.id.currentVPButton);
+        createVPButton = findViewById(R.id.adminCreateVPButton);
+        testRunButton = findViewById(R.id.testRunButton);
+        loadExperimentButton = findViewById(R.id.loadExperimentButton);
+        logoutButton = findViewById(R.id.logoutButton);
+        currentVPButton.setOnClickListener(this);
+        createVPButton.setOnClickListener(this);
+        testRunButton.setOnClickListener(this);
+        loadExperimentButton.setOnClickListener(this);
+        logoutButton.setOnClickListener(this);
+        restartAutoExitTimer();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (currentVPButton.equals(v)) {
+            restartAutoExitTimer();
+            Experiment experiment = createExperiment();
+            Intent intent = new Intent(this, CurrentVPActivity.class);
+            intent.putExtra(Config.PROGRESS_MAXIMUM_KEY, experiment.getSurveys().size());
+            startActivity(intent);
+        }
+        else if (logoutButton.equals(v)) {
+            cancelAutoExitTimer();
+            // Switch to login activity and exit app
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.putExtra(Config.EXIT_APP_KEY, true);
+            startActivity(intent);
+        }
+        else if (createVPButton.equals(v)) {
+            restartAutoExitTimer();
+            Intent intent = new Intent(this, CreateVPActivity.class);
+            startActivity(intent);
+        }
+        else if (loadExperimentButton.equals(v)) {
+            // TODO: Implement Loading Experiment
+        }
+        else if (testRunButton.equals(v)) {
+            // TODO: Implement Test Experiment
+        }
+    }
+
+    private void restartAutoExitTimer() {
+        ExperimentAlarmManager alarmManager = new ExperimentAlarmManager(this);
+        alarmManager.setAdminTimeoutAlarm();
+    }
+
+    private void cancelAutoExitTimer() {
+        ExperimentAlarmManager alarmManager = new ExperimentAlarmManager(this);
+        alarmManager.cancelAdminTimeoutAlarm();
+    }
+
+    public void addObserver(Observer observer) {
+        OBSERVABLE.deleteObservers();
+        OBSERVABLE.addObserver(observer);
+    }
+
+    // Disabling the OS-Back Button
+    @Override
+    public void onBackPressed() {
+        //
     }
 
     // TODO: The experiment object will be created by the RemEx Interface in the future
-    private void createExperiment() {
-        experiment = new Experiment("Test Experiment", 1);
+    private Experiment createExperiment() {
+        Experiment experiment = new Experiment("Test Experiment", 1);
 
         Survey survey1 = new Survey("Survey1 +1 Min", 0, 3);
         survey1.setId(1);
@@ -75,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 instruction.setImageFileName("salivette1");
             }
 
-            // Setting an ongoing instruction
+            /* Setting an ongoing instruction
             if (i == 0) {
                 instruction.setDurationInMin(1);
                 instruction.setWaitingText("Bitte warte noch wegen der ersten Instruktion.");
@@ -83,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // Defining a step that has to wait for that instruction to finish
             if (i == 2) {
                 instruction.setWaitForStep(1);
-            }
+            }*/
 
             instructions.add(instruction);
         }
@@ -95,10 +252,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         breathingExercise.setInstructionText("Erklärung der Atemübung.");
         breathingExercise.setDischargeHeader("Atemübung");
         breathingExercise.setDischargeText("Verabschiedung der Atemübung.");
-        breathingExercise.setDurationInMin(1);
+        breathingExercise.setDurationInMin(0);
         breathingExercise.setBreathingFrequencyInSec(5);
 
-        // Building questionnaire
+        /* Building questionnaire
         Questionnaire questionnaire = new Questionnaire();
         questionnaire.setId(7);
         questionnaire.setInstructionText("Instruktion des Fragebogens");
@@ -191,14 +348,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         questionnaire.addQuestion(daysQuestion);
         questionnaire.addQuestion(dateQuestion);
 
+         */
+
         // Filling surveys with steps
         for (int i = 0; i < instructions.size(); i++) {
             Instruction currInstruction = instructions.get(i);
             Instruction nextInstruction;
             if (i == instructions.size() - 1) {
                 currInstruction.setNextStep(breathingExercise);
-                breathingExercise.setNextStep(questionnaire);
-                questionnaire.setNextStep(null);
+                breathingExercise.setNextStep(null);
+                //questionnaire.setNextStep(null);
             }
             else {
                 nextInstruction = instructions.get(i + 1);
@@ -209,9 +368,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // Adding Breathing exercise and questionnaire
             if (i == instructions.size() - 1) {
                 survey1.addStep(breathingExercise);
-                survey1.addStep(questionnaire);
+                //survey1.addStep(questionnaire);
                 survey2.addStep(breathingExercise);
-                survey2.addStep(questionnaire);
+                //survey2.addStep(questionnaire);
             }
         }
 
@@ -220,16 +379,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         experiment.addSurvey(survey1);
         experiment.addSurvey(survey2);
-    }
 
-    @Override
-    public void onClick(View v) {
-        if (v.equals(startExperimentButton)) {
-            if (experimentController != null) {
-                experimentController.stopExperiment();
-            }
-            experimentController = new ExperimentController(this);
-            experimentController.startExperiment(experiment);
-        }
+        return experiment;
     }
 }

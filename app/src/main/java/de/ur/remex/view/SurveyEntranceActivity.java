@@ -13,7 +13,7 @@ import de.ur.remex.Config;
 
 public class SurveyEntranceActivity extends AppCompatActivity {
 
-    private static final Observable observable = new Observable();
+    private static final Observable OBSERVABLE = new Observable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,11 +21,12 @@ public class SurveyEntranceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_instruction);
 
         Event event = new Event(this, Config.EVENT_SURVEY_STARTED, null);
-        observable.notifyExperimentController(event);
+        OBSERVABLE.notifyExperimentController(event);
     }
 
     public void addObserver(Observer observer) {
-        observable.addObserver(observer);
+        OBSERVABLE.deleteObservers();
+        OBSERVABLE.addObserver(observer);
     }
 
     // Disabling the OS-Back Button

@@ -5,11 +5,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioAttributes;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Build;
-import android.os.PowerManager;
 
 import androidx.core.app.NotificationCompat;
 
@@ -19,7 +16,7 @@ import de.ur.remex.view.SurveyEntranceActivity;
 
 public class ExperimentNotificationManager {
 
-    private final static String CHANNEL_ID = "reminder";
+    private final static String CHANNEL_ID = "RemExReminder";
     private final Context context;
 
     public ExperimentNotificationManager(Context context) {
@@ -27,15 +24,14 @@ public class ExperimentNotificationManager {
     }
 
     public void createNotification() {
-
         // Ring Alarm
         MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.notification_clock);
         mediaPlayer.start();
-
+        // Build pending intent
         Intent destinationIntent = new Intent(context, SurveyEntranceActivity.class);
         destinationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK & Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, destinationIntent, 0);
-
+        // Create notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.medbo_logo)
                 .setContentTitle(Config.NOTIFICATION_HEADER)
@@ -47,26 +43,26 @@ public class ExperimentNotificationManager {
                 .setChannelId(CHANNEL_ID);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = Config.NOTIFICATION_CHANNEL_NAME;
-            String description = Config.NOTIFICATION_CHANNEL_DESCRIPTION;
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            channel.enableVibration(true);
-            channel.setVibrationPattern(new long[]{1000, 1000, 1000, 1000, 1000});
-
-            // TODO: Channel update
-            notificationManager.createNotificationChannel(channel);
-            // For test cases:
-            /*
+            boolean channelAlreadyCreated = false;
             for (NotificationChannel notificationChannel : notificationManager.getNotificationChannels()) {
-                notificationManager.deleteNotificationChannel(notificationChannel.getId());
-            }*/
-            //Log.e("notificationChannel", notificationManager.getNotificationChannel(CHANNEL_ID).toString());
+                if (notificationChannel.getId().equals(CHANNEL_ID)) {
+                    channelAlreadyCreated = true;
+                }
+            }
+            if (!channelAlreadyCreated) {
+                CharSequence name = Config.NOTIFICATION_CHANNEL_NAME;
+                String description = Config.NOTIFICATION_CHANNEL_DESCRIPTION;
+                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+                channel.setDescription(description);
+                channel.enableVibration(true);
+                channel.setVibrationPattern(new long[]{1000, 1000, 1000, 1000, 1000, 1000});
+
+                notificationManager.createNotificationChannel(channel);
+            }
         }
         notificationManager.notify(0, builder.build());
     }

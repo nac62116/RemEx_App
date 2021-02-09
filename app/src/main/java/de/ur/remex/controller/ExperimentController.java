@@ -9,6 +9,8 @@ import java.util.Calendar;
 import java.util.Observable;
 import java.util.Observer;
 
+import de.ur.remex.admin.AdminActivity;
+import de.ur.remex.admin.LoginActivity;
 import de.ur.remex.model.experiment.Experiment;
 import de.ur.remex.model.experiment.Instruction;
 import de.ur.remex.model.experiment.Step;
@@ -22,7 +24,6 @@ import de.ur.remex.utilities.CsvCreator;
 import de.ur.remex.utilities.Event;
 import de.ur.remex.Config;
 import de.ur.remex.utilities.ExperimentAlarmManager;
-import de.ur.remex.admin.MainActivity;
 import de.ur.remex.utilities.ExperimentNotificationManager;
 import de.ur.remex.view.BreathingExerciseActivity;
 import de.ur.remex.view.InstructionActivity;
@@ -49,36 +50,40 @@ public class ExperimentController implements Observer {
         BreathingExerciseActivity breathingExerciseActivity = new BreathingExerciseActivity();
         WaitingRoomActivity waitingRoomActivity = new WaitingRoomActivity();
         SurveyEntranceActivity surveyEntranceActivity = new SurveyEntranceActivity();
+        AdminActivity adminActivity = new AdminActivity();
         instructionActivity.addObserver(this);
         breathingExerciseActivity.addObserver(this);
         surveyEntranceActivity.addObserver(this);
         alarmReceiver.addObserver(this);
         waitingRoomActivity.addObserver(this);
+        adminActivity.addObserver(this);
         userIsAlreadyWaiting = false;
     }
 
-    public void startExperiment(Experiment experiment) {
-        // Init CSV
+    public void startExperiment(Experiment experiment, long startTimeInMs) {
+        Log.e("ExperimentController", "EVENT_EXPERIMENT_STARTED");
         InternalStorage storage = new InternalStorage(currentContext);
+        // Cancel possible ongoing alarms
+        ExperimentAlarmManager alarmManager = new ExperimentAlarmManager(currentContext);
+        alarmManager.cancelAllAlarms();
+        // Set internal storage values
+        storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, Config.EXPERIMENT_RUNNING);
+        storage.saveFileContent(Config.FILE_NAME_CSV_STATUS, Config.CSV_NOT_SAVED);
+        // Init CSV
         String vpId = storage.getFileContent(Config.FILE_NAME_ID);
         String vpGroup = storage.getFileContent(Config.FILE_NAME_GROUP);
         csvCreator = new CsvCreator();
-        csvCreator.initCsv(experiment.getSurveys(), vpId, vpGroup);
-
-        // TODO: set start time in CreateVPActivity
-        Calendar c = Calendar.getInstance();
-        experiment.setStartTimeInMillis(c.getTimeInMillis());
+        csvCreator.initCsvMap(experiment.getSurveys(), vpId, vpGroup);
+        storage.saveFileContent(Config.FILE_NAME_CSV, Config.INITIAL_CSV_VALUE);
+        // Set start time
+        experiment.setStartTimeInMillis(startTimeInMs);
         // Init current state
         currentExperiment = experiment;
         currentSurvey = currentExperiment.getFirstSurvey();
         setSurveyAlarm(currentExperiment.getStartTimeInMillis());
-    }
-
-    public void stopExperiment() {
-        if (currentSurvey != null) {
-            ExperimentAlarmManager alarmManager = new ExperimentAlarmManager(currentContext);
-            alarmManager.cancelSurveyAlarm(currentSurvey.getId());
-        }
+        // Inform user
+        Toast toast = Toast.makeText(currentContext, Config.EXPERIMENT_STARTED_TOAST, Toast.LENGTH_LONG);
+        toast.show();
     }
 
     @Override
@@ -94,97 +99,9 @@ public class ExperimentController implements Observer {
         Calendar calendar = Calendar.getInstance();
         // Checking event type
         switch (event.getType()) {
-            case Config.EVENT_SURVEY_STARTED:
-                Log.e("ExperimentController", "EVENT_SURVEY_STARTED");
-                alarmManager.cancelNotificationTimeoutAlarm();
-                alarmManager.setSurveyTimeoutAlarm(currentSurvey.getId(), currentSurvey.getMaxDurationInMin());
-                currentStep = currentSurvey.getFirstStep();
-                navigateTo(currentStep);
-                break;
-
-            case Config.EVENT_NEXT_STEP:
-                Log.e("ExperimentController", "EVENT_NEXT_STEP");
-                /* Description for the next if scope:
-                Checking if the step that was finished just now is an ongoing step.
-                That means that another step waits for the completion of this step.
-                f.e.:
-                - Instruction ("Please take the cotton bud into your mouth and continue answering our questions.")
-                    -> Note: The cotton bud in this example has to be inside the mouth for at least 2 minutes to get good results
-                - Several other Steps (Questionnaires, Breathing Exercises, Instructions, ...)
-                - Instruction ("Please take the cotton bud out of your mouth and put it in the fridge")
-                    -> Here we have to check if the "cotton bud"-Instruction is already finished (2 minutes passed)
-                */
-                // If the step is ongoing we set a step timer and pass the step name to it
-                if (currentStep.getType().equals(StepType.INSTRUCTION)) {
-                    Instruction instructionStep = (Instruction) currentStep;
-                    if (instructionStep.getDurationInMin() != 0) {
-                        Log.e("ExperimentController:", "StepTimer set");
-                        alarmManager.setStepTimer(instructionStep.getId(), instructionStep.getDurationInMin());
-                    }
-                }
-                // Switching to next step
-                currentStep = currentStep.getNextStep();
-                // There is a next step
-                if (currentStep != null) {
-                    // Here we're checking if the next step waits for another step, like in the above "cotton-bud"-example explained
-                    if (currentStep.getWaitForStep() != 0) {
-                        Log.e("ExperimentController:", "Next step has to wait");
-                        Instruction instructionToWaitFor = (Instruction) currentSurvey.getStepById(currentStep.getWaitForStep());
-                        // The next step waits for the instruction "instructionToWaitFor".
-                        // If its not finished the user gets directed to the WaitingRoomActivity
-                        if (!instructionToWaitFor.isFinished()) {
-                            Log.e("ExperimentController:", "Instruction to wait for is not finished yet");
-                            userIsAlreadyWaiting = true;
-                            Intent intent = new Intent(currentContext, WaitingRoomActivity.class);
-                            intent.putExtra(Config.WAITING_ROOM_TEXT_KEY, instructionToWaitFor.getWaitingText());
-                            currentContext.startActivity(intent);
-                        } else {
-                            navigateTo(currentStep);
-                        }
-                    } else {
-                        navigateTo(currentStep);
-                    }
-                }
-                // There is no next step and the survey gets finished
-                else {
-                    Log.e("ExperimentController", "EVENT_SURVEY_FINISHED");
-                    alarmManager.cancelSurveyAlarm(currentSurvey.getId());
-                    updateProgress();
-                    prepareNextSurvey(calendar.getTimeInMillis());
-                    exitApp();
-                }
-                break;
-
-            case Config.EVENT_NEXT_QUESTION:
-                Log.e("ExperimentController", "EVENT_NEXT_QUESTION");
-                // TODO: CsvCreator: Update hashmap with questionName (key) and event.getData() (value).
-                //  Prepare next question.
-                //  If null switch to next step (Make a function for above code in EVENT_NEXT_STEP)
-                break;
-
-            case Config.EVENT_STEP_TIMER:
-                Log.e("ExperimentController", "EVENT_STEP_TIMER");
-                String stepId = event.getData();
-                Instruction instructionToWaitFor = (Instruction) currentSurvey.getStepById(Integer.parseInt(stepId));
-                instructionToWaitFor.setFinished(true);
-                if (userIsAlreadyWaiting) {
-                    userIsAlreadyWaiting = false;
-                    Log.e("ExperimentController:", "Instruction to wait for is finished now and user is in the waiting room");
-                    navigateTo(currentStep);
-                }
-                break;
-
-            case Config.EVENT_SURVEY_TIMEOUT:
-                Log.e("ExperimentController", "EVENT_SURVEY_TIMEOUT");
-                Toast toast = Toast.makeText(currentContext, Config.MESSAGE_SURVEY_TIMEOUT, Toast.LENGTH_LONG);
-                toast.show();
-                prepareNextSurvey(calendar.getTimeInMillis());
-                exitApp();
-                break;
 
             case Config.EVENT_SURVEY_ALARM:
                 Log.e("ExperimentController", "EVENT_SURVEY_ALARM");
-                // TODO: Make current experiment accessible via Admin Screen with Local Storage value
                 // Making survey accessible via AdminActivity (App Launcher)
                 internalStorage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, Config.SURVEY_ENTRANCE_OPENED);
                 // Creating notification
@@ -204,23 +121,56 @@ public class ExperimentController implements Observer {
                 prepareNextSurvey(referenceTime);
                 break;
 
+            case Config.EVENT_SURVEY_STARTED:
+                Log.e("ExperimentController", "EVENT_SURVEY_STARTED");
+                alarmManager.cancelNotificationTimeoutAlarm();
+                alarmManager.setSurveyTimeoutAlarm(currentSurvey.getId(), currentSurvey.getMaxDurationInMin());
+                currentStep = currentSurvey.getFirstStep();
+                navigateToStep(currentStep);
+                break;
+
+            case Config.EVENT_NEXT_STEP:
+                Log.e("ExperimentController", "EVENT_NEXT_STEP");
+                switchToNextStep(alarmManager, calendar);
+                break;
+
+            case Config.EVENT_NEXT_QUESTION:
+                Log.e("ExperimentController", "EVENT_NEXT_QUESTION");
+                // TODO: CsvCreator: Update hashmap with questionName (key) and event.getData() (value).
+                //  Prepare next question.
+                //  If null switch to next step (Function in EVENT_NEXT_STEP)
+                break;
+
+            case Config.EVENT_STEP_TIMER:
+                Log.e("ExperimentController", "EVENT_STEP_TIMER");
+                String stepId = event.getData();
+                Instruction instructionToWaitFor = (Instruction) currentSurvey.getStepById(Integer.parseInt(stepId));
+                instructionToWaitFor.setFinished(true);
+                if (userIsAlreadyWaiting) {
+                    userIsAlreadyWaiting = false;
+                    Log.e("ExperimentController:", "Instruction to wait for is finished now and user is in the waiting room");
+                    navigateToStep(currentStep);
+                }
+                break;
+
+            case Config.EVENT_SURVEY_TIMEOUT:
+                Log.e("ExperimentController", "EVENT_SURVEY_TIMEOUT");
+                Toast toast = Toast.makeText(currentContext, Config.MESSAGE_SURVEY_TIMEOUT, Toast.LENGTH_LONG);
+                toast.show();
+                prepareNextSurvey(calendar.getTimeInMillis());
+                exitApp();
+                break;
+
+            case Config.EVENT_CSV_REQUEST:
+                Log.e("ExperimentController", "EVENT_CSV_REQUEST");
+                saveCsvInternalStorage();
+
             default:
                 break;
         }
     }
 
-    private void updateProgress() {
-        InternalStorage internalStorage = new InternalStorage(currentContext);
-        String progress = internalStorage.getFileContent(Config.FILE_NAME_PROGRESS);
-        int prog = Integer.parseInt(progress) + 1;
-        internalStorage.saveFileContent(Config.FILE_NAME_PROGRESS, Integer.toString(prog));
-    }
 
-    private void exitApp() {
-        Intent intent = new Intent(currentContext, MainActivity.class);
-        intent.putExtra(Config.EXIT_APP_KEY, true);
-        currentContext.startActivity(intent);
-    }
 
     private void prepareNextSurvey(long referenceTime) {
         currentSurvey = currentSurvey.getNextSurvey();
@@ -228,13 +178,9 @@ public class ExperimentController implements Observer {
             setSurveyAlarm(referenceTime);
         }
         else {
-            Log.e("ExperimentController", "EVENT_EXPERIMENT_FINISHED");
-            String csv = csvCreator.getCsv();
-            InternalStorage internalStorage = new InternalStorage(currentContext);
-            internalStorage.saveFileContent(Config.FILE_NAME_CSV, csv);
+            finishExperiment();
         }
     }
-
     private void setSurveyAlarm(long referenceTime) {
         ExperimentAlarmManager alarmManager = new ExperimentAlarmManager(currentContext);
         if (currentSurvey.isRelative()) {
@@ -250,8 +196,15 @@ public class ExperimentController implements Observer {
                     currentSurvey.getAbsoluteStartDaysOffset());
         }
     }
+    private void finishExperiment() {
+        Log.e("ExperimentController", "EVENT_EXPERIMENT_FINISHED");
+        // Set running value
+        InternalStorage storage = new InternalStorage(currentContext);
+        storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, Config.EXPERIMENT_FINISHED);
 
-    private void navigateTo(Step nextStep) {
+    }
+
+    private void navigateToStep(Step nextStep) {
         if (nextStep.getType().equals(StepType.INSTRUCTION)) {
             Log.e("ExperimentController", "Init InstructionStep");
             Instruction instruction = (Instruction) nextStep;
@@ -278,5 +231,89 @@ public class ExperimentController implements Observer {
             Log.e("ExperimentController", "Init Questionnaire");
             // TODO: QuestionnaireActivity
         }
+    }
+
+    private void switchToNextStep(ExperimentAlarmManager alarmManager, Calendar calendar) {
+        // Set step timer if the current step was an ongoing step
+        setStepTimer(alarmManager);
+        // Switching to next step
+        currentStep = currentStep.getNextStep();
+        // There is a next step
+        if (currentStep != null) {
+            // Moving on to next step after a little checkup
+            checkWaitingRequestAndNavigateToNextStep();
+        }
+        // There is no next step and the survey gets finished
+        else {
+            Log.e("ExperimentController", "EVENT_SURVEY_FINISHED");
+            alarmManager.cancelAllAlarms();
+            updateProgress();
+            prepareNextSurvey(calendar.getTimeInMillis());
+            exitApp();
+        }
+    }
+    private void setStepTimer(ExperimentAlarmManager alarmManager) {
+        /* Description:
+                Checking if the step that was finished just now is an ongoing step.
+                That means that another step waits for the completion of this step.
+                f.e.:
+                - Instruction ("Please take the cotton bud into your mouth and continue answering our questions.")
+                    -> Note: The cotton bud in this example has to be inside the mouth for at least 2 minutes to get good results
+                - Several other Steps (Questionnaires, Breathing Exercises, Instructions, ...)
+                - Instruction ("Please take the cotton bud out of your mouth and put it in the fridge")
+                    -> Here we have to check if the "cotton bud"-Instruction is already finished (2 minutes passed)
+                */
+        // If the step is ongoing we set a step timer and pass the step name to it
+        if (currentStep.getType().equals(StepType.INSTRUCTION)) {
+            Instruction instructionStep = (Instruction) currentStep;
+            if (instructionStep.getDurationInMin() != 0) {
+                Log.e("ExperimentController:", "StepTimer set");
+                alarmManager.setStepTimer(instructionStep.getId(), instructionStep.getDurationInMin());
+            }
+        }
+    }
+    private void checkWaitingRequestAndNavigateToNextStep() {
+        // Here we're checking if the next step waits for another step,
+        // like in the "cotton-bud"-example in "setStepTimer()" explained.
+        if (currentStep.getWaitForStep() != 0) {
+            Log.e("ExperimentController:", "Next step has to wait");
+            Instruction instructionToWaitFor = (Instruction) currentSurvey.getStepById(currentStep.getWaitForStep());
+            // The next step waits for the instruction "instructionToWaitFor".
+            // If its not finished the user gets directed to the WaitingRoomActivity
+            if (!instructionToWaitFor.isFinished()) {
+                Log.e("ExperimentController:", "Instruction to wait for is not finished yet");
+                userIsAlreadyWaiting = true;
+                Intent intent = new Intent(currentContext, WaitingRoomActivity.class);
+                intent.putExtra(Config.WAITING_ROOM_TEXT_KEY, instructionToWaitFor.getWaitingText());
+                currentContext.startActivity(intent);
+            }
+            else {
+                navigateToStep(currentStep);
+            }
+        }
+        else {
+            navigateToStep(currentStep);
+        }
+    }
+
+    private void updateProgress() {
+        InternalStorage internalStorage = new InternalStorage(currentContext);
+        String progress = internalStorage.getFileContent(Config.FILE_NAME_PROGRESS);
+        int prog = Integer.parseInt(progress) + 1;
+        internalStorage.saveFileContent(Config.FILE_NAME_PROGRESS, Integer.toString(prog));
+    }
+
+    private void exitApp() {
+        InternalStorage storage = new InternalStorage(currentContext);
+        storage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, Config.SURVEY_ENTRANCE_CLOSED);
+        Intent intent = new Intent(currentContext, LoginActivity.class);
+        intent.putExtra(Config.EXIT_APP_KEY, true);
+        currentContext.startActivity(intent);
+    }
+
+    private void saveCsvInternalStorage() {
+        String csv = csvCreator.getCsvString();
+        InternalStorage internalStorage = new InternalStorage(currentContext);
+        internalStorage.saveFileContent(Config.FILE_NAME_CSV, csv);
     }
 }

@@ -13,13 +13,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
-        <activity android:name=".admin.MainActivity" android:screenOrientation="portrait" android:noHistory="true">
+        <activity android:name=".admin.LoginActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".admin.AdminActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".admin.CurrentVPActivity" android:screenOrientation="portrait" android:noHistory="true"/>
+        <activity android:name=".admin.CreateVPActivity" android:screenOrientation="portrait" android:noHistory="true"/>
         <activity android:name=".view.InstructionActivity" android:screenOrientation="portrait" android:noHistory="true"/>
         <activity android:name=".view.SurveyEntranceActivity" android:screenOrientation="portrait" android:noHistory="true"/>
         <activity android:name=".view.WaitingRoomActivity" android:screenOrientation="portrait" android:noHistory="true"/>

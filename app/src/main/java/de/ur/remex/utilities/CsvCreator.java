@@ -1,7 +1,5 @@
 package de.ur.remex.utilities;
 
-import android.content.Context;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -11,7 +9,6 @@ import de.ur.remex.model.experiment.StepType;
 import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.questionnaire.Question;
 import de.ur.remex.model.experiment.questionnaire.Questionnaire;
-import de.ur.remex.model.storage.InternalStorage;
 
 public class CsvCreator {
 
@@ -20,10 +17,9 @@ public class CsvCreator {
 
     // Hash Structure: Key = questionName.replace(",", ""); Value = csvLine
     // Csv Structure: VP_ID, VP_GROUP, SURVEY_NAME, QUESTION_NAME, ANSWER_CODE, TIME_STAMP
-    public void initCsv(ArrayList<Survey> surveys, String vpId, String vpGroup) {
+    public void initCsvMap(ArrayList<Survey> surveys, String vpId, String vpGroup) {
         questionMap = new HashMap<>();
         questionKeys = new ArrayList<>();
-        StringBuilder csvLine = new StringBuilder(vpId + "," + vpGroup + ",");
 
         for (Survey survey: surveys) {
             String surveyName = survey.getName().replace(",", "");
@@ -33,6 +29,7 @@ public class CsvCreator {
                     Questionnaire questionnaire = (Questionnaire) step;
                     ArrayList<Question> questions = questionnaire.getQuestions();
                     for (Question question: questions) {
+                        StringBuilder csvLine = new StringBuilder(vpId + "," + vpGroup + ",");
                         String questionName = question.getName().replace(",", "");
                         csvLine.append(surveyName).append(",").append(questionName).append(",,\n");
                         questionMap.put(questionName, csvLine.toString());
@@ -43,17 +40,19 @@ public class CsvCreator {
         }
     }
 
-    public void updateCsv(String questionName, String answer, String timeStamp) {
+    public void updateCsvMap(String questionName, String answer, String timeStamp) {
         String key = questionName.replace(",", "");
         String csvLine = questionMap.get(key);
-        csvLine = csvLine.substring(0, csvLine.length() - 3);
-        csvLine = csvLine + answer.replace(",", "") + "," +
-                timeStamp.replace(",", "") + "\n";
-        questionMap.put(key, csvLine);
+        if (csvLine != null) {
+            csvLine = csvLine.substring(0, csvLine.length() - 3);
+            csvLine = csvLine + answer.replace(",", "") + "," +
+                    timeStamp.replace(",", "") + "\n";
+            questionMap.put(key, csvLine);
+        }
     }
 
-    public String getCsv() {
-        StringBuilder csv = new StringBuilder("VP_ID,VP_GROUP,SURVEY_NAME,QUESTION_NAME,ANSWER_CODE,TIME_STAMP\n");
+    public String getCsvString() {
+        StringBuilder csv = new StringBuilder(Config.INITIAL_CSV_VALUE);
         for (String key: questionKeys) {
             csv.append(questionMap.get(key));
         }

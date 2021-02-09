@@ -2,7 +2,6 @@ package de.ur.remex.view;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,11 +16,11 @@ import de.ur.remex.utilities.Event;
 import de.ur.remex.utilities.Observable;
 import de.ur.remex.Config;
 
-// TODO: Image and video support
+// TODO: Video support
 
 public class InstructionActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final Observable observable = new Observable();
+    private static final Observable OBSERVABLE = new Observable();
 
     private String header;
     private String text;
@@ -76,14 +75,15 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
     }
 
     public void addObserver(Observer observer) {
-        observable.addObserver(observer);
+        OBSERVABLE.deleteObservers();
+        OBSERVABLE.addObserver(observer);
     }
 
     @Override
     public void onClick(View v) {
         if (v.equals(nextButton)) {
             Event event = new Event(this, Config.EVENT_NEXT_STEP, null);
-            observable.notifyExperimentController(event);
+            OBSERVABLE.notifyExperimentController(event);
         }
     }
 

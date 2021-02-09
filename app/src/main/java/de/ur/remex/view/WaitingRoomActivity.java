@@ -14,7 +14,7 @@ import de.ur.remex.Config;
 
 public class WaitingRoomActivity extends AppCompatActivity {
 
-    private static final Observable observable = new Observable();
+    private static final Observable OBSERVABLE = new Observable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +22,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_waiting_room);
 
         Event event = new Event(this, Config.EVENT_WAITING_ROOM_ENTERED, null);
-        observable.notifyExperimentController(event);
+        OBSERVABLE.notifyExperimentController(event);
 
         TextView waitingRoomText = findViewById(R.id.waitingRoomText);
         if (getIntent().getStringExtra(Config.WAITING_ROOM_TEXT_KEY) != null) {
@@ -32,7 +32,8 @@ public class WaitingRoomActivity extends AppCompatActivity {
     }
 
     public void addObserver(Observer observer) {
-        observable.addObserver(observer);
+        OBSERVABLE.deleteObservers();
+        OBSERVABLE.addObserver(observer);
     }
 
     // Disabling the OS-Back Button

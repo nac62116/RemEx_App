@@ -10,11 +10,27 @@ public final class Config {
     }
 
     // General app settings
-    public static final int ADMIN_TIMEOUT_MIN = 3;
+    public static final int ADMIN_TIMEOUT_MIN = 1;
+    public static final String INITIAL_PASSWORD = "";
+    public static final String PASSWORD_ALERT_TITLE = "Login fehlgeschlagen";
+    public static final String PASSWORD_ALERT_MESSAGE = "Das eingegebene Passwort ist falsch.";
+    public static final String EXPERIMENT_NOT_FINISHED_ALERT_TITLE = "Experiment läuft noch";
+    public static final String EXPERIMENT_NOT_FINISHED_ALERT_MESSAGE = "Das Experiment der aktuellen Versuchsperson läuft noch. Möchten Sie trotzdem das Experiment mit einer neuen Versuchsperson starten? Dadurch wird das aktuelle Experiment gestoppt und die dazugehörige CSV-Datei geht verloren.";
+    public static final String EXTERNAL_WRITE_ALERT_TITLE = "Speichern fehlgeschlagen";
+    public static final String EXTERNAL_WRITE_ALERT_MESSAGE = "Die CSV-Datei konnte nicht gespeichert werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
+    public static final String INPUT_INVALID_ALERT_TITLE = "Angaben unvollständig";
+    public static final String INPUT_INVALID_ALERT_MESSAGE = "Es wurden nicht alle Felder ausgefüllt.";
+    public static final String DATE_INVALID_ALERT_TITLE = "Falsches Datum";
+    public static final String DATE_INVALID_ALERT_MESSAGE = "Das gewählte Datum ist heute oder liegt in der Vergangenheit.";
+    public static final String CSV_SAVED_TOAST = "CSV-Datei gespeichert";
+    public static final String EXPERIMENT_STARTED_TOAST = "Experiment gestartet";
+    public static final String OK = "Ok";
+    public static final String JA = "Ja";
+    public static final String NEIN = "Nein";
     public static final String MESSAGE_SURVEY_TIMEOUT = "Zeit abgelaufen.\nBefragung beendet.";
 
     // Event types
-    static final String EVENT_NEXT_STEP = "nextStep";
+    public static final String EVENT_NEXT_STEP = "nextStep";
     public static final String EVENT_SURVEY_STARTED = "surveyStarted";
     public static final String EVENT_SURVEY_TIMEOUT = "surveyTimeoutEvent";
     public static final String EVENT_SURVEY_ALARM = "surveyAlarmEvent";
@@ -22,10 +38,15 @@ public final class Config {
     public static final String EVENT_STEP_TIMER = "stepTimeoutEvent";
     public static final String EVENT_WAITING_ROOM_ENTERED = "waitingRoomEntered";
     public static final String EVENT_NEXT_QUESTION = "eventNextQuestion";
+    public static final String EVENT_CSV_REQUEST = "eventCsvRequest";
 
     // Intent Extra Keys
     public static final String EXIT_APP_KEY = "exitApp";
     public static final String ALARM_PURPOSE_KEY = "purpose";
+    public static final String CREATE_CSV_KEY = "createCSV";
+    public static final String START_EXPERIMENT_KEY = "startExperiment";
+    public static final String START_TIME_MS_KEY = "startTimeMs";
+    public static final String PROGRESS_MAXIMUM_KEY = "progressMaximum";
     public static final String STEP_ID_KEY = "stepId";
     public static final String INSTRUCTION_HEADER_KEY = "instructionHeader";
     public static final String INSTRUCTION_TEXT_KEY = "instructionText";
@@ -62,11 +83,21 @@ public final class Config {
     // File Names
     public static final String FILE_NAME_ID = "vpId";
     public static final String FILE_NAME_GROUP = "vpGroup";
+    public static final String FILE_NAME_START_DATE = "startDate";
+    public static final String FILE_NAME_START_TIME = "startTime";
     public static final String FILE_NAME_CSV = "csv";
+    public static final String FILE_NAME_CSV_STATUS = "csvStatus";
     public static final String FILE_NAME_PROGRESS = "progress";
     public static final String FILE_NAME_SURVEY_ENTRANCE = "surveyEntrance";
+    public static final String FILE_NAME_PASSWORD = "password";
+    public static final String FILE_NAME_EXPERIMENT_STATUS = "experimentStatus";
 
     // File Values
     public static final String SURVEY_ENTRANCE_OPENED = "surveyEntranceOpened";
     public static final String SURVEY_ENTRANCE_CLOSED = "surveyEntranceClosed";
+    public static final String INITIAL_CSV_VALUE = "VP_ID,VP_GROUP,SURVEY_NAME,QUESTION_NAME,ANSWER_CODE,TIME_STAMP\n";
+    public static final String EXPERIMENT_RUNNING = "experimentRunning";
+    public static final String EXPERIMENT_FINISHED = "experimentFinished";
+    public static final String CSV_SAVED = "CSV-Datei wurde bereits gespeichert";
+    public static final String CSV_NOT_SAVED = "CSV-Datei wurde noch nicht gespeichert";
 }

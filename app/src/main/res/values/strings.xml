@@ -34,7 +34,7 @@
     <string name="create_vp_start_date_hint">Datum</string>
     <string name="create_vp_start_time_prefix">Weckzeit:</string>
     <string name="create_vp_start_time_hint">Weckzeit</string>
-    <string name="create_vp_buttontext">Fertig</string>
+    <string name="create_vp_buttontext">Experiment starten</string>
 
     <!-- TODO: Into Config-->
     <string name="fos_alert_title">Fehler beim Speichern</string>
@@ -81,5 +81,7 @@
     <string name="du_wirst_automatisch_weitergeleitet">Du wirst automatisch weitergeleitet.</string>
     <string name="atem_bung">Atemübung</string>
     <string name="breathing_circle_content_description">Kreis für die Atemübung</string>
+    <string name="experiment_laden">Experiment laden</string>
+    <string name="csv_status">Csv status</string>
 
 </resources>
