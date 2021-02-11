@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,8 +18,6 @@ import de.ur.remex.utilities.Event;
 import de.ur.remex.utilities.Observable;
 import de.ur.remex.Config;
 
-// TODO: Video support
-
 public class InstructionActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final Observable OBSERVABLE = new Observable();
@@ -25,7 +25,9 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
     private String header;
     private String text;
     private String imageFileName;
+    private String videoFileName;
     private Button nextButton;
+    private MediaController mediaController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,15 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.activity_instruction);
         getIntentExtras();
         initViews();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Hiding mediaController to prevent window leaked error which leads to app crash
+        if (mediaController != null) {
+            mediaController.hide();
+        }
     }
 
     private void getIntentExtras() {
@@ -45,11 +56,15 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
         if (getIntent().getStringExtra(Config.INSTRUCTION_IMAGE_KEY) != null) {
             imageFileName = getIntent().getStringExtra(Config.INSTRUCTION_IMAGE_KEY);
         }
+        if (getIntent().getStringExtra(Config.INSTRUCTION_VIDEO_KEY) != null) {
+            videoFileName = getIntent().getStringExtra(Config.INSTRUCTION_VIDEO_KEY);
+        }
     }
 
     private void initViews() {
         TextView headerTextView = findViewById(R.id.instructionHeader);
         ImageView imageView = findViewById(R.id.instructionImageView);
+        VideoView videoView = findViewById(R.id.instructionVideoView);
         TextView bodyTextView = findViewById(R.id.instructionText);
         nextButton = findViewById(R.id.instructionNextButton);
         nextButton.setOnClickListener(this);
@@ -66,11 +81,23 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
             bodyTextView.setVisibility(View.GONE);
         }
         if (imageFileName != null) {
-            Uri image = Uri.parse("android.resource://" + this.getPackageName() + "/drawable/" + imageFileName);
-            imageView.setImageURI(image);
+            Uri imageUri = Uri.parse("android.resource://" + this.getPackageName() + "/drawable/" + imageFileName);
+            imageView.setImageURI(imageUri);
         }
         else {
             imageView.setVisibility(View.GONE);
+        }
+        if (videoFileName != null) {
+            imageView.setVisibility(View.INVISIBLE);
+            mediaController = new MediaController(this);
+            mediaController.setAnchorView(videoView);
+            videoView.setMediaController(mediaController);
+            Uri videoUri = Uri.parse("android.resource://" + this.getPackageName() + "/raw/" + videoFileName);
+            videoView.setVideoURI(videoUri);
+            videoView.start();
+        }
+        else {
+            videoView.setVisibility(View.GONE);
         }
     }
 

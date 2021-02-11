@@ -5,44 +5,27 @@ import java.util.ArrayList;
 public class Experiment {
 
     private String name;
-    private long startTimeInMillis;
-    private int notificationDurationInMin;
-    private ArrayList<Survey> surveys;
+    private ArrayList<ExperimentGroup> groups;
 
-    public Experiment(String name, int notificationDurationInMin) {
+    public Experiment(String name) {
         this.name = name;
-        this.notificationDurationInMin = notificationDurationInMin;
-        surveys = new ArrayList<>();
+        groups = new ArrayList<>();
     }
 
-    public void setStartTimeInMillis(long startTimeInMillis) {
-        this.startTimeInMillis = startTimeInMillis;
+    public void addExperimentGroup(ExperimentGroup group) {
+        groups.add(group);
     }
 
-    public long getStartTimeInMillis() {
-        return startTimeInMillis;
-    }
-
-    public void addSurvey(Survey survey) {
-        surveys.add(survey);
-    }
-
-    public Survey getFirstSurvey() {
-        if (!surveys.isEmpty()) {
-            return surveys.get(0);
+    public ExperimentGroup getExperimentGroupByName(String groupName) {
+        for (ExperimentGroup group: groups) {
+            if (group.getName().equals(groupName)) {
+                return group;
+            }
         }
         return null;
     }
 
-    public ArrayList<Survey> getSurveys() {
-        return surveys;
-    }
-
-    public int getNotificationDurationInMin() {
-        return notificationDurationInMin;
-    }
-
-    public void setNotificationDurationInMin(int notificationDurationInMin) {
-        this.notificationDurationInMin = notificationDurationInMin;
+    public ArrayList<ExperimentGroup> getExperimentGroups() {
+        return groups;
     }
 }

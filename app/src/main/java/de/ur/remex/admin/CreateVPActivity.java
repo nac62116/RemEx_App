@@ -6,8 +6,11 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,13 +21,13 @@ import de.ur.remex.R;
 import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.utilities.ExperimentAlarmManager;
 
-public class CreateVPActivity extends AppCompatActivity implements View.OnClickListener {
+public class CreateVPActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private EditText vpIdEditText;
-    private Button vpGroupButton;
     private EditText startDateEditText;
     private EditText startTimeEditText;
     private Button createVPButton;
+    private String selectedGroup;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -36,11 +39,16 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
     private void init() {
         restartAutoExitTimer();
         vpIdEditText = findViewById(R.id.inputVPid);
-        vpGroupButton = findViewById(R.id.inputVPGroup);
         startDateEditText = findViewById(R.id.startDate);
         startTimeEditText = findViewById(R.id.startTime);
         createVPButton = findViewById(R.id.createVP);
-        vpGroupButton.setOnClickListener(this);
+        Spinner vpGroupSpinner = findViewById(R.id.inputVPGroup);
+        String[] groups = this.getIntent().getStringArrayExtra(Config.GROUP_NAMES_KEY);
+        selectedGroup = groups[0];
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, groups);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        vpGroupSpinner.setAdapter(adapter);
+        vpGroupSpinner.setOnItemSelectedListener(this);
         startDateEditText.setOnClickListener(this);
         startTimeEditText.setOnClickListener(this);
         createVPButton.setOnClickListener(this);
@@ -49,9 +57,6 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onClick(View v) {
         restartAutoExitTimer();
-        if (vpGroupButton.equals(v)) {
-            // TODO: Convert vpGroupButton to dropdown menu with group data from current experiment
-        }
         if (startDateEditText.equals(v)) {
             DatePickerDialog datePickerDialog = createDatePickerDialog();
             datePickerDialog.show();
@@ -80,8 +85,8 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
 
     private long getStartTimeInMs() {
         Calendar calendar = Calendar.getInstance();
-        // TODO: Move line "long startTimeInMs..." under "calender.set(..." and remove "+ 30 * 1000"
-        long startTimeInMs = calendar.getTimeInMillis() + 30 * 1000;
+        // TODO: Move line "long startTimeInMs..." under "calender.set(..."
+        long startTimeInMs = calendar.getTimeInMillis();
         // Format: dd.mm.yyyy
         String startDate = startDateEditText.getText().toString();
         // Format: hh:mm Uhr
@@ -207,7 +212,7 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
 
     private void saveVpInternalStorage() {
         String vpId = vpIdEditText.getText().toString();
-        String group = vpGroupButton.getText().toString();
+        String group = selectedGroup;
         String progress = "0";
         String startDate = startDateEditText.getText().toString();
         String startTime = startTimeEditText.getText().toString();
@@ -230,5 +235,15 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         restartAutoExitTimer();
         Intent intent = new Intent(this, AdminActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        selectedGroup = (String) parent.getItemAtPosition(position);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

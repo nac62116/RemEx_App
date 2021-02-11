@@ -58,18 +58,6 @@
         app:layout_constraintTop_toBottomOf="@+id/newVPidPrefix" />
 
     <Button
-        android:id="@+id/inputVPGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/next_button"
-        android:text="@string/vp_group_buttontext_eg"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/startTimePrefix"
-        app:layout_constraintTop_toBottomOf="@+id/inputVPid" />
-
-    <Button
         android:id="@+id/createVP"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -83,6 +71,18 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/startTime" />
+
+    <Spinner
+        android:id="@+id/inputVPGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:textAlignment="center"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/startTimePrefix"
+        app:layout_constraintTop_toBottomOf="@+id/inputVPid" />
 
     <TextView
         android:id="@+id/currentStartDatePrefix2"
@@ -100,7 +100,7 @@
         android:id="@+id/startDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="28dp"
         android:autofillHints=""
         android:focusable="false"
         android:hint="@string/create_vp_start_date_hint"

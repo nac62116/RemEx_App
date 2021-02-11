@@ -47,10 +47,12 @@ public final class Config {
     public static final String START_EXPERIMENT_KEY = "startExperiment";
     public static final String START_TIME_MS_KEY = "startTimeMs";
     public static final String PROGRESS_MAXIMUM_KEY = "progressMaximum";
+    public static final String GROUP_NAMES_KEY = "groupNames";
     public static final String STEP_ID_KEY = "stepId";
     public static final String INSTRUCTION_HEADER_KEY = "instructionHeader";
     public static final String INSTRUCTION_TEXT_KEY = "instructionText";
     public static final String INSTRUCTION_IMAGE_KEY = "instructionImage";
+    public static final String INSTRUCTION_VIDEO_KEY = "instructionVideo";
     public static final String WAITING_ROOM_TEXT_KEY = "waitingRoomText";
     public static final String BREATHING_MODE_KEY = "breathingMode";
     public static final String BREATHING_INSTRUCTION_HEADER_KEY = "breathingInstructionHeader";

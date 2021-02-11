@@ -11,7 +11,7 @@ import java.util.Observer;
 
 import de.ur.remex.admin.AdminActivity;
 import de.ur.remex.admin.LoginActivity;
-import de.ur.remex.model.experiment.Experiment;
+import de.ur.remex.model.experiment.ExperimentGroup;
 import de.ur.remex.model.experiment.Instruction;
 import de.ur.remex.model.experiment.Step;
 import de.ur.remex.model.experiment.StepType;
@@ -33,7 +33,7 @@ import de.ur.remex.view.WaitingRoomActivity;
 public class ExperimentController implements Observer {
 
     // Current Model
-    private Experiment currentExperiment;
+    private ExperimentGroup currentExperimentGroup;
     private Survey currentSurvey;
     private Step currentStep;
     private Question currentQuestion;
@@ -60,7 +60,7 @@ public class ExperimentController implements Observer {
         userIsAlreadyWaiting = false;
     }
 
-    public void startExperiment(Experiment experiment, long startTimeInMs) {
+    public void startExperiment(ExperimentGroup experimentGroup, long startTimeInMs) {
         Log.e("ExperimentController", "EVENT_EXPERIMENT_STARTED");
         InternalStorage storage = new InternalStorage(currentContext);
         // Cancel possible ongoing alarms
@@ -73,14 +73,13 @@ public class ExperimentController implements Observer {
         String vpId = storage.getFileContent(Config.FILE_NAME_ID);
         String vpGroup = storage.getFileContent(Config.FILE_NAME_GROUP);
         csvCreator = new CsvCreator();
-        csvCreator.initCsvMap(experiment.getSurveys(), vpId, vpGroup);
+        csvCreator.initCsvMap(experimentGroup.getSurveys(), vpId, vpGroup);
         storage.saveFileContent(Config.FILE_NAME_CSV, Config.INITIAL_CSV_VALUE);
-        // Set start time
-        experiment.setStartTimeInMillis(startTimeInMs);
         // Init current state
-        currentExperiment = experiment;
-        currentSurvey = currentExperiment.getFirstSurvey();
-        setSurveyAlarm(currentExperiment.getStartTimeInMillis());
+        currentExperimentGroup = experimentGroup;
+        currentExperimentGroup.setStartTimeInMillis(startTimeInMs);
+        currentSurvey = currentExperimentGroup.getFirstSurvey();
+        setSurveyAlarm(startTimeInMs);
         // Inform user
         Toast toast = Toast.makeText(currentContext, Config.EXPERIMENT_STARTED_TOAST, Toast.LENGTH_LONG);
         toast.show();
@@ -107,7 +106,7 @@ public class ExperimentController implements Observer {
                 // Creating notification
                 notificationManager.createNotification();
                 // Setting timer to close the AdminActivity (App Launcher) entrance after the notification expired
-                alarmManager.setNotificationTimeoutAlarm(currentExperiment.getNotificationDurationInMin());
+                alarmManager.setNotificationTimeoutAlarm(currentSurvey.getNotificationDurationInMin());
                 break;
 
             case Config.EVENT_NOTIFICATION_TIMEOUT:
@@ -117,7 +116,7 @@ public class ExperimentController implements Observer {
                 // Closing the AdminActivity (App Launcher) entrance
                 internalStorage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, Config.SURVEY_ENTRANCE_CLOSED);
                 // Prepare next survey
-                long referenceTime = calendar.getTimeInMillis() - currentExperiment.getNotificationDurationInMin() * 60 * 1000;
+                long referenceTime = calendar.getTimeInMillis() - currentSurvey.getNotificationDurationInMin() * 60 * 1000;
                 prepareNextSurvey(referenceTime);
                 break;
 
@@ -190,7 +189,7 @@ public class ExperimentController implements Observer {
         }
         else {
             alarmManager.setAbsoluteSurveyAlarm(currentSurvey.getId(),
-                    currentExperiment.getStartTimeInMillis(),
+                    currentExperimentGroup.getStartTimeInMillis(),
                     currentSurvey.getAbsoluteStartAtHour(),
                     currentSurvey.getAbsoluteStartAtMinute(),
                     currentSurvey.getAbsoluteStartDaysOffset());
@@ -212,6 +211,7 @@ public class ExperimentController implements Observer {
             intent.putExtra(Config.INSTRUCTION_HEADER_KEY, instruction.getHeader());
             intent.putExtra(Config.INSTRUCTION_TEXT_KEY, instruction.getText());
             intent.putExtra(Config.INSTRUCTION_IMAGE_KEY, instruction.getImageFileName());
+            intent.putExtra(Config.INSTRUCTION_VIDEO_KEY, instruction.getVideoFileName());
             currentContext.startActivity(intent);
         }
         else if (nextStep.getType().equals(StepType.BREATHING_EXERCISE)) {

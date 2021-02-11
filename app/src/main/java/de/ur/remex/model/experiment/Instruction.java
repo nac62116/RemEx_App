@@ -5,6 +5,7 @@ public class Instruction extends Step {
     private String header;
     // Max characters: 350 (with image), 500 (without image)
     private String text;
+    // Either image or video in one Instruction
     private String imageFileName;
     private String videoFileName;
     private int durationInMin;
@@ -63,5 +64,13 @@ public class Instruction extends Step {
 
     public void setWaitingText(String waitingText) {
         this.waitingText = waitingText;
+    }
+
+    public String getVideoFileName() {
+        return videoFileName;
+    }
+
+    public void setVideoFileName(String videoFileName) {
+        this.videoFileName = videoFileName;
     }
 }

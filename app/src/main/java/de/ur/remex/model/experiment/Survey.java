@@ -16,23 +16,26 @@ public class Survey {
     private int absoluteStartDaysOffset;
     // Calculate min maxDuration
     private int maxDurationInMin;
+    private int notificationDurationInMin;
     private Survey nextSurvey;
     private ArrayList<Step> steps;
 
-    public Survey(String name, int relativeStartTimeInMillis, int maxDurationInMin) {
+    public Survey(String name, int relativeStartTimeInMillis, int maxDurationInMin, int notificationDurationInMin) {
         this.name = name;
         this.relativeStartTimeInMillis = relativeStartTimeInMillis;
+        this.notificationDurationInMin = notificationDurationInMin;
         isRelative = true;
         this.maxDurationInMin = maxDurationInMin;
         steps = new ArrayList<>();
     }
 
     public Survey(String name, int absoluteStartAtHour, int absoluteStartAtMinute,
-                  int absoluteStartDaysOffset, int maxDurationInMin) {
+                  int absoluteStartDaysOffset, int maxDurationInMin, int notificationDurationInMin) {
         this.name = name;
         this.absoluteStartAtHour = absoluteStartAtHour;
         this.absoluteStartAtMinute = absoluteStartAtMinute;
         this.absoluteStartDaysOffset = absoluteStartDaysOffset;
+        this.notificationDurationInMin = notificationDurationInMin;
         isRelative = false;
         this.maxDurationInMin = maxDurationInMin;
         steps = new ArrayList<>();
@@ -101,5 +104,9 @@ public class Survey {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getNotificationDurationInMin() {
+        return notificationDurationInMin;
     }
 }

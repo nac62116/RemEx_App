@@ -23,6 +23,7 @@ import de.ur.remex.Config;
 import de.ur.remex.R;
 import de.ur.remex.controller.ExperimentController;
 import de.ur.remex.model.experiment.Experiment;
+import de.ur.remex.model.experiment.ExperimentGroup;
 import de.ur.remex.model.experiment.Instruction;
 import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
@@ -33,7 +34,7 @@ import de.ur.remex.utilities.ExperimentAlarmManager;
 import de.ur.remex.utilities.Observable;
 
 // TODO: Make password changeable
-// TODO: Implement Activity Lifecycle funtionality (Home Button, etc...)
+// TODO: Implement Activity Lifecycle functionality (Home Button, etc...)
 
 public class AdminActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -42,6 +43,8 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
     private Button testRunButton;
     private Button loadExperimentButton;
     private Button logoutButton;
+
+    private Experiment experiment;
 
     private static final Observable OBSERVABLE = new Observable();
 
@@ -52,6 +55,8 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
+        // Get current experiment
+        experiment = getExperiment();
         // Check for create CSV request
         boolean createCsv = this.getIntent().getBooleanExtra(Config.CREATE_CSV_KEY, false);
         if (createCsv) {
@@ -67,10 +72,12 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
 
     private void startExperiment() {
         // Create new ExperimentController and start experiment
-        Experiment experiment = createExperiment();
+        InternalStorage storage = new InternalStorage(this);
+        String vpGroup = storage.getFileContent(Config.FILE_NAME_GROUP);
+        ExperimentGroup group = experiment.getExperimentGroupByName(vpGroup);
         long startTimeInMs = this.getIntent().getLongExtra(Config.START_TIME_MS_KEY, 0);
         ExperimentController experimentController = new ExperimentController(this);
-        experimentController.startExperiment(experiment, startTimeInMs);
+        experimentController.startExperiment(group, startTimeInMs);
     }
 
     private void createCsv() {
@@ -161,9 +168,16 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         if (currentVPButton.equals(v)) {
             restartAutoExitTimer();
-            Experiment experiment = createExperiment();
+            InternalStorage storage = new InternalStorage(this);
+            String vpGroup = storage.getFileContent(Config.FILE_NAME_GROUP);
+            ExperimentGroup group = experiment.getExperimentGroupByName(vpGroup);
             Intent intent = new Intent(this, CurrentVPActivity.class);
-            intent.putExtra(Config.PROGRESS_MAXIMUM_KEY, experiment.getSurveys().size());
+            if (group != null) {
+                intent.putExtra(Config.PROGRESS_MAXIMUM_KEY, group.getSurveys().size());
+            }
+            else {
+                intent.putExtra(Config.PROGRESS_MAXIMUM_KEY, 1);
+            }
             startActivity(intent);
         }
         else if (logoutButton.equals(v)) {
@@ -175,15 +189,28 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         }
         else if (createVPButton.equals(v)) {
             restartAutoExitTimer();
+            ArrayList<ExperimentGroup> groups = experiment.getExperimentGroups();
+            String[] groupNames = new String[groups.size()];
+            for (int i = 0; i < groups.size(); i++) {
+                groupNames[i] = groups.get(i).getName();
+            }
             Intent intent = new Intent(this, CreateVPActivity.class);
+            intent.putExtra(Config.GROUP_NAMES_KEY, groupNames);
             startActivity(intent);
         }
         else if (loadExperimentButton.equals(v)) {
-            // TODO: Implement Loading Experiment
+            // TODO: Implement Loading Experiment as JSON into internal storage and update experiment variable
+            // Save new experiment in internal storage
+            // experiment = getExperiment
         }
         else if (testRunButton.equals(v)) {
             // TODO: Implement Test Experiment
         }
+    }
+    // TODO: Get experiment JSON from internal storage
+    private Experiment getExperiment() {
+        // Get experiment from internal storage
+        return createExperiment();
     }
 
     private void restartAutoExitTimer() {
@@ -207,13 +234,15 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         //
     }
 
-    // TODO: The experiment object will be created by the RemEx Interface in the future
+    // TODO: The experiment object will be created by the RemEx Interface in the future.
     private Experiment createExperiment() {
-        Experiment experiment = new Experiment("Test Experiment", 1);
+        Experiment experiment = new Experiment("Test Experiment");
+        ExperimentGroup experimentGroup = new ExperimentGroup("Experiment Group");
+        ExperimentGroup controlGroup = new ExperimentGroup("Control Group");
 
-        Survey survey1 = new Survey("Survey1 +1 Min", 0, 3);
+        Survey survey1 = new Survey("Survey1 +1 Min", 0, 3, 5);
         survey1.setId(1);
-        Survey survey2 = new Survey("Survey2 +2 Min", 60 * 1000, 3);
+        Survey survey2 = new Survey("Survey2 +2 Min", 60 * 1000, 3, 5);
         survey2.setId(2);
 
         // Building instruction steps
@@ -228,8 +257,11 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
             else {
                 instruction.setText("Super, vielen Dank. Deine aktive Teilnahme wird vermerkt. Toll gemacht! Denke daran, dass die zwei Tage der Befragung am Smartphone nun vorbei sind und dein Besuch am Lehrstuhl für Kinder- und Jugendpsychiatrie und -psychotherapie bevorsteht.");
             }
-            if (i != 3) {
+            if (i != 3 && i != 4) {
                 instruction.setImageFileName("salivette1");
+            }
+            if (i == 4) {
+                instruction.setVideoFileName("test_video");
             }
 
             /* Setting an ongoing instruction
@@ -377,8 +409,14 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         survey1.setNextSurvey(survey2);
         survey2.setNextSurvey(null);
 
-        experiment.addSurvey(survey1);
-        experiment.addSurvey(survey2);
+        experimentGroup.addSurvey(survey1);
+        experimentGroup.addSurvey(survey2);
+
+        controlGroup.addSurvey(survey1);
+        controlGroup.addSurvey(survey2);
+
+        experiment.addExperimentGroup(experimentGroup);
+        experiment.addExperimentGroup(controlGroup);
 
         return experiment;
     }

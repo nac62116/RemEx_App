@@ -75,7 +75,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         InternalStorage storage = new InternalStorage(this);
 
         // TODO: Remove this line
-        //storage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, Config.SURVEY_ENTRANCE_CLOSED);
+        storage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, Config.SURVEY_ENTRANCE_CLOSED);
 
 
         String experimentActive = storage.getFileContent(Config.FILE_NAME_SURVEY_ENTRANCE);
