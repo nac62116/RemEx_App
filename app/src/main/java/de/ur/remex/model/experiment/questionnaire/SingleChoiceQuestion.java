@@ -15,7 +15,33 @@ public class SingleChoiceQuestion extends Question {
         return answers;
     }
 
+    public String[] getAnswerTexts() {
+        String[] answerTexts = new String[answers.size()];
+        for (int i = 0; i < answerTexts.length; i++) {
+            answerTexts[i] = answers.get(i).getText();
+        }
+        return answerTexts;
+    }
+
+    public String getCodeByAnswerText(String answerText) {
+        for (Answer a: answers) {
+            if (a.getText().equals(answerText)) {
+                return a.getCode();
+            }
+        }
+        return null;
+    }
+
     public void addAnswer(Answer answer) {
         this.answers.add(answer);
+    }
+
+    public Question getNextQuestionByAnswerText(String answerText) {
+        for (Answer a: answers) {
+            if (a.getText().equals(answerText)) {
+                return a.getNextQuestion();
+            }
+        }
+        return null;
     }
 }

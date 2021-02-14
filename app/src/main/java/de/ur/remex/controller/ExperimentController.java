@@ -18,6 +18,9 @@ import de.ur.remex.model.experiment.StepType;
 import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
 import de.ur.remex.model.experiment.questionnaire.Question;
+import de.ur.remex.model.experiment.questionnaire.QuestionType;
+import de.ur.remex.model.experiment.questionnaire.Questionnaire;
+import de.ur.remex.model.experiment.questionnaire.SingleChoiceQuestion;
 import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.utilities.AlarmReceiver;
 import de.ur.remex.utilities.CsvCreator;
@@ -27,6 +30,7 @@ import de.ur.remex.utilities.ExperimentAlarmManager;
 import de.ur.remex.utilities.ExperimentNotificationManager;
 import de.ur.remex.view.BreathingExerciseActivity;
 import de.ur.remex.view.InstructionActivity;
+import de.ur.remex.view.SingleChoiceQuestionActivity;
 import de.ur.remex.view.SurveyEntranceActivity;
 import de.ur.remex.view.WaitingRoomActivity;
 
@@ -51,12 +55,14 @@ public class ExperimentController implements Observer {
         WaitingRoomActivity waitingRoomActivity = new WaitingRoomActivity();
         SurveyEntranceActivity surveyEntranceActivity = new SurveyEntranceActivity();
         AdminActivity adminActivity = new AdminActivity();
+        SingleChoiceQuestionActivity singleChoiceQuestionActivity = new SingleChoiceQuestionActivity();
         instructionActivity.addObserver(this);
         breathingExerciseActivity.addObserver(this);
         surveyEntranceActivity.addObserver(this);
         alarmReceiver.addObserver(this);
         waitingRoomActivity.addObserver(this);
         adminActivity.addObserver(this);
+        singleChoiceQuestionActivity.addObserver(this);
         userIsAlreadyWaiting = false;
     }
 
@@ -230,6 +236,18 @@ public class ExperimentController implements Observer {
         else if (nextStep.getType().equals(StepType.QUESTIONNAIRE)) {
             Log.e("ExperimentController", "Init Questionnaire");
             // TODO: QuestionnaireActivity
+            Questionnaire questionnaire = (Questionnaire) nextStep;
+            currentQuestion = questionnaire.getFirstQuestion();
+            Intent intent = new Intent();
+            if (currentQuestion.getType().equals(QuestionType.SINGLE_CHOICE)) {
+                SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) currentQuestion;
+                intent = new Intent(currentContext, SingleChoiceQuestionActivity.class);
+                intent.putExtra(Config.ANSWER_TEXTS_KEY, singleChoiceQuestion.getAnswerTexts());
+            }
+            intent.putExtra(Config.QUESTIONNAIRE_INSTRUCTION_KEY, questionnaire.getInstructionText());
+            intent.putExtra(Config.QUESTION_TEXT_KEY, currentQuestion.getText());
+            intent.putExtra(Config.QUESTION_HINT_KEY, currentQuestion.getHint());
+            currentContext.startActivity(intent);
         }
     }
 

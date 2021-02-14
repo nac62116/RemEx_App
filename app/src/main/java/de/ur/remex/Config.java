@@ -61,6 +61,10 @@ public final class Config {
     public static final String BREATHING_DISCHARGE_TEXT_KEY = "breathingDischargeText";
     public static final String BREATHING_DURATION_KEY = "breathingDuration";
     public static final String BREATHING_FREQUENCY_KEY = "breathingFrequency";
+    public static final String QUESTIONNAIRE_INSTRUCTION_KEY = "questionnaireInstruction";
+    public static final String QUESTION_TEXT_KEY = "questionText";
+    public static final String QUESTION_HINT_KEY = "questionHint";
+    public static final String ANSWER_TEXTS_KEY = "answerTexts";
 
     // Alarm purposes
     public static final String PURPOSE_SURVEY_ALARM = "surveyAlarm";

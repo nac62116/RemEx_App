@@ -44,7 +44,13 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         createVPButton = findViewById(R.id.createVP);
         Spinner vpGroupSpinner = findViewById(R.id.inputVPGroup);
         String[] groups = this.getIntent().getStringArrayExtra(Config.GROUP_NAMES_KEY);
-        selectedGroup = groups[0];
+        if (groups != null) {
+            selectedGroup = groups[0];
+        }
+        else {
+            groups = new String[0];
+            selectedGroup = "";
+        }
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, groups);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         vpGroupSpinner.setAdapter(adapter);

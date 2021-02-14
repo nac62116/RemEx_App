@@ -5,9 +5,11 @@ import de.ur.remex.model.experiment.StepType;
 
 public class BreathingExercise extends Step {
 
+    // Max characters: 50
     private String instructionHeader;
     // Max characters: 500
     private String instructionText;
+    // Max characters: 50
     private String dischargeHeader;
     // Max characters: 500
     private String dischargeText;

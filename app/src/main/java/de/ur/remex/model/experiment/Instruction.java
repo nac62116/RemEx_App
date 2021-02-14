@@ -2,6 +2,7 @@ package de.ur.remex.model.experiment;
 
 public class Instruction extends Step {
 
+    // Max characters: 50
     private String header;
     // Max characters: 350 (with image), 500 (without image)
     private String text;
