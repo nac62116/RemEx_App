@@ -27,7 +27,7 @@
         <activity android:name=".view.SurveyEntranceActivity" android:screenOrientation="portrait" android:noHistory="true"/>
         <activity android:name=".view.WaitingRoomActivity" android:screenOrientation="portrait" android:noHistory="true"/>
         <activity android:name=".view.BreathingExerciseActivity" android:screenOrientation="portrait" android:noHistory="true"/>
-        <activity android:name=".view.SingleChoiceQuestionActivity" android:screenOrientation="portrait" android:noHistory="true"/>
+        <activity android:name=".view.ChoiceQuestionActivity" android:screenOrientation="portrait" android:noHistory="true"/>
 
         <receiver android:name=".utilities.AlarmReceiver">
         </receiver>

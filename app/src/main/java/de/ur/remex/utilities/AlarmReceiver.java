@@ -32,7 +32,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                     break;
                 case Config.PURPOSE_STEP_TIMER:
                     int stepId = intent.getIntExtra(Config.STEP_ID_KEY, 0);
-                    event = new Event(null, Config.EVENT_STEP_TIMER, Integer.toString(stepId));
+                    event = new Event(null, Config.EVENT_STEP_TIMER, stepId);
                     break;
                 case Config.PURPOSE_ADMIN_TIMEOUT:
                     Log.e("AlarmReceiver", "EVENT_ADMIN_TIMEOUT");

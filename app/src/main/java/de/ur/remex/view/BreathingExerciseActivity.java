@@ -23,14 +23,10 @@ public class BreathingExerciseActivity extends AppCompatActivity {
 
     private static final Observable OBSERVABLE = new Observable();
 
-    // Instruction and discharge
-    private TextView instructionHeaderView;
-    private TextView instructionTextView;
-    private Button instructionNextButton;
-
     // Breathing exercise
     private TextView timeTextView;
     private TextView circleTextView;
+    private Button nextButton;
     private ImageView breathingCircleView;
     private MediaPlayer mediaPlayer;
     private int progressCounterInMillis;
@@ -39,48 +35,30 @@ public class BreathingExerciseActivity extends AppCompatActivity {
 
     // Model
     private BreathingMode mode;
-    private String instructionHeader;
-    private String instructionText;
-    private String dischargeHeader;
-    private String dischargeText;
     private int durationInMin;
     private int breathingFrequencyInSec;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_breathing_instruction);
+        setContentView(R.layout.activity_breathing_exercise);
         getIntentExtras();
-        initInstruction();
+        initBreathingExercise();
     }
 
     private void getIntentExtras() {
         mode = (BreathingMode) getIntent().getSerializableExtra(Config.BREATHING_MODE_KEY);
-        instructionHeader = getIntent().getStringExtra(Config.BREATHING_INSTRUCTION_HEADER_KEY);
-        instructionText = getIntent().getStringExtra(Config.BREATHING_INSTRUCTION_TEXT_KEY);
-        dischargeHeader = getIntent().getStringExtra(Config.BREATHING_DISCHARGE_HEADER_KEY);
-        dischargeText = getIntent().getStringExtra(Config.BREATHING_DISCHARGE_TEXT_KEY);
         durationInMin = getIntent().getIntExtra(Config.BREATHING_DURATION_KEY, 0);
         breathingFrequencyInSec = getIntent().getIntExtra(Config.BREATHING_FREQUENCY_KEY, 0);
     }
 
-    private void initInstruction() {
-        instructionHeaderView = findViewById(R.id.breathingInstructionHeader);
-        instructionTextView = findViewById(R.id.breathingInstructionText);
-        instructionNextButton = findViewById(R.id.breathingInstructionNextButton);
-        instructionHeaderView.setText(instructionHeader);
-        instructionTextView.setText(instructionText);
-        instructionNextButton.setOnClickListener(v -> initBreathingExercise());
-    }
-
     private void initBreathingExercise() {
-        setContentView(R.layout.activity_breathing_exercise);
         circleTextView = findViewById(R.id.circleText);
         timeTextView = findViewById(R.id.breathingHeader);
         breathingCircleView = findViewById(R.id.breathCircle);
-        Button breathingNextButton = findViewById(R.id.breathingNextButton);
+        nextButton = findViewById(R.id.breathingNextButton);
         mediaPlayer = null;
-        breathingNextButton.setVisibility(View.INVISIBLE);
+        nextButton.setVisibility(View.INVISIBLE);
         String duration;
         if (durationInMin < 10) {
             duration = "0" + durationInMin + ":00";
@@ -170,7 +148,7 @@ public class BreathingExerciseActivity extends AppCompatActivity {
 
         if (progressCounterInMillis >= durationInMillis) {
             timer.cancel();
-            initDischarge();
+            finishExercise();
         }
         progressCounterInMillis += Config.BREATHING_TIMER_FREQUENCY_MS;
     }
@@ -204,14 +182,9 @@ public class BreathingExerciseActivity extends AppCompatActivity {
         timeTextView.setText(newTimeString);
     }
 
-    private void initDischarge() {
-        setContentView(R.layout.activity_breathing_instruction);
-        instructionHeaderView = findViewById(R.id.breathingInstructionHeader);
-        instructionTextView = findViewById(R.id.breathingInstructionText);
-        instructionNextButton = findViewById(R.id.breathingInstructionNextButton);
-        instructionHeaderView.setText(dischargeHeader);
-        instructionTextView.setText(dischargeText);
-        instructionNextButton.setOnClickListener(v -> {
+    private void finishExercise() {
+        nextButton.setVisibility(View.VISIBLE);
+        nextButton.setOnClickListener(v -> {
             Event event = new Event(this, Config.EVENT_NEXT_STEP, null);
             OBSERVABLE.notifyExperimentController(event);
         });

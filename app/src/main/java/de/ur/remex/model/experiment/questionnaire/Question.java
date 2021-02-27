@@ -5,6 +5,7 @@ import de.ur.remex.model.experiment.StepType;
 public abstract class Question {
 
     protected QuestionType type;
+    // Has to be unique inside one survey
     protected String name;
     // Max characters 130
     protected String text;

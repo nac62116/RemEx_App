@@ -5,14 +5,12 @@ import de.ur.remex.model.experiment.StepType;
 
 public class BreathingExercise extends Step {
 
-    // Max characters: 50
-    private String instructionHeader;
-    // Max characters: 500
-    private String instructionText;
-    // Max characters: 50
-    private String dischargeHeader;
-    // Max characters: 500
-    private String dischargeText;
+    // RemEx Interface: For below attributes create two hidden instructions, one before and one after the breathingExercise step.
+    // instructionText
+    // instructionHeader
+    // dischargeText
+    // dischargeHeader
+
     // int value! max duration = 60
     private int durationInMin;
     // min 2, max 10
@@ -22,23 +20,6 @@ public class BreathingExercise extends Step {
 
     public BreathingExercise() {
         type = StepType.BREATHING_EXERCISE;
-    }
-
-
-    public String getInstructionHeader() {
-        return instructionHeader;
-    }
-
-    public void setInstructionHeader(String instructionHeader) {
-        this.instructionHeader = instructionHeader;
-    }
-
-    public String getInstructionText() {
-        return instructionText;
-    }
-
-    public void setInstructionText(String instructionText) {
-        this.instructionText = instructionText;
     }
 
     public int getDurationInMin() {
@@ -63,21 +44,5 @@ public class BreathingExercise extends Step {
 
     public void setMode(BreathingMode mode) {
         this.mode = mode;
-    }
-
-    public String getDischargeHeader() {
-        return dischargeHeader;
-    }
-
-    public void setDischargeHeader(String dischargeHeader) {
-        this.dischargeHeader = dischargeHeader;
-    }
-
-    public String getDischargeText() {
-        return dischargeText;
-    }
-
-    public void setDischargeText(String dischargeText) {
-        this.dischargeText = dischargeText;
     }
 }

@@ -7,7 +7,11 @@ import de.ur.remex.model.experiment.StepType;
 
 public class Questionnaire extends Step {
 
-    private String instructionText;
+    // RemEx Interface: For below attributes create two hidden instructions, one before and one after the questionnaire step.
+    // instructionText
+    // instructionHeader
+    // dischargeText
+    // dischargeHeader
     private ArrayList<Question> questions;
 
     public Questionnaire() {
@@ -25,13 +29,5 @@ public class Questionnaire extends Step {
 
     public void addQuestion(Question question) {
         questions.add(question);
-    }
-
-    public String getInstructionText() {
-        return instructionText;
-    }
-
-    public void setInstructionText(String instructionText) {
-        this.instructionText = instructionText;
     }
 }

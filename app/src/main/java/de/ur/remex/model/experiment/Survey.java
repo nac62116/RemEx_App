@@ -6,6 +6,7 @@ public class Survey {
 
     // Id must have an unique value excluding 0 -> RemEx Interface
     private int id;
+    // Has to be unique
     private String name;
     // Calculated relative to a given time (f.e. last survey finish, experimentStart, etc..)
     private long relativeStartTimeInMillis;

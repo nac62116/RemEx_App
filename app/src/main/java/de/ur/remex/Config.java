@@ -5,12 +5,13 @@ package de.ur.remex;
 // Can't be extended
 public final class Config {
 
+
     private Config() {
         // Can't be instantiated
     }
 
     // General app settings
-    public static final int ADMIN_TIMEOUT_MIN = 1;
+    public static final int ADMIN_TIMEOUT_MIN = 10;
     public static final String INITIAL_PASSWORD = "";
     public static final String PASSWORD_ALERT_TITLE = "Login fehlgeschlagen";
     public static final String PASSWORD_ALERT_MESSAGE = "Das eingegebene Passwort ist falsch.";
@@ -55,15 +56,11 @@ public final class Config {
     public static final String INSTRUCTION_VIDEO_KEY = "instructionVideo";
     public static final String WAITING_ROOM_TEXT_KEY = "waitingRoomText";
     public static final String BREATHING_MODE_KEY = "breathingMode";
-    public static final String BREATHING_INSTRUCTION_HEADER_KEY = "breathingInstructionHeader";
-    public static final String BREATHING_INSTRUCTION_TEXT_KEY = "breathingInstructionText";
-    public static final String BREATHING_DISCHARGE_HEADER_KEY = "breathingDischargeHeader";
-    public static final String BREATHING_DISCHARGE_TEXT_KEY = "breathingDischargeText";
     public static final String BREATHING_DURATION_KEY = "breathingDuration";
     public static final String BREATHING_FREQUENCY_KEY = "breathingFrequency";
-    public static final String QUESTIONNAIRE_INSTRUCTION_KEY = "questionnaireInstruction";
     public static final String QUESTION_TEXT_KEY = "questionText";
     public static final String QUESTION_HINT_KEY = "questionHint";
+    public static final String QUESTION_TYPE_KEY = "questionType";
     public static final String ANSWER_TEXTS_KEY = "answerTexts";
 
     // Alarm purposes

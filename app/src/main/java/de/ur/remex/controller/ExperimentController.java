@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Observable;
 import java.util.Observer;
@@ -17,6 +18,7 @@ import de.ur.remex.model.experiment.Step;
 import de.ur.remex.model.experiment.StepType;
 import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
+import de.ur.remex.model.experiment.questionnaire.MultipleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.Question;
 import de.ur.remex.model.experiment.questionnaire.QuestionType;
 import de.ur.remex.model.experiment.questionnaire.Questionnaire;
@@ -30,7 +32,7 @@ import de.ur.remex.utilities.ExperimentAlarmManager;
 import de.ur.remex.utilities.ExperimentNotificationManager;
 import de.ur.remex.view.BreathingExerciseActivity;
 import de.ur.remex.view.InstructionActivity;
-import de.ur.remex.view.SingleChoiceQuestionActivity;
+import de.ur.remex.view.ChoiceQuestionActivity;
 import de.ur.remex.view.SurveyEntranceActivity;
 import de.ur.remex.view.WaitingRoomActivity;
 
@@ -55,14 +57,14 @@ public class ExperimentController implements Observer {
         WaitingRoomActivity waitingRoomActivity = new WaitingRoomActivity();
         SurveyEntranceActivity surveyEntranceActivity = new SurveyEntranceActivity();
         AdminActivity adminActivity = new AdminActivity();
-        SingleChoiceQuestionActivity singleChoiceQuestionActivity = new SingleChoiceQuestionActivity();
+        ChoiceQuestionActivity choiceQuestionActivity = new ChoiceQuestionActivity();
         instructionActivity.addObserver(this);
         breathingExerciseActivity.addObserver(this);
         surveyEntranceActivity.addObserver(this);
         alarmReceiver.addObserver(this);
         waitingRoomActivity.addObserver(this);
         adminActivity.addObserver(this);
-        singleChoiceQuestionActivity.addObserver(this);
+        choiceQuestionActivity.addObserver(this);
         userIsAlreadyWaiting = false;
     }
 
@@ -144,12 +146,39 @@ public class ExperimentController implements Observer {
                 // TODO: CsvCreator: Update hashmap with questionName (key) and event.getData() (value).
                 //  Prepare next question.
                 //  If null switch to next step (Function in EVENT_NEXT_STEP)
+                if (currentQuestion.getType().equals(QuestionType.SINGLE_CHOICE)) {
+                    SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) currentQuestion;
+                    String answerText = (String) event.getData();
+                    String answerCode = singleChoiceQuestion.getCodeByAnswerText(answerText);
+                    csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                            answerCode, calendar.getTime().toString());
+                    currentQuestion = singleChoiceQuestion.getNextQuestionByAnswerText(answerText);
+                }
+                else if (currentQuestion.getType().equals(QuestionType.MULTIPLE_CHOICE)) {
+                    MultipleChoiceQuestion multipleChoiceQuestion = (MultipleChoiceQuestion) currentQuestion;
+                    @SuppressWarnings("unchecked")
+                    ArrayList<String> answerTexts = (ArrayList<String>) event.getData();
+                    StringBuilder answerCode = new StringBuilder();
+                    for (String answerText: answerTexts) {
+                        answerCode.append(multipleChoiceQuestion.getCodeByAnswerText(answerText));
+                    }
+                    csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                            answerCode.toString(), calendar.getTime().toString());
+                    currentQuestion = multipleChoiceQuestion.getNextQuestion();
+                }
+                if (currentQuestion != null) {
+                    Log.e("ExperimentController", "navigating to next question");
+                    navigateToQuestion(currentQuestion);
+                }
+                else {
+                    switchToNextStep(alarmManager, calendar);
+                }
                 break;
 
             case Config.EVENT_STEP_TIMER:
                 Log.e("ExperimentController", "EVENT_STEP_TIMER");
-                String stepId = event.getData();
-                Instruction instructionToWaitFor = (Instruction) currentSurvey.getStepById(Integer.parseInt(stepId));
+                int stepId = (int) event.getData();
+                Instruction instructionToWaitFor = (Instruction) currentSurvey.getStepById(stepId);
                 instructionToWaitFor.setFinished(true);
                 if (userIsAlreadyWaiting) {
                     userIsAlreadyWaiting = false;
@@ -224,13 +253,9 @@ public class ExperimentController implements Observer {
             Log.e("ExperimentController", "Init BreathingExercise");
             BreathingExercise breathingExercise = (BreathingExercise) nextStep;
             Intent intent = new Intent(currentContext, BreathingExerciseActivity.class);
-            intent.putExtra(Config.BREATHING_INSTRUCTION_HEADER_KEY, breathingExercise.getInstructionHeader());
-            intent.putExtra(Config.BREATHING_INSTRUCTION_TEXT_KEY, breathingExercise.getInstructionText());
             intent.putExtra(Config.BREATHING_MODE_KEY, breathingExercise.getMode());
             intent.putExtra(Config.BREATHING_DURATION_KEY, breathingExercise.getDurationInMin());
             intent.putExtra(Config.BREATHING_FREQUENCY_KEY, breathingExercise.getBreathingFrequencyInSec());
-            intent.putExtra(Config.BREATHING_DISCHARGE_HEADER_KEY, breathingExercise.getDischargeHeader());
-            intent.putExtra(Config.BREATHING_DISCHARGE_TEXT_KEY, breathingExercise.getDischargeText());
             currentContext.startActivity(intent);
         }
         else if (nextStep.getType().equals(StepType.QUESTIONNAIRE)) {
@@ -238,17 +263,27 @@ public class ExperimentController implements Observer {
             // TODO: QuestionnaireActivity
             Questionnaire questionnaire = (Questionnaire) nextStep;
             currentQuestion = questionnaire.getFirstQuestion();
-            Intent intent = new Intent();
-            if (currentQuestion.getType().equals(QuestionType.SINGLE_CHOICE)) {
-                SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) currentQuestion;
-                intent = new Intent(currentContext, SingleChoiceQuestionActivity.class);
-                intent.putExtra(Config.ANSWER_TEXTS_KEY, singleChoiceQuestion.getAnswerTexts());
-            }
-            intent.putExtra(Config.QUESTIONNAIRE_INSTRUCTION_KEY, questionnaire.getInstructionText());
-            intent.putExtra(Config.QUESTION_TEXT_KEY, currentQuestion.getText());
-            intent.putExtra(Config.QUESTION_HINT_KEY, currentQuestion.getHint());
-            currentContext.startActivity(intent);
+            navigateToQuestion(currentQuestion);
         }
+    }
+
+    private void navigateToQuestion(Question nextQuestion) {
+        Intent intent = new Intent();
+        if (nextQuestion.getType().equals(QuestionType.SINGLE_CHOICE)) {
+            SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) currentQuestion;
+            intent = new Intent(currentContext, ChoiceQuestionActivity.class);
+            intent.putExtra(Config.ANSWER_TEXTS_KEY, singleChoiceQuestion.getAnswerTexts());
+            intent.putExtra(Config.QUESTION_TYPE_KEY, singleChoiceQuestion.getType());
+        }
+        else if (nextQuestion.getType().equals(QuestionType.MULTIPLE_CHOICE)) {
+            MultipleChoiceQuestion multipleChoiceQuestion = (MultipleChoiceQuestion) currentQuestion;
+            intent = new Intent(currentContext, ChoiceQuestionActivity.class);
+            intent.putExtra(Config.ANSWER_TEXTS_KEY, multipleChoiceQuestion.getAnswerTexts());
+            intent.putExtra(Config.QUESTION_TYPE_KEY, multipleChoiceQuestion.getType());
+        }
+        intent.putExtra(Config.QUESTION_TEXT_KEY, currentQuestion.getText());
+        intent.putExtra(Config.QUESTION_HINT_KEY, currentQuestion.getHint());
+        currentContext.startActivity(intent);
     }
 
     private void switchToNextStep(ExperimentAlarmManager alarmManager, Calendar calendar) {

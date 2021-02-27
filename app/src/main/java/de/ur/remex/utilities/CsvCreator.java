@@ -1,5 +1,7 @@
 package de.ur.remex.utilities;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -32,23 +34,25 @@ public class CsvCreator {
                         StringBuilder csvLine = new StringBuilder(vpId + "," + vpGroup + ",");
                         String questionName = question.getName().replace(",", "");
                         csvLine.append(surveyName).append(",").append(questionName).append(",,\n");
-                        questionMap.put(questionName, csvLine.toString());
-                        questionKeys.add(questionName);
+                        questionMap.put(surveyName + questionName, csvLine.toString());
+                        questionKeys.add(surveyName + questionName);
                     }
                 }
             }
         }
+        Log.e("CSV after initCSV:", getCsvString());
     }
 
-    public void updateCsvMap(String questionName, String answer, String timeStamp) {
-        String key = questionName.replace(",", "");
+    public void updateCsvMap(String surveyName, String questionName, String answer, String timeStamp) {
+        String key = surveyName.replace(",", "") + questionName.replace(",", "");
         String csvLine = questionMap.get(key);
         if (csvLine != null) {
-            csvLine = csvLine.substring(0, csvLine.length() - 3);
+            csvLine = csvLine.substring(0, csvLine.length() - 2);
             csvLine = csvLine + answer.replace(",", "") + "," +
                     timeStamp.replace(",", "") + "\n";
             questionMap.put(key, csvLine);
         }
+        Log.e("CSV after updateCSV:", getCsvString());
     }
 
     public String getCsvString() {

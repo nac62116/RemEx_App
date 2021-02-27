@@ -29,6 +29,7 @@ import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
 import de.ur.remex.model.experiment.breathingExercise.BreathingMode;
 import de.ur.remex.model.experiment.questionnaire.Answer;
+import de.ur.remex.model.experiment.questionnaire.MultipleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.Questionnaire;
 import de.ur.remex.model.experiment.questionnaire.SingleChoiceQuestion;
 import de.ur.remex.model.storage.InternalStorage;
@@ -283,17 +284,12 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         BreathingExercise breathingExercise = new BreathingExercise();
         breathingExercise.setId(6);
         breathingExercise.setMode(BreathingMode.MOVING_CIRCLE);
-        breathingExercise.setInstructionHeader("Atemübung");
-        breathingExercise.setInstructionText("Erklärung der Atemübung.");
-        breathingExercise.setDischargeHeader("Atemübung");
-        breathingExercise.setDischargeText("Verabschiedung der Atemübung.");
         breathingExercise.setDurationInMin(0);
         breathingExercise.setBreathingFrequencyInSec(5);
 
         // Building questionnaire
         Questionnaire questionnaire = new Questionnaire();
         questionnaire.setId(7);
-        questionnaire.setInstructionText("Instruktion des Fragebogens");
         // Building questions
         /* Text
         TextQuestion textQuestion = new TextQuestion();
@@ -306,12 +302,12 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         singleChoiceQuestion.setName("singleChoiceQuestion_0");
         singleChoiceQuestion.setText("Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt?");
         singleChoiceQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc... Warst du verägert, fröhlich, optimistisc");
-        /* Multiple choice
+        // Multiple choice
         MultipleChoiceQuestion multipleChoiceQuestion = new MultipleChoiceQuestion();
         multipleChoiceQuestion.setName("multipleChoiceQuestion_0");
         multipleChoiceQuestion.setText("Wie hat sich das ganze angefühlt?");
         multipleChoiceQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc...");
-        // Minutes
+        /* Minutes
         MinutesQuestion minutesQuestion = new MinutesQuestion();
         minutesQuestion.setName("minutesQuestion_0");
         minutesQuestion.setText("Wie lange hast du gebraucht?");
@@ -348,40 +344,40 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         Answer answerS1 = new Answer();
         answerS1.setText("Verärgert");
         answerS1.setCode("1");
-        answerS1.setNextQuestion(null); //multipleChoiceQuestion
+        answerS1.setNextQuestion(multipleChoiceQuestion); //multipleChoiceQuestion
         singleChoiceQuestion.addAnswer(answerS1);
         Answer answerS2 = new Answer();
         answerS2.setText("Fröhlich");
         answerS2.setCode("2");
-        answerS2.setNextQuestion(null); //dateQuestion
+        answerS2.setNextQuestion(multipleChoiceQuestion); //dateQuestion
         singleChoiceQuestion.addAnswer(answerS2);
         Answer answerS3 = new Answer();
         answerS3.setText("Schlecht");
         answerS3.setCode("3");
-        answerS3.setNextQuestion(null); //minuteQuestion
+        answerS3.setNextQuestion(multipleChoiceQuestion); //minuteQuestion
         singleChoiceQuestion.addAnswer(answerS3);
         Answer answerS4 = new Answer();
         answerS4.setText("Gut");
         answerS4.setCode("4");
-        answerS4.setNextQuestion(null); //minuteQuestion
+        answerS4.setNextQuestion(multipleChoiceQuestion); //minuteQuestion
         singleChoiceQuestion.addAnswer(answerS4);
         Answer answerS5 = new Answer();
         answerS5.setText("Hervorragend");
         answerS5.setCode("5");
-        answerS5.setNextQuestion(null); //minuteQuestion
+        answerS5.setNextQuestion(multipleChoiceQuestion); //minuteQuestion
         singleChoiceQuestion.addAnswer(answerS5);
-        /* Multiple choice
+        // Multiple choice
         Answer answerM1 = new Answer();
         answerM1.setText("Verärgert");
         answerM1.setCode("1");
-        answerM1.setNextQuestion(minutesQuestion);
         multipleChoiceQuestion.addAnswer(answerM1);
         Answer answerM2 = new Answer();
         answerM2.setText("Fröhlich");
         answerM2.setCode("2");
-        answerM2.setNextQuestion(minutesQuestion);
         multipleChoiceQuestion.addAnswer(answerM2);
         // Connecting questions together
+        multipleChoiceQuestion.setNextQuestion(null);
+        /*
         textQuestion.setNextQuestion(singleChoiceQuestion);
         minutesQuestion.setNextQuestion(likertQuestion);
         likertQuestion.setNextQuestion(hoursQuestion);
@@ -391,7 +387,6 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         dateQuestion.setNextQuestion(null);
         // Adding questions to questionnaire
         questionnaire.addQuestion(textQuestion);
-        questionnaire.addQuestion(multipleChoiceQuestion);
         questionnaire.addQuestion(minutesQuestion);
         questionnaire.addQuestion(likertQuestion);
         questionnaire.addQuestion(hoursQuestion);
@@ -400,6 +395,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         questionnaire.addQuestion(dateQuestion);
          */
         questionnaire.addQuestion(singleChoiceQuestion);
+        questionnaire.addQuestion(multipleChoiceQuestion);
 
         // Filling surveys with steps
         for (int i = 0; i < instructions.size(); i++) {

@@ -5,10 +5,10 @@ import android.content.Context;
 public class Event {
 
     private final String type;
-    private final String data;
+    private final Object data;
     private final Context context;
 
-    public Event(Context activityContext, String type, String data) {
+    public Event(Context activityContext, String type, Object data) {
         this.context = activityContext;
         this.data = data;
         this.type = type;
@@ -18,7 +18,7 @@ public class Event {
         return type;
     }
 
-    public String getData() {
+    public Object getData() {
         return data;
     }
 
