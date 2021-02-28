@@ -29,6 +29,7 @@ import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
 import de.ur.remex.model.experiment.breathingExercise.BreathingMode;
 import de.ur.remex.model.experiment.questionnaire.Answer;
+import de.ur.remex.model.experiment.questionnaire.DateQuestion;
 import de.ur.remex.model.experiment.questionnaire.DaytimeQuestion;
 import de.ur.remex.model.experiment.questionnaire.MultipleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.Questionnaire;
@@ -313,6 +314,10 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         DaytimeQuestion daytimeQuestion = new DaytimeQuestion();
         daytimeQuestion.setName("daytimeQuestion_0");
         daytimeQuestion.setText("Um wie viel Uhr bist du ins Bett gegangen?");
+        // Date
+        DateQuestion dateQuestion = new DateQuestion();
+        dateQuestion.setName("dateQuestion_0");
+        dateQuestion.setText("Wann hast du Geburtstag?");
         /* Minutes
         MinutesQuestion minutesQuestion = new MinutesQuestion();
         minutesQuestion.setName("minutesQuestion_0");
@@ -336,10 +341,6 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         daysQuestion.setName("daysQuestion_0");
         daysQuestion.setText("An wie vielen Tagen der letzten Woche hast du geraucht?");
         daysQuestion.setHint("Angabe in Tagen");
-        // Date
-        DateQuestion dateQuestion = new DateQuestion();
-        dateQuestion.setName("dateQuestion_0");
-        dateQuestion.setText("Wann hast du Geburtstag?");
         */
         // Building answers
         // Single choice
@@ -361,7 +362,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         Answer answerS4 = new Answer();
         answerS4.setText("Gut");
         answerS4.setCode("4");
-        answerS4.setNextQuestion(multipleChoiceQuestion);
+        answerS4.setNextQuestion(dateQuestion);
         singleChoiceQuestion.addAnswer(answerS4);
         Answer answerS5 = new Answer();
         answerS5.setText("Hervorragend");
@@ -380,7 +381,8 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         // Connecting questions together
         multipleChoiceQuestion.setNextQuestion(textQuestion);
         textQuestion.setNextQuestion(daytimeQuestion);
-        daytimeQuestion.setNextQuestion(null);
+        daytimeQuestion.setNextQuestion(dateQuestion);
+        dateQuestion.setNextQuestion(null);
         /*
         minutesQuestion.setNextQuestion(likertQuestion);
         likertQuestion.setNextQuestion(hoursQuestion);
@@ -399,6 +401,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         questionnaire.addQuestion(multipleChoiceQuestion);
         questionnaire.addQuestion(textQuestion);
         questionnaire.addQuestion(daytimeQuestion);
+        questionnaire.addQuestion(dateQuestion);
 
         // Filling surveys with steps
         for (int i = 0; i < instructions.size(); i++) {

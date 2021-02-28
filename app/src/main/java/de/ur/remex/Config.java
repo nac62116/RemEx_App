@@ -5,8 +5,6 @@ package de.ur.remex;
 // Can't be extended
 public final class Config {
 
-
-
     private Config() {
         // Can't be instantiated
     }
@@ -83,6 +81,10 @@ public final class Config {
     public static final String BREATHING_NEUTRAL_TEXT = "Entspannen";
     public static final int BREATHING_GONG_LENGTH_SEC = 2;
     public static final int BREATHING_TIMER_FREQUENCY_MS = 50; // Value to set the fps for the moving circle (f.e. 50ms = 20fps)
+
+    // Point of time question settings
+    public static final String DAYTIME_ANSWER_HINT = "Uhrzeit eingeben...";
+    public static final String DATE_ANSWER_HINT = "Datum eingeben...";
 
     // File Names
     public static final String FILE_NAME_ID = "vpId";

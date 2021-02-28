@@ -18,6 +18,7 @@ import de.ur.remex.model.experiment.Step;
 import de.ur.remex.model.experiment.StepType;
 import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
+import de.ur.remex.model.experiment.questionnaire.DateQuestion;
 import de.ur.remex.model.experiment.questionnaire.DaytimeQuestion;
 import de.ur.remex.model.experiment.questionnaire.MultipleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.Question;
@@ -33,7 +34,7 @@ import de.ur.remex.Config;
 import de.ur.remex.utilities.AlarmSender;
 import de.ur.remex.utilities.NotificationSender;
 import de.ur.remex.view.BreathingExerciseActivity;
-import de.ur.remex.view.DaytimeQuestionActivity;
+import de.ur.remex.view.PointOfTimeQuestionActivity;
 import de.ur.remex.view.InstructionActivity;
 import de.ur.remex.view.ChoiceQuestionActivity;
 import de.ur.remex.view.SurveyEntranceActivity;
@@ -63,7 +64,7 @@ public class ExperimentController implements Observer {
         AdminActivity adminActivity = new AdminActivity();
         ChoiceQuestionActivity choiceQuestionActivity = new ChoiceQuestionActivity();
         TextQuestionActivity textQuestionActivity = new TextQuestionActivity();
-        DaytimeQuestionActivity daytimeQuestionActivity = new DaytimeQuestionActivity();
+        PointOfTimeQuestionActivity pointOfTimeQuestionActivity = new PointOfTimeQuestionActivity();
         instructionActivity.addObserver(this);
         breathingExerciseActivity.addObserver(this);
         surveyEntranceActivity.addObserver(this);
@@ -72,7 +73,7 @@ public class ExperimentController implements Observer {
         adminActivity.addObserver(this);
         choiceQuestionActivity.addObserver(this);
         textQuestionActivity.addObserver(this);
-        daytimeQuestionActivity.addObserver(this);
+        pointOfTimeQuestionActivity.addObserver(this);
         userIsAlreadyWaiting = false;
     }
 
@@ -185,6 +186,13 @@ public class ExperimentController implements Observer {
                     csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
                             answerText, calendar.getTime().toString());
                     currentQuestion = daytimeQuestion.getNextQuestion();
+                }
+                else if (currentQuestion.getType().equals(QuestionType.DATE)) {
+                    DateQuestion dateQuestion = (DateQuestion) currentQuestion;
+                    String answerText = (String) event.getData();
+                    csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                            answerText, calendar.getTime().toString());
+                    currentQuestion = dateQuestion.getNextQuestion();
                 }
                 if (currentQuestion != null) {
                     navigateToQuestion(currentQuestion);
@@ -303,7 +311,12 @@ public class ExperimentController implements Observer {
             intent = new Intent(currentContext, TextQuestionActivity.class);
         }
         else if (nextQuestion.getType().equals(QuestionType.DAYTIME)) {
-            intent = new Intent(currentContext, DaytimeQuestionActivity.class);
+            intent = new Intent(currentContext, PointOfTimeQuestionActivity.class);
+            intent.putExtra(Config.QUESTION_TYPE_KEY, QuestionType.DAYTIME);
+        }
+        else if (nextQuestion.getType().equals(QuestionType.DATE)) {
+            intent = new Intent(currentContext, PointOfTimeQuestionActivity.class);
+            intent.putExtra(Config.QUESTION_TYPE_KEY, QuestionType.DATE);
         }
         intent.putExtra(Config.QUESTION_TEXT_KEY, currentQuestion.getText());
         intent.putExtra(Config.QUESTION_HINT_KEY, currentQuestion.getHint());
