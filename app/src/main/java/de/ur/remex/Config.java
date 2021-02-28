@@ -6,6 +6,7 @@ package de.ur.remex;
 public final class Config {
 
 
+
     private Config() {
         // Can't be instantiated
     }
@@ -98,7 +99,7 @@ public final class Config {
     // File Values
     public static final String SURVEY_ENTRANCE_OPENED = "surveyEntranceOpened";
     public static final String SURVEY_ENTRANCE_CLOSED = "surveyEntranceClosed";
-    public static final String INITIAL_CSV_VALUE = "VP_ID,VP_GROUP,SURVEY_NAME,QUESTION_NAME,ANSWER_CODE,TIME_STAMP\n";
+    public static final String INITIAL_CSV_VALUE = "VP_ID,VP_GROUP,SURVEY_NAME,QUESTION_NAME,ANSWER_CODE,TIME_STAMP*";
     public static final String EXPERIMENT_RUNNING = "experimentRunning";
     public static final String EXPERIMENT_FINISHED = "experimentFinished";
     public static final String CSV_SAVED = "CSV-Datei wurde bereits gespeichert";

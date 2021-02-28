@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import de.ur.remex.Config;
 import de.ur.remex.R;
 import de.ur.remex.model.storage.InternalStorage;
-import de.ur.remex.utilities.ExperimentNotificationManager;
+import de.ur.remex.utilities.NotificationSender;
 import de.ur.remex.view.SurveyEntranceActivity;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
@@ -80,7 +80,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         String experimentActive = storage.getFileContent(Config.FILE_NAME_SURVEY_ENTRANCE);
         if (experimentActive.equals(Config.SURVEY_ENTRANCE_OPENED)) {
-            ExperimentNotificationManager notificationManager = new ExperimentNotificationManager(this);
+            NotificationSender notificationManager = new NotificationSender(this);
             notificationManager.cancelNotification();
             Intent intent = new Intent(this, SurveyEntranceActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK & Intent.FLAG_ACTIVITY_CLEAR_TASK);

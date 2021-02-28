@@ -86,6 +86,8 @@
     <string name="question_text">Question_Text</string>
     <string name="question_hint">Question_Hint</string>
     <string name="answer">Answer</string>
-    <string name="eventuell_scrollen_f_r_weitere_antworten">Eventuell scrollen für weitere Antworten</string>
+    <string name="choice_question_scroll_hint">Scrollen für weitere Antworten</string>
+    <string name="mehrere_antworten_sind_m_glich">Mehrere Antworten sind möglich</string>
+    <string name="deine_antwort">Deine Antwort…</string>
 
 </resources>

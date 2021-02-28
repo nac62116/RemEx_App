@@ -19,7 +19,7 @@ import java.util.Calendar;
 import de.ur.remex.Config;
 import de.ur.remex.R;
 import de.ur.remex.model.storage.InternalStorage;
-import de.ur.remex.utilities.ExperimentAlarmManager;
+import de.ur.remex.utilities.AlarmSender;
 
 public class CreateVPActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
@@ -232,7 +232,7 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void restartAutoExitTimer() {
-        ExperimentAlarmManager alarmManager = new ExperimentAlarmManager(this);
+        AlarmSender alarmManager = new AlarmSender(this);
         alarmManager.setAdminTimeoutAlarm();
     }
 

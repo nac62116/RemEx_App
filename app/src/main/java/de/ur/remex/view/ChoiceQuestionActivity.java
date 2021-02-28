@@ -61,19 +61,31 @@ public class ChoiceQuestionActivity extends AppCompatActivity implements View.On
     }
 
     private void initViews() {
-        TextView questionTextView = findViewById(R.id.singleChoiceText);
+        TextView questionTextView = findViewById(R.id.choiceQuestionText);
         questionTextView.setText(questionText);
-        TextView questionHintView = findViewById(R.id.singleChoiceHint);
+        TextView questionHintView = findViewById(R.id.choiceQuestionHint);
         questionHintView.setText(questionHint);
-        nextButton = findViewById(R.id.singleChoiceNextButton);
+        nextButton = findViewById(R.id.choiceQuestionNextButton);
         nextButton.setOnClickListener(this);
         nextButton.setEnabled(false);
         nextButton.setBackground(ContextCompat.getDrawable(this, R.drawable.next_button_deactivated));
         nextButton.setTextColor(Color.LTGRAY);
-        ListView answerListView = findViewById(R.id.singleChoiceAnswers);
+        ListView answerListView = findViewById(R.id.choiceAnswerList);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, answerTexts);
         answerListView.setAdapter(adapter);
         answerListView.setOnItemClickListener(this);
+        Runnable fitsOnScreen = () -> {
+            int last = answerListView.getLastVisiblePosition();
+            if (last == answerListView.getCount() - 1 && answerListView.getChildAt(last).getBottom() <= answerListView.getHeight()) {
+                TextView scrollHint = findViewById(R.id.choiceQuestionScrollHint);
+                scrollHint.setVisibility(View.INVISIBLE);
+            }
+        };
+        answerListView.post(fitsOnScreen);
+        if (questionType.equals(QuestionType.SINGLE_CHOICE)) {
+            TextView multipleChoiceHint = findViewById(R.id.multipleChoiceHint);
+            multipleChoiceHint.setVisibility(View.INVISIBLE);
+        }
     }
 
     public void addObserver(Observer observer) {

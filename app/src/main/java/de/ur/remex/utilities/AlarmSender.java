@@ -13,7 +13,7 @@ import de.ur.remex.Config;
 
 import static android.content.Context.ALARM_SERVICE;
 
-public class ExperimentAlarmManager {
+public class AlarmSender {
 
     private final Context context;
 
@@ -25,7 +25,7 @@ public class ExperimentAlarmManager {
     private static final ArrayList<PendingIntent> pendingIntents = new ArrayList<>();
 
 
-    public ExperimentAlarmManager(Context context) {
+    public AlarmSender(Context context) {
         this.context = context;
     }
 

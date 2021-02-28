@@ -14,12 +14,12 @@ import de.ur.remex.Config;
 import de.ur.remex.R;
 import de.ur.remex.view.SurveyEntranceActivity;
 
-public class ExperimentNotificationManager {
+public class NotificationSender {
 
     private final static String CHANNEL_ID = "RemExReminder";
     private final Context context;
 
-    public ExperimentNotificationManager(Context context) {
+    public NotificationSender(Context context) {
         this.context = context;
     }
 

@@ -1,7 +1,5 @@
 package de.ur.remex.model.experiment.questionnaire;
 
-import de.ur.remex.model.experiment.StepType;
-
 public abstract class Question {
 
     protected QuestionType type;

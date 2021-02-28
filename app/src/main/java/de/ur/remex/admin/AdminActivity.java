@@ -32,9 +32,10 @@ import de.ur.remex.model.experiment.questionnaire.Answer;
 import de.ur.remex.model.experiment.questionnaire.MultipleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.Questionnaire;
 import de.ur.remex.model.experiment.questionnaire.SingleChoiceQuestion;
+import de.ur.remex.model.experiment.questionnaire.TextQuestion;
 import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.utilities.Event;
-import de.ur.remex.utilities.ExperimentAlarmManager;
+import de.ur.remex.utilities.AlarmSender;
 import de.ur.remex.utilities.Observable;
 
 // TODO: Make password changeable
@@ -106,6 +107,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         if (requestCode == CREATE_CSV_FILE && resultCode == Activity.RESULT_OK) {
             InternalStorage storage = new InternalStorage(this);
             String csv = storage.getFileContent(Config.FILE_NAME_CSV);
+            csv = csv.replace("*","\n");
 
             // The resultData contains a URI for the document or directory that
             // the user selected.
@@ -218,12 +220,12 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void restartAutoExitTimer() {
-        ExperimentAlarmManager alarmManager = new ExperimentAlarmManager(this);
+        AlarmSender alarmManager = new AlarmSender(this);
         alarmManager.setAdminTimeoutAlarm();
     }
 
     private void cancelAutoExitTimer() {
-        ExperimentAlarmManager alarmManager = new ExperimentAlarmManager(this);
+        AlarmSender alarmManager = new AlarmSender(this);
         alarmManager.cancelAdminTimeoutAlarm();
     }
 
@@ -291,12 +293,11 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         Questionnaire questionnaire = new Questionnaire();
         questionnaire.setId(7);
         // Building questions
-        /* Text
+        // Text
         TextQuestion textQuestion = new TextQuestion();
         textQuestion.setName("textQuestion_0");
         textQuestion.setText("Wie hat sich das ganze angefühlt?");
         textQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc...");
-        */
         // Single choice
         SingleChoiceQuestion singleChoiceQuestion = new SingleChoiceQuestion();
         singleChoiceQuestion.setName("singleChoiceQuestion_0");
@@ -376,9 +377,9 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         answerM2.setCode("2");
         multipleChoiceQuestion.addAnswer(answerM2);
         // Connecting questions together
-        multipleChoiceQuestion.setNextQuestion(null);
+        multipleChoiceQuestion.setNextQuestion(textQuestion);
+        textQuestion.setNextQuestion(null);
         /*
-        textQuestion.setNextQuestion(singleChoiceQuestion);
         minutesQuestion.setNextQuestion(likertQuestion);
         likertQuestion.setNextQuestion(hoursQuestion);
         hoursQuestion.setNextQuestion(daytimeQuestion);
@@ -386,7 +387,6 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         daysQuestion.setNextQuestion(dateQuestion);
         dateQuestion.setNextQuestion(null);
         // Adding questions to questionnaire
-        questionnaire.addQuestion(textQuestion);
         questionnaire.addQuestion(minutesQuestion);
         questionnaire.addQuestion(likertQuestion);
         questionnaire.addQuestion(hoursQuestion);
@@ -396,6 +396,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
          */
         questionnaire.addQuestion(singleChoiceQuestion);
         questionnaire.addQuestion(multipleChoiceQuestion);
+        questionnaire.addQuestion(textQuestion);
 
         // Filling surveys with steps
         for (int i = 0; i < instructions.size(); i++) {

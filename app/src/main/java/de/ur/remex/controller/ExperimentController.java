@@ -23,17 +23,19 @@ import de.ur.remex.model.experiment.questionnaire.Question;
 import de.ur.remex.model.experiment.questionnaire.QuestionType;
 import de.ur.remex.model.experiment.questionnaire.Questionnaire;
 import de.ur.remex.model.experiment.questionnaire.SingleChoiceQuestion;
+import de.ur.remex.model.experiment.questionnaire.TextQuestion;
 import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.utilities.AlarmReceiver;
 import de.ur.remex.utilities.CsvCreator;
 import de.ur.remex.utilities.Event;
 import de.ur.remex.Config;
-import de.ur.remex.utilities.ExperimentAlarmManager;
-import de.ur.remex.utilities.ExperimentNotificationManager;
+import de.ur.remex.utilities.AlarmSender;
+import de.ur.remex.utilities.NotificationSender;
 import de.ur.remex.view.BreathingExerciseActivity;
 import de.ur.remex.view.InstructionActivity;
 import de.ur.remex.view.ChoiceQuestionActivity;
 import de.ur.remex.view.SurveyEntranceActivity;
+import de.ur.remex.view.TextQuestionActivity;
 import de.ur.remex.view.WaitingRoomActivity;
 
 public class ExperimentController implements Observer {
@@ -58,6 +60,7 @@ public class ExperimentController implements Observer {
         SurveyEntranceActivity surveyEntranceActivity = new SurveyEntranceActivity();
         AdminActivity adminActivity = new AdminActivity();
         ChoiceQuestionActivity choiceQuestionActivity = new ChoiceQuestionActivity();
+        TextQuestionActivity textQuestionActivity = new TextQuestionActivity();
         instructionActivity.addObserver(this);
         breathingExerciseActivity.addObserver(this);
         surveyEntranceActivity.addObserver(this);
@@ -65,6 +68,7 @@ public class ExperimentController implements Observer {
         waitingRoomActivity.addObserver(this);
         adminActivity.addObserver(this);
         choiceQuestionActivity.addObserver(this);
+        textQuestionActivity.addObserver(this);
         userIsAlreadyWaiting = false;
     }
 
@@ -72,7 +76,7 @@ public class ExperimentController implements Observer {
         Log.e("ExperimentController", "EVENT_EXPERIMENT_STARTED");
         InternalStorage storage = new InternalStorage(currentContext);
         // Cancel possible ongoing alarms
-        ExperimentAlarmManager alarmManager = new ExperimentAlarmManager(currentContext);
+        AlarmSender alarmManager = new AlarmSender(currentContext);
         alarmManager.cancelAllAlarms();
         // Set internal storage values
         storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, Config.EXPERIMENT_RUNNING);
@@ -100,8 +104,8 @@ public class ExperimentController implements Observer {
             currentContext = event.getContext();
         }
         // Preparing utilities
-        ExperimentAlarmManager alarmManager = new ExperimentAlarmManager(currentContext);
-        ExperimentNotificationManager notificationManager = new ExperimentNotificationManager(currentContext);
+        AlarmSender alarmManager = new AlarmSender(currentContext);
+        NotificationSender notificationManager = new NotificationSender(currentContext);
         InternalStorage internalStorage = new InternalStorage(currentContext);
         Calendar calendar = Calendar.getInstance();
         // Checking event type
@@ -143,9 +147,7 @@ public class ExperimentController implements Observer {
 
             case Config.EVENT_NEXT_QUESTION:
                 Log.e("ExperimentController", "EVENT_NEXT_QUESTION");
-                // TODO: CsvCreator: Update hashmap with questionName (key) and event.getData() (value).
-                //  Prepare next question.
-                //  If null switch to next step (Function in EVENT_NEXT_STEP)
+                // TODO: Outsource in method
                 if (currentQuestion.getType().equals(QuestionType.SINGLE_CHOICE)) {
                     SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) currentQuestion;
                     String answerText = (String) event.getData();
@@ -166,8 +168,14 @@ public class ExperimentController implements Observer {
                             answerCode.toString(), calendar.getTime().toString());
                     currentQuestion = multipleChoiceQuestion.getNextQuestion();
                 }
+                else if (currentQuestion.getType().equals(QuestionType.TEXT)) {
+                    TextQuestion textQuestion = (TextQuestion) currentQuestion;
+                    String answerText = (String) event.getData();
+                    csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                            answerText, calendar.getTime().toString());
+                    currentQuestion = textQuestion.getNextQuestion();
+                }
                 if (currentQuestion != null) {
-                    Log.e("ExperimentController", "navigating to next question");
                     navigateToQuestion(currentQuestion);
                 }
                 else {
@@ -216,7 +224,7 @@ public class ExperimentController implements Observer {
         }
     }
     private void setSurveyAlarm(long referenceTime) {
-        ExperimentAlarmManager alarmManager = new ExperimentAlarmManager(currentContext);
+        AlarmSender alarmManager = new AlarmSender(currentContext);
         if (currentSurvey.isRelative()) {
             alarmManager.setRelativeSurveyAlarm(currentSurvey.getId(),
                     referenceTime,
@@ -260,7 +268,6 @@ public class ExperimentController implements Observer {
         }
         else if (nextStep.getType().equals(StepType.QUESTIONNAIRE)) {
             Log.e("ExperimentController", "Init Questionnaire");
-            // TODO: QuestionnaireActivity
             Questionnaire questionnaire = (Questionnaire) nextStep;
             currentQuestion = questionnaire.getFirstQuestion();
             navigateToQuestion(currentQuestion);
@@ -281,12 +288,15 @@ public class ExperimentController implements Observer {
             intent.putExtra(Config.ANSWER_TEXTS_KEY, multipleChoiceQuestion.getAnswerTexts());
             intent.putExtra(Config.QUESTION_TYPE_KEY, multipleChoiceQuestion.getType());
         }
+        else if (nextQuestion.getType().equals(QuestionType.TEXT)) {
+            intent = new Intent(currentContext, TextQuestionActivity.class);
+        }
         intent.putExtra(Config.QUESTION_TEXT_KEY, currentQuestion.getText());
         intent.putExtra(Config.QUESTION_HINT_KEY, currentQuestion.getHint());
         currentContext.startActivity(intent);
     }
 
-    private void switchToNextStep(ExperimentAlarmManager alarmManager, Calendar calendar) {
+    private void switchToNextStep(AlarmSender alarmManager, Calendar calendar) {
         // Set step timer if the current step was an ongoing step
         setStepTimer(alarmManager);
         // Switching to next step
@@ -305,7 +315,7 @@ public class ExperimentController implements Observer {
             exitApp();
         }
     }
-    private void setStepTimer(ExperimentAlarmManager alarmManager) {
+    private void setStepTimer(AlarmSender alarmManager) {
         /* Description:
                 Checking if the step that was finished just now is an ongoing step.
                 That means that another step waits for the completion of this step.

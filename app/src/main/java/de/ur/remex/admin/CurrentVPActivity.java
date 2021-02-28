@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import de.ur.remex.Config;
 import de.ur.remex.R;
 import de.ur.remex.model.storage.InternalStorage;
-import de.ur.remex.utilities.ExperimentAlarmManager;
+import de.ur.remex.utilities.AlarmSender;
 
 public class CurrentVPActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -55,7 +55,7 @@ public class CurrentVPActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void restartAutoExitTimer() {
-        ExperimentAlarmManager alarmManager = new ExperimentAlarmManager(this);
+        AlarmSender alarmManager = new AlarmSender(this);
         alarmManager.setAdminTimeoutAlarm();
     }
 
