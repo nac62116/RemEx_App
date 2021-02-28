@@ -35,6 +35,7 @@ import de.ur.remex.model.experiment.questionnaire.MultipleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.Questionnaire;
 import de.ur.remex.model.experiment.questionnaire.SingleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.TextQuestion;
+import de.ur.remex.model.experiment.questionnaire.TimeIntervallQuestion;
 import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.utilities.Event;
 import de.ur.remex.utilities.AlarmSender;
@@ -318,12 +319,11 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         DateQuestion dateQuestion = new DateQuestion();
         dateQuestion.setName("dateQuestion_0");
         dateQuestion.setText("Wann hast du Geburtstag?");
-        /* Minutes
-        MinutesQuestion minutesQuestion = new MinutesQuestion();
-        minutesQuestion.setName("minutesQuestion_0");
-        minutesQuestion.setText("Wie lange hast du gebraucht?");
-        minutesQuestion.setHint("Angabe in Minuten");
-        // Likert
+        // Time Intervall
+        TimeIntervallQuestion timeIntervallQuestion = new TimeIntervallQuestion();
+        timeIntervallQuestion.setName("timeIntervallQuestion_0");
+        timeIntervallQuestion.setText("Wie lange hast du gebraucht?");
+        /* Likert
         LikertQuestion likertQuestion = new LikertQuestion();
         likertQuestion.setName("likertQuestion_0");
         likertQuestion.setText("Wie unangenehm war die Situation?");
@@ -331,16 +331,6 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         likertQuestion.setScaleMaximumLabel("Gar nicht unangenehm");
         likertQuestion.setItemCount(5);
         likertQuestion.setInitialValue(1);
-        // Hours
-        HoursQuestion hoursQuestion = new HoursQuestion();
-        hoursQuestion.setName("hoursQuestion_0");
-        hoursQuestion.setText("Wie lange hast du gebraucht?");
-        hoursQuestion.setHint("Angabe in Stunden");
-        // Days
-        DaysQuestion daysQuestion = new DaysQuestion();
-        daysQuestion.setName("daysQuestion_0");
-        daysQuestion.setText("An wie vielen Tagen der letzten Woche hast du geraucht?");
-        daysQuestion.setHint("Angabe in Tagen");
         */
         // Building answers
         // Single choice
@@ -367,8 +357,13 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         Answer answerS5 = new Answer();
         answerS5.setText("Hervorragend");
         answerS5.setCode("5");
-        answerS5.setNextQuestion(multipleChoiceQuestion);
+        answerS5.setNextQuestion(timeIntervallQuestion);
         singleChoiceQuestion.addAnswer(answerS5);
+        Answer answerS6 = new Answer();
+        answerS6.setText("Besser gehts nicht");
+        answerS6.setCode("6");
+        answerS6.setNextQuestion(timeIntervallQuestion);
+        singleChoiceQuestion.addAnswer(answerS6);
         // Multiple choice
         Answer answerM1 = new Answer();
         answerM1.setText("Verärgert");
@@ -382,26 +377,19 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         multipleChoiceQuestion.setNextQuestion(textQuestion);
         textQuestion.setNextQuestion(daytimeQuestion);
         daytimeQuestion.setNextQuestion(dateQuestion);
-        dateQuestion.setNextQuestion(null);
+        dateQuestion.setNextQuestion(timeIntervallQuestion);
+        timeIntervallQuestion.setNextQuestion(null);
         /*
-        minutesQuestion.setNextQuestion(likertQuestion);
         likertQuestion.setNextQuestion(hoursQuestion);
-        hoursQuestion.setNextQuestion(daytimeQuestion);
-        daysQuestion.setNextQuestion(dateQuestion);
-        dateQuestion.setNextQuestion(null);
         // Adding questions to questionnaire
-        questionnaire.addQuestion(minutesQuestion);
         questionnaire.addQuestion(likertQuestion);
-        questionnaire.addQuestion(hoursQuestion);
-        questionnaire.addQuestion(daytimeQuestion);
-        questionnaire.addQuestion(daysQuestion);
-        questionnaire.addQuestion(dateQuestion);
          */
         questionnaire.addQuestion(singleChoiceQuestion);
         questionnaire.addQuestion(multipleChoiceQuestion);
         questionnaire.addQuestion(textQuestion);
         questionnaire.addQuestion(daytimeQuestion);
         questionnaire.addQuestion(dateQuestion);
+        questionnaire.addQuestion(timeIntervallQuestion);
 
         // Filling surveys with steps
         for (int i = 0; i < instructions.size(); i++) {

@@ -26,6 +26,7 @@ import de.ur.remex.model.experiment.questionnaire.QuestionType;
 import de.ur.remex.model.experiment.questionnaire.Questionnaire;
 import de.ur.remex.model.experiment.questionnaire.SingleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.TextQuestion;
+import de.ur.remex.model.experiment.questionnaire.TimeIntervallQuestion;
 import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.utilities.AlarmReceiver;
 import de.ur.remex.utilities.CsvCreator;
@@ -39,6 +40,7 @@ import de.ur.remex.view.InstructionActivity;
 import de.ur.remex.view.ChoiceQuestionActivity;
 import de.ur.remex.view.SurveyEntranceActivity;
 import de.ur.remex.view.TextQuestionActivity;
+import de.ur.remex.view.TimeIntervallQuestionActivity;
 import de.ur.remex.view.WaitingRoomActivity;
 
 public class ExperimentController implements Observer {
@@ -65,6 +67,7 @@ public class ExperimentController implements Observer {
         ChoiceQuestionActivity choiceQuestionActivity = new ChoiceQuestionActivity();
         TextQuestionActivity textQuestionActivity = new TextQuestionActivity();
         PointOfTimeQuestionActivity pointOfTimeQuestionActivity = new PointOfTimeQuestionActivity();
+        TimeIntervallQuestionActivity timeIntervallQuestionActivity = new TimeIntervallQuestionActivity();
         instructionActivity.addObserver(this);
         breathingExerciseActivity.addObserver(this);
         surveyEntranceActivity.addObserver(this);
@@ -74,6 +77,7 @@ public class ExperimentController implements Observer {
         choiceQuestionActivity.addObserver(this);
         textQuestionActivity.addObserver(this);
         pointOfTimeQuestionActivity.addObserver(this);
+        timeIntervallQuestionActivity.addObserver(this);
         userIsAlreadyWaiting = false;
     }
 
@@ -193,6 +197,13 @@ public class ExperimentController implements Observer {
                     csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
                             answerText, calendar.getTime().toString());
                     currentQuestion = dateQuestion.getNextQuestion();
+                }
+                else if (currentQuestion.getType().equals(QuestionType.TIME_INTERVALL)) {
+                    TimeIntervallQuestion timeIntervallQuestion = (TimeIntervallQuestion) currentQuestion;
+                    String answerText = (String) event.getData();
+                    csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                            answerText, calendar.getTime().toString());
+                    currentQuestion = timeIntervallQuestion.getNextQuestion();
                 }
                 if (currentQuestion != null) {
                     navigateToQuestion(currentQuestion);
@@ -317,6 +328,9 @@ public class ExperimentController implements Observer {
         else if (nextQuestion.getType().equals(QuestionType.DATE)) {
             intent = new Intent(currentContext, PointOfTimeQuestionActivity.class);
             intent.putExtra(Config.QUESTION_TYPE_KEY, QuestionType.DATE);
+        }
+        else if (nextQuestion.getType().equals(QuestionType.TIME_INTERVALL)) {
+            intent = new Intent(currentContext, TimeIntervallQuestionActivity.class);
         }
         intent.putExtra(Config.QUESTION_TEXT_KEY, currentQuestion.getText());
         intent.putExtra(Config.QUESTION_HINT_KEY, currentQuestion.getHint());

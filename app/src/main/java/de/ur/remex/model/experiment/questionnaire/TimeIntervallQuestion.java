@@ -1,11 +1,11 @@
 package de.ur.remex.model.experiment.questionnaire;
 
-public class MinutesQuestion extends Question {
+public class TimeIntervallQuestion extends Question {
 
     private Question nextQuestion;
 
-    public MinutesQuestion() {
-        type = QuestionType.MINUTES;
+    public TimeIntervallQuestion() {
+        type = QuestionType.TIME_INTERVALL;
     }
 
     public Question getNextQuestion() {

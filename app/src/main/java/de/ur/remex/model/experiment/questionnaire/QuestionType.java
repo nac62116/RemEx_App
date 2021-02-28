@@ -7,7 +7,5 @@ public enum QuestionType {
     TEXT,
     DATE,
     DAYTIME,
-    MINUTES,
-    HOURS,
-    DAYS
+    TIME_INTERVALL
 }

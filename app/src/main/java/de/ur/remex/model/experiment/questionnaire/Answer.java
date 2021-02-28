@@ -4,8 +4,8 @@ public class Answer {
 
     private String text;
     // Add RemEx Interface functionality to create a list of the answer codes
+    // Has to be unique inside one question
     private String code;
-    // Multiple choice answers must either have the same destination or all combinations must be defined
     private Question nextQuestion;
 
     public String getText() {
