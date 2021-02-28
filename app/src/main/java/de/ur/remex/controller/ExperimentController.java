@@ -18,6 +18,7 @@ import de.ur.remex.model.experiment.Step;
 import de.ur.remex.model.experiment.StepType;
 import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
+import de.ur.remex.model.experiment.questionnaire.DaytimeQuestion;
 import de.ur.remex.model.experiment.questionnaire.MultipleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.Question;
 import de.ur.remex.model.experiment.questionnaire.QuestionType;
@@ -32,6 +33,7 @@ import de.ur.remex.Config;
 import de.ur.remex.utilities.AlarmSender;
 import de.ur.remex.utilities.NotificationSender;
 import de.ur.remex.view.BreathingExerciseActivity;
+import de.ur.remex.view.DaytimeQuestionActivity;
 import de.ur.remex.view.InstructionActivity;
 import de.ur.remex.view.ChoiceQuestionActivity;
 import de.ur.remex.view.SurveyEntranceActivity;
@@ -61,6 +63,7 @@ public class ExperimentController implements Observer {
         AdminActivity adminActivity = new AdminActivity();
         ChoiceQuestionActivity choiceQuestionActivity = new ChoiceQuestionActivity();
         TextQuestionActivity textQuestionActivity = new TextQuestionActivity();
+        DaytimeQuestionActivity daytimeQuestionActivity = new DaytimeQuestionActivity();
         instructionActivity.addObserver(this);
         breathingExerciseActivity.addObserver(this);
         surveyEntranceActivity.addObserver(this);
@@ -69,6 +72,7 @@ public class ExperimentController implements Observer {
         adminActivity.addObserver(this);
         choiceQuestionActivity.addObserver(this);
         textQuestionActivity.addObserver(this);
+        daytimeQuestionActivity.addObserver(this);
         userIsAlreadyWaiting = false;
     }
 
@@ -174,6 +178,13 @@ public class ExperimentController implements Observer {
                     csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
                             answerText, calendar.getTime().toString());
                     currentQuestion = textQuestion.getNextQuestion();
+                }
+                else if (currentQuestion.getType().equals(QuestionType.DAYTIME)) {
+                    DaytimeQuestion daytimeQuestion = (DaytimeQuestion) currentQuestion;
+                    String answerText = (String) event.getData();
+                    csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                            answerText, calendar.getTime().toString());
+                    currentQuestion = daytimeQuestion.getNextQuestion();
                 }
                 if (currentQuestion != null) {
                     navigateToQuestion(currentQuestion);
@@ -290,6 +301,9 @@ public class ExperimentController implements Observer {
         }
         else if (nextQuestion.getType().equals(QuestionType.TEXT)) {
             intent = new Intent(currentContext, TextQuestionActivity.class);
+        }
+        else if (nextQuestion.getType().equals(QuestionType.DAYTIME)) {
+            intent = new Intent(currentContext, DaytimeQuestionActivity.class);
         }
         intent.putExtra(Config.QUESTION_TEXT_KEY, currentQuestion.getText());
         intent.putExtra(Config.QUESTION_HINT_KEY, currentQuestion.getHint());

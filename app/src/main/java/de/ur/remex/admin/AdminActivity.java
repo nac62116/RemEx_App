@@ -29,6 +29,7 @@ import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
 import de.ur.remex.model.experiment.breathingExercise.BreathingMode;
 import de.ur.remex.model.experiment.questionnaire.Answer;
+import de.ur.remex.model.experiment.questionnaire.DaytimeQuestion;
 import de.ur.remex.model.experiment.questionnaire.MultipleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.Questionnaire;
 import de.ur.remex.model.experiment.questionnaire.SingleChoiceQuestion;
@@ -308,6 +309,10 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         multipleChoiceQuestion.setName("multipleChoiceQuestion_0");
         multipleChoiceQuestion.setText("Wie hat sich das ganze angefühlt?");
         multipleChoiceQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc...");
+        // Daytime
+        DaytimeQuestion daytimeQuestion = new DaytimeQuestion();
+        daytimeQuestion.setName("daytimeQuestion_0");
+        daytimeQuestion.setText("Um wie viel Uhr bist du ins Bett gegangen?");
         /* Minutes
         MinutesQuestion minutesQuestion = new MinutesQuestion();
         minutesQuestion.setName("minutesQuestion_0");
@@ -326,10 +331,6 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         hoursQuestion.setName("hoursQuestion_0");
         hoursQuestion.setText("Wie lange hast du gebraucht?");
         hoursQuestion.setHint("Angabe in Stunden");
-        // Daytime
-        DaytimeQuestion daytimeQuestion = new DaytimeQuestion();
-        daytimeQuestion.setName("daytimeQuestion_0");
-        daytimeQuestion.setText("Um wie viel Uhr bist du ins Bett gegangen?");
         // Days
         DaysQuestion daysQuestion = new DaysQuestion();
         daysQuestion.setName("daysQuestion_0");
@@ -345,27 +346,27 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         Answer answerS1 = new Answer();
         answerS1.setText("Verärgert");
         answerS1.setCode("1");
-        answerS1.setNextQuestion(multipleChoiceQuestion); //multipleChoiceQuestion
+        answerS1.setNextQuestion(multipleChoiceQuestion);
         singleChoiceQuestion.addAnswer(answerS1);
         Answer answerS2 = new Answer();
         answerS2.setText("Fröhlich");
         answerS2.setCode("2");
-        answerS2.setNextQuestion(multipleChoiceQuestion); //dateQuestion
+        answerS2.setNextQuestion(textQuestion);
         singleChoiceQuestion.addAnswer(answerS2);
         Answer answerS3 = new Answer();
         answerS3.setText("Schlecht");
         answerS3.setCode("3");
-        answerS3.setNextQuestion(multipleChoiceQuestion); //minuteQuestion
+        answerS3.setNextQuestion(daytimeQuestion);
         singleChoiceQuestion.addAnswer(answerS3);
         Answer answerS4 = new Answer();
         answerS4.setText("Gut");
         answerS4.setCode("4");
-        answerS4.setNextQuestion(multipleChoiceQuestion); //minuteQuestion
+        answerS4.setNextQuestion(multipleChoiceQuestion);
         singleChoiceQuestion.addAnswer(answerS4);
         Answer answerS5 = new Answer();
         answerS5.setText("Hervorragend");
         answerS5.setCode("5");
-        answerS5.setNextQuestion(multipleChoiceQuestion); //minuteQuestion
+        answerS5.setNextQuestion(multipleChoiceQuestion);
         singleChoiceQuestion.addAnswer(answerS5);
         // Multiple choice
         Answer answerM1 = new Answer();
@@ -378,12 +379,12 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         multipleChoiceQuestion.addAnswer(answerM2);
         // Connecting questions together
         multipleChoiceQuestion.setNextQuestion(textQuestion);
-        textQuestion.setNextQuestion(null);
+        textQuestion.setNextQuestion(daytimeQuestion);
+        daytimeQuestion.setNextQuestion(null);
         /*
         minutesQuestion.setNextQuestion(likertQuestion);
         likertQuestion.setNextQuestion(hoursQuestion);
         hoursQuestion.setNextQuestion(daytimeQuestion);
-        daytimeQuestion.setNextQuestion(daysQuestion);
         daysQuestion.setNextQuestion(dateQuestion);
         dateQuestion.setNextQuestion(null);
         // Adding questions to questionnaire
@@ -397,6 +398,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         questionnaire.addQuestion(singleChoiceQuestion);
         questionnaire.addQuestion(multipleChoiceQuestion);
         questionnaire.addQuestion(textQuestion);
+        questionnaire.addQuestion(daytimeQuestion);
 
         // Filling surveys with steps
         for (int i = 0; i < instructions.size(); i++) {

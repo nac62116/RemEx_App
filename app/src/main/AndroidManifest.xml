@@ -29,6 +29,7 @@
         <activity android:name=".view.BreathingExerciseActivity" android:screenOrientation="portrait" android:noHistory="true"/>
         <activity android:name=".view.ChoiceQuestionActivity" android:screenOrientation="portrait" android:noHistory="true"/>
         <activity android:name=".view.TextQuestionActivity" android:screenOrientation="portrait" android:noHistory="true"/>
+        <activity android:name=".view.DaytimeQuestionActivity" android:screenOrientation="portrait" android:noHistory="true"/>
 
         <receiver android:name=".utilities.AlarmReceiver">
         </receiver>
