@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class MultipleChoiceQuestion extends Question {
 
-    private Question nextQuestion;
+    private int nextQuestionId;
     private ArrayList<Answer> answers;
 
     public MultipleChoiceQuestion() {
@@ -37,11 +37,11 @@ public class MultipleChoiceQuestion extends Question {
         return null;
     }
 
-    public Question getNextQuestion() {
-        return nextQuestion;
+    public int getNextQuestionId() {
+        return nextQuestionId;
     }
 
-    public void setNextQuestion(Question nextQuestion) {
-        this.nextQuestion = nextQuestion;
+    public void setNextQuestionId(int nextQuestionId) {
+        this.nextQuestionId = nextQuestionId;
     }
 }

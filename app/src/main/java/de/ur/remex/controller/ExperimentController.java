@@ -157,13 +157,14 @@ public class ExperimentController implements Observer {
             case Config.EVENT_NEXT_QUESTION:
                 Log.e("ExperimentController", "EVENT_NEXT_QUESTION");
                 // TODO: Outsource in method
+                Questionnaire currentQuestionnaire = (Questionnaire) currentStep;
                 if (currentQuestion.getType().equals(QuestionType.SINGLE_CHOICE)) {
                     SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) currentQuestion;
                     String answerText = (String) event.getData();
                     String answerCode = singleChoiceQuestion.getCodeByAnswerText(answerText);
                     csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
                             answerCode, calendar.getTime().toString());
-                    currentQuestion = singleChoiceQuestion.getNextQuestionByAnswerText(answerText);
+                    currentQuestion = currentQuestionnaire.getQuestionById(singleChoiceQuestion.getNextQuestionIdByAnswerText(answerText));
                 }
                 else if (currentQuestion.getType().equals(QuestionType.MULTIPLE_CHOICE)) {
                     MultipleChoiceQuestion multipleChoiceQuestion = (MultipleChoiceQuestion) currentQuestion;
@@ -175,35 +176,35 @@ public class ExperimentController implements Observer {
                     }
                     csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
                             answerCode.toString(), calendar.getTime().toString());
-                    currentQuestion = multipleChoiceQuestion.getNextQuestion();
+                    currentQuestion = currentQuestionnaire.getQuestionById(multipleChoiceQuestion.getNextQuestionId());
                 }
                 else if (currentQuestion.getType().equals(QuestionType.TEXT)) {
                     TextQuestion textQuestion = (TextQuestion) currentQuestion;
                     String answerText = (String) event.getData();
                     csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
                             answerText, calendar.getTime().toString());
-                    currentQuestion = textQuestion.getNextQuestion();
+                    currentQuestion = currentQuestionnaire.getQuestionById(textQuestion.getNextQuestionId());
                 }
                 else if (currentQuestion.getType().equals(QuestionType.DAYTIME)) {
                     DaytimeQuestion daytimeQuestion = (DaytimeQuestion) currentQuestion;
                     String answerText = (String) event.getData();
                     csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
                             answerText, calendar.getTime().toString());
-                    currentQuestion = daytimeQuestion.getNextQuestion();
+                    currentQuestion = currentQuestionnaire.getQuestionById(daytimeQuestion.getNextQuestionId());
                 }
                 else if (currentQuestion.getType().equals(QuestionType.DATE)) {
                     DateQuestion dateQuestion = (DateQuestion) currentQuestion;
                     String answerText = (String) event.getData();
                     csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
                             answerText, calendar.getTime().toString());
-                    currentQuestion = dateQuestion.getNextQuestion();
+                    currentQuestion = currentQuestionnaire.getQuestionById(dateQuestion.getNextQuestionId());
                 }
                 else if (currentQuestion.getType().equals(QuestionType.TIME_INTERVALL)) {
                     TimeIntervallQuestion timeIntervallQuestion = (TimeIntervallQuestion) currentQuestion;
                     String answerText = (String) event.getData();
                     csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
                             answerText, calendar.getTime().toString());
-                    currentQuestion = timeIntervallQuestion.getNextQuestion();
+                    currentQuestion = currentQuestionnaire.getQuestionById(timeIntervallQuestion.getNextQuestionId());
                 }
                 if (currentQuestion != null) {
                     navigateToQuestion(currentQuestion);
@@ -242,10 +243,8 @@ public class ExperimentController implements Observer {
         }
     }
 
-
-
     private void prepareNextSurvey(long referenceTime) {
-        currentSurvey = currentSurvey.getNextSurvey();
+        currentSurvey = currentExperimentGroup.getSurveyById(currentSurvey.getNextSurveyId());
         if (currentSurvey != null) {
             setSurveyAlarm(referenceTime);
         }
@@ -256,9 +255,10 @@ public class ExperimentController implements Observer {
     private void setSurveyAlarm(long referenceTime) {
         AlarmSender alarmManager = new AlarmSender(currentContext);
         if (currentSurvey.isRelative()) {
+            long relativeStartTimeInMillis = currentSurvey.getRelativeStartTimeInMin() * 60 * 1000;
             alarmManager.setRelativeSurveyAlarm(currentSurvey.getId(),
                     referenceTime,
-                    currentSurvey.getRelativeStartTimeInMillis());
+                    relativeStartTimeInMillis);
         }
         else {
             alarmManager.setAbsoluteSurveyAlarm(currentSurvey.getId(),
@@ -341,7 +341,7 @@ public class ExperimentController implements Observer {
         // Set step timer if the current step was an ongoing step
         setStepTimer(alarmManager);
         // Switching to next step
-        currentStep = currentStep.getNextStep();
+        currentStep = currentSurvey.getStepById(currentStep.getNextStepId());
         // There is a next step
         if (currentStep != null) {
             // Moving on to next step after a little checkup

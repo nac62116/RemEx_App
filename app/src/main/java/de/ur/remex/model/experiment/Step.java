@@ -8,15 +8,15 @@ public abstract class Step {
     protected StepType type;
     protected int waitForStep;
     // Only needed if back button gets implemented.
-    protected Step previousStep;
-    protected Step nextStep;
+    protected int previousStepId;
+    protected int nextStepId;
 
-    public void setNextStep(Step nextStep) {
-        this.nextStep = nextStep;
+    public void setNextStepId(int nextStepId) {
+        this.nextStepId = nextStepId;
     }
 
-    public Step getNextStep() {
-        return nextStep;
+    public int getNextStepId() {
+        return nextStepId;
     }
 
     public StepType getType() {

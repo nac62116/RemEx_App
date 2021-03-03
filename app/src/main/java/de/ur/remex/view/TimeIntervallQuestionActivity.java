@@ -24,7 +24,6 @@ public class TimeIntervallQuestionActivity extends AppCompatActivity implements 
 
     private String questionText;
     private String questionHint;
-    private EditText answerInputField;
     private TextView answerTextView;
     private Button nextButton;
     private int currentPlaceValue;
@@ -58,7 +57,7 @@ public class TimeIntervallQuestionActivity extends AppCompatActivity implements 
         nextButton = findViewById(R.id.timeIntervallQuestionNextButton);
         nextButton.setOnClickListener(this);
         answerTextView = findViewById(R.id.timeIntervallQuestionAnswerView);
-        answerInputField = findViewById(R.id.timeIntervallQuestionAnswerField);
+        EditText answerInputField = findViewById(R.id.timeIntervallQuestionAnswerField);
         currentText = new StringBuilder("000000");
         currentPlaceValue = currentText.length() - 1;
         answerInputField.addTextChangedListener(new TextWatcher() {

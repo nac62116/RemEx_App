@@ -9,7 +9,7 @@ public class Survey {
     // Has to be unique
     private String name;
     // Calculated relative to a given time (f.e. last survey finish, experimentStart, etc..)
-    private long relativeStartTimeInMillis;
+    private int relativeStartTimeInMin;
     private boolean isRelative;
     private int absoluteStartAtHour;
     private int absoluteStartAtMinute;
@@ -18,12 +18,12 @@ public class Survey {
     // Calculate min maxDuration
     private int maxDurationInMin;
     private int notificationDurationInMin;
-    private Survey nextSurvey;
+    private int nextSurveyId;
     private ArrayList<Step> steps;
 
-    public Survey(String name, int relativeStartTimeInMillis, int maxDurationInMin, int notificationDurationInMin) {
+    public Survey(String name, int relativeStartTimeInMin, int maxDurationInMin, int notificationDurationInMin) {
         this.name = name;
-        this.relativeStartTimeInMillis = relativeStartTimeInMillis;
+        this.relativeStartTimeInMin = relativeStartTimeInMin;
         this.notificationDurationInMin = notificationDurationInMin;
         isRelative = true;
         this.maxDurationInMin = maxDurationInMin;
@@ -42,20 +42,20 @@ public class Survey {
         steps = new ArrayList<>();
     }
 
-    public void setNextSurvey(Survey nextSurvey) {
-        this.nextSurvey = nextSurvey;
+    public void setNextSurveyId(int nextSurveyId) {
+        this.nextSurveyId = nextSurveyId;
     }
 
-    public Survey getNextSurvey() {
-        return nextSurvey;
+    public int getNextSurveyId() {
+        return nextSurveyId;
     }
 
     public boolean isRelative() {
         return isRelative;
     }
 
-    public long getRelativeStartTimeInMillis() {
-        return relativeStartTimeInMillis;
+    public int getRelativeStartTimeInMin() {
+        return relativeStartTimeInMin;
     }
 
     public int getAbsoluteStartAtHour() {
@@ -79,7 +79,10 @@ public class Survey {
     }
 
     public Step getFirstStep() {
-        return steps.get(0);
+        if (!steps.isEmpty()) {
+            return steps.get(0);
+        }
+        return null;
     }
 
     public ArrayList<Step> getSteps() {

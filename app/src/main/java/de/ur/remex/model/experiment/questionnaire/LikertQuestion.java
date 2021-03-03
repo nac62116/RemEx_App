@@ -2,7 +2,7 @@ package de.ur.remex.model.experiment.questionnaire;
 
 public class LikertQuestion extends Question {
 
-    private Question nextQuestion;
+    private int nextQuestionId;
     private String scaleMinimumLabel;
     private String scaleMaximumLabel;
     private int initialValue;
@@ -12,12 +12,12 @@ public class LikertQuestion extends Question {
         type = QuestionType.LIKERT;
     }
 
-    public Question getNextQuestion() {
-        return nextQuestion;
+    public int getNextQuestionId() {
+        return nextQuestionId;
     }
 
-    public void setNextQuestion(Question nextQuestion) {
-        this.nextQuestion = nextQuestion;
+    public void setNextQuestionId(int nextQuestionId) {
+        this.nextQuestionId = nextQuestionId;
     }
 
     public String getScaleMinimumLabel() {

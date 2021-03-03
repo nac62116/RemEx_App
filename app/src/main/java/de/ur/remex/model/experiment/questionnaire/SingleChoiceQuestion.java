@@ -36,12 +36,12 @@ public class SingleChoiceQuestion extends Question {
         this.answers.add(answer);
     }
 
-    public Question getNextQuestionByAnswerText(String answerText) {
-        for (Answer a: answers) {
-            if (a.getText().equals(answerText)) {
-                return a.getNextQuestion();
+    public int getNextQuestionIdByAnswerText(String answerText) {
+        for (Answer answer: answers) {
+            if (answer.getText().equals(answerText)) {
+                return answer.getNextQuestionId();
             }
         }
-        return null;
+        return 0;
     }
 }

@@ -3,6 +3,8 @@ package de.ur.remex.model.experiment.questionnaire;
 public abstract class Question {
 
     protected QuestionType type;
+    // Has to be unique inside one questionnaire
+    protected int id;
     // Has to be unique inside one survey
     protected String name;
     // Max characters 130
@@ -10,7 +12,15 @@ public abstract class Question {
     // Max characters 90
     protected String hint;
     // Only needed if back button gets implemented.
-    protected Question previousQuestion;
+    protected int previousQuestionId;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public QuestionType getType() {
         return type;

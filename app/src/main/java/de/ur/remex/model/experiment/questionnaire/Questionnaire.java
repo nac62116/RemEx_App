@@ -20,7 +20,19 @@ public class Questionnaire extends Step {
     }
 
     public Question getFirstQuestion() {
-        return questions.get(0);
+        if (!questions.isEmpty()) {
+            return questions.get(0);
+        }
+        return null;
+    }
+
+    public Question getQuestionById(int questionId) {
+        for (Question question: questions) {
+            if (questionId == question.getId()) {
+                return question;
+            }
+        }
+        return null;
     }
 
     public ArrayList<Question> getQuestions() {

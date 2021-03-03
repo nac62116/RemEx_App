@@ -2,17 +2,17 @@ package de.ur.remex.model.experiment.questionnaire;
 
 public class DaytimeQuestion extends Question {
 
-    private Question nextQuestion;
+    private int nextQuestionId;
 
     public DaytimeQuestion() {
         type = QuestionType.DAYTIME;
     }
 
-    public Question getNextQuestion() {
-        return nextQuestion;
+    public int getNextQuestionId() {
+        return nextQuestionId;
     }
 
-    public void setNextQuestion(Question nextQuestion) {
-        this.nextQuestion = nextQuestion;
+    public void setNextQuestionId(int nextQuestionId) {
+        this.nextQuestionId = nextQuestionId;
     }
 }

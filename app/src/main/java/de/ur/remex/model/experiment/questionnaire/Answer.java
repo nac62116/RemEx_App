@@ -6,7 +6,7 @@ public class Answer {
     // Add RemEx Interface functionality to create a list of the answer codes
     // Has to be unique inside one question
     private String code;
-    private Question nextQuestion;
+    private int nextQuestionId;
 
     public String getText() {
         return text;
@@ -24,11 +24,11 @@ public class Answer {
         this.code = code;
     }
 
-    public Question getNextQuestion() {
-        return nextQuestion;
+    public int getNextQuestionId() {
+        return nextQuestionId;
     }
 
-    public void setNextQuestion(Question nextQuestion) {
-        this.nextQuestion = nextQuestion;
+    public void setNextQuestionId(int nextQuestionId) {
+        this.nextQuestionId = nextQuestionId;
     }
 }

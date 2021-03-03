@@ -12,6 +12,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -100,6 +103,8 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("text/csv");
+        // TODO: Remove this
+        //intent.putExtra(Intent.EXTRA_TITLE, vpId + ".json");
         intent.putExtra(Intent.EXTRA_TITLE, vpId + ".csv");
         startActivityForResult(intent, CREATE_CSV_FILE);
     }
@@ -112,6 +117,21 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
             String csv = storage.getFileContent(Config.FILE_NAME_CSV);
             csv = csv.replace("*","\n");
 
+            // TODO: Remove this
+            /*
+            ObjectMapper mapper = new ObjectMapper();
+            String experimentJSON = "";
+            try {
+                experimentJSON = mapper.writeValueAsString(experiment);
+            } catch (JsonProcessingException e) {
+                // AlertDialog: Systemfehler
+                new AlertDialog.Builder(this)
+                        .setTitle(this.getResources().getString(R.string.exception_alert_title))
+                        .setMessage(this.getResources().getString(R.string.exception_alert_text))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+            }*/
+
             // The resultData contains a URI for the document or directory that
             // the user selected.
             if (resultData != null) {
@@ -120,6 +140,8 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
                 if (uri != null) {
                     // Writing csv in selected uri
                     success = writeInFile(uri, csv);
+                    // TODO: Remove this
+                    //success = writeInFile(uri, experimentJSON);
                 }
                 if (success) {
                     storage.saveFileContent(Config.FILE_NAME_CSV_STATUS, Config.CSV_SAVED);
@@ -251,7 +273,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
 
         Survey survey1 = new Survey("Survey1 +1 Min", 0, 3, 5);
         survey1.setId(1);
-        Survey survey2 = new Survey("Survey2 +2 Min", 60 * 1000, 3, 5);
+        Survey survey2 = new Survey("Survey2 +2 Min", 1, 3, 5);
         survey2.setId(2);
 
         // Building instruction steps
@@ -298,33 +320,40 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         // Building questions
         // Text
         TextQuestion textQuestion = new TextQuestion();
+        textQuestion.setId(1);
         textQuestion.setName("textQuestion_0");
         textQuestion.setText("Wie hat sich das ganze angefühlt?");
         textQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc...");
         // Single choice
         SingleChoiceQuestion singleChoiceQuestion = new SingleChoiceQuestion();
+        singleChoiceQuestion.setId(2);
         singleChoiceQuestion.setName("singleChoiceQuestion_0");
         singleChoiceQuestion.setText("Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt?");
         singleChoiceQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc... Warst du verägert, fröhlich, optimistisc");
         // Multiple choice
         MultipleChoiceQuestion multipleChoiceQuestion = new MultipleChoiceQuestion();
+        multipleChoiceQuestion.setId(3);
         multipleChoiceQuestion.setName("multipleChoiceQuestion_0");
         multipleChoiceQuestion.setText("Wie hat sich das ganze angefühlt?");
         multipleChoiceQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc...");
         // Daytime
         DaytimeQuestion daytimeQuestion = new DaytimeQuestion();
+        daytimeQuestion.setId(4);
         daytimeQuestion.setName("daytimeQuestion_0");
         daytimeQuestion.setText("Um wie viel Uhr bist du ins Bett gegangen?");
         // Date
         DateQuestion dateQuestion = new DateQuestion();
+        dateQuestion.setId(5);
         dateQuestion.setName("dateQuestion_0");
         dateQuestion.setText("Wann hast du Geburtstag?");
         // Time Intervall
         TimeIntervallQuestion timeIntervallQuestion = new TimeIntervallQuestion();
+        timeIntervallQuestion.setId(6);
         timeIntervallQuestion.setName("timeIntervallQuestion_0");
         timeIntervallQuestion.setText("Wie lange hast du gebraucht?");
         /* Likert
         LikertQuestion likertQuestion = new LikertQuestion();
+        likertQuestion.setId(7);
         likertQuestion.setName("likertQuestion_0");
         likertQuestion.setText("Wie unangenehm war die Situation?");
         likertQuestion.setScaleMinimumLabel("Sehr unangenehm");
@@ -337,32 +366,32 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         Answer answerS1 = new Answer();
         answerS1.setText("Verärgert");
         answerS1.setCode("1");
-        answerS1.setNextQuestion(multipleChoiceQuestion);
+        answerS1.setNextQuestionId(multipleChoiceQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS1);
         Answer answerS2 = new Answer();
         answerS2.setText("Fröhlich");
         answerS2.setCode("2");
-        answerS2.setNextQuestion(textQuestion);
+        answerS2.setNextQuestionId(textQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS2);
         Answer answerS3 = new Answer();
         answerS3.setText("Schlecht");
         answerS3.setCode("3");
-        answerS3.setNextQuestion(daytimeQuestion);
+        answerS3.setNextQuestionId(daytimeQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS3);
         Answer answerS4 = new Answer();
         answerS4.setText("Gut");
         answerS4.setCode("4");
-        answerS4.setNextQuestion(dateQuestion);
+        answerS4.setNextQuestionId(dateQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS4);
         Answer answerS5 = new Answer();
         answerS5.setText("Hervorragend");
         answerS5.setCode("5");
-        answerS5.setNextQuestion(timeIntervallQuestion);
+        answerS5.setNextQuestionId(timeIntervallQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS5);
         Answer answerS6 = new Answer();
         answerS6.setText("Besser gehts nicht");
         answerS6.setCode("6");
-        answerS6.setNextQuestion(timeIntervallQuestion);
+        answerS6.setNextQuestionId(timeIntervallQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS6);
         // Multiple choice
         Answer answerM1 = new Answer();
@@ -374,13 +403,13 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         answerM2.setCode("2");
         multipleChoiceQuestion.addAnswer(answerM2);
         // Connecting questions together
-        multipleChoiceQuestion.setNextQuestion(textQuestion);
-        textQuestion.setNextQuestion(daytimeQuestion);
-        daytimeQuestion.setNextQuestion(dateQuestion);
-        dateQuestion.setNextQuestion(timeIntervallQuestion);
-        timeIntervallQuestion.setNextQuestion(null);
+        multipleChoiceQuestion.setNextQuestionId(textQuestion.getId());
+        textQuestion.setNextQuestionId(daytimeQuestion.getId());
+        daytimeQuestion.setNextQuestionId(dateQuestion.getId());
+        dateQuestion.setNextQuestionId(timeIntervallQuestion.getId());
+        timeIntervallQuestion.setNextQuestionId(0);
         /*
-        likertQuestion.setNextQuestion(hoursQuestion);
+        likertQuestion.setNextQuestionId(0);
         // Adding questions to questionnaire
         questionnaire.addQuestion(likertQuestion);
          */
@@ -396,13 +425,13 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
             Instruction currInstruction = instructions.get(i);
             Instruction nextInstruction;
             if (i == instructions.size() - 1) {
-                currInstruction.setNextStep(breathingExercise);
-                breathingExercise.setNextStep(questionnaire);
-                questionnaire.setNextStep(null);
+                currInstruction.setNextStepId(breathingExercise.getId());
+                breathingExercise.setNextStepId(questionnaire.getId());
+                questionnaire.setNextStepId(0);
             }
             else {
                 nextInstruction = instructions.get(i + 1);
-                currInstruction.setNextStep(nextInstruction);
+                currInstruction.setNextStepId(nextInstruction.getId());
             }
             survey1.addStep(currInstruction);
             survey2.addStep(currInstruction);
@@ -415,8 +444,8 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
             }
         }
 
-        survey1.setNextSurvey(survey2);
-        survey2.setNextSurvey(null);
+        survey1.setNextSurveyId(survey2.getId());
+        survey2.setNextSurveyId(0);
 
         experimentGroup.addSurvey(survey1);
         experimentGroup.addSurvey(survey2);

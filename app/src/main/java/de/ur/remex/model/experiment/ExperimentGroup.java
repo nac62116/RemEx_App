@@ -33,6 +33,15 @@ public class ExperimentGroup {
         return null;
     }
 
+    public Survey getSurveyById(int surveyId) {
+        for (Survey survey: surveys) {
+            if (surveyId == survey.getId()) {
+                return survey;
+            }
+        }
+        return null;
+    }
+
     public ArrayList<Survey> getSurveys() {
         return surveys;
     }
