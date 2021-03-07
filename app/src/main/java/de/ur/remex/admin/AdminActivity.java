@@ -36,6 +36,7 @@ import de.ur.remex.model.experiment.questionnaire.Questionnaire;
 import de.ur.remex.model.experiment.questionnaire.ChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.TextQuestion;
 import de.ur.remex.model.experiment.questionnaire.TimeIntervallQuestion;
+import de.ur.remex.model.experiment.questionnaire.TimeIntervallType;
 import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.utilities.Event;
 import de.ur.remex.utilities.AlarmSender;
@@ -354,14 +355,31 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         daytimeAndDateQuestion.addPointOfTimeType(PointOfTimeType.DATE);
         daytimeAndDateQuestion.setName("daytimeDateQuestion_0");
         daytimeAndDateQuestion.setText("Wann ist deine nächste Schulaufgabe?");
+        // Time Intervall (Hours, Minutes)
+        TimeIntervallQuestion hoursMinutesQuestion = new TimeIntervallQuestion();
+        hoursMinutesQuestion.setId(7);
+        hoursMinutesQuestion.addTimeIntervallType(TimeIntervallType.HOURS);
+        hoursMinutesQuestion.addTimeIntervallType(TimeIntervallType.MINUTES);
+        hoursMinutesQuestion.setName("hoursMinutesQuestion_0");
+        hoursMinutesQuestion.setText("Wie lange hast du für den Marathon gebraucht?");
         // Time Intervall
-        TimeIntervallQuestion timeIntervallQuestion = new TimeIntervallQuestion();
-        timeIntervallQuestion.setId(7);
-        timeIntervallQuestion.setName("timeIntervallQuestion_0");
-        timeIntervallQuestion.setText("Wie lange hast du gebraucht?");
+        TimeIntervallQuestion yearsMonthsDaysQuestion = new TimeIntervallQuestion();
+        yearsMonthsDaysQuestion.setId(8);
+        yearsMonthsDaysQuestion.addTimeIntervallType(TimeIntervallType.YEARS);
+        yearsMonthsDaysQuestion.addTimeIntervallType(TimeIntervallType.MONTHS);
+        yearsMonthsDaysQuestion.addTimeIntervallType(TimeIntervallType.DAYS);
+        yearsMonthsDaysQuestion.setName("yearsMonthsDaysQuestion_0");
+        yearsMonthsDaysQuestion.setText("Wie lange geht der Corona Lockdown jetzt schon?");
+        // Time Intervall
+        TimeIntervallQuestion minutesSecondsQuestion = new TimeIntervallQuestion();
+        minutesSecondsQuestion.setId(9);
+        minutesSecondsQuestion.addTimeIntervallType(TimeIntervallType.MINUTES);
+        minutesSecondsQuestion.addTimeIntervallType(TimeIntervallType.SECONDS);
+        minutesSecondsQuestion.setName("minutesSecondsQuestion_0");
+        minutesSecondsQuestion.setText("Wie lange kannst du die Luft anhalten?");
         /* Likert
         LikertQuestion likertQuestion = new LikertQuestion();
-        likertQuestion.setId(7);
+        likertQuestion.setId(9);
         likertQuestion.setName("likertQuestion_0");
         likertQuestion.setText("Wie unangenehm war die Situation?");
         likertQuestion.setScaleMinimumLabel("Sehr unangenehm");
@@ -399,7 +417,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         Answer answerS6 = new Answer();
         answerS6.setText("Besser gehts nicht");
         answerS6.setCode("6");
-        answerS6.setNextQuestionId(timeIntervallQuestion.getId());
+        answerS6.setNextQuestionId(yearsMonthsDaysQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS6);
         // Multiple choice
         Answer answerM1 = new Answer();
@@ -431,8 +449,10 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         textQuestion.setNextQuestionId(dateQuestion.getId());
         dateQuestion.setNextQuestionId(daytimeQuestion.getId());
         daytimeQuestion.setNextQuestionId(daytimeAndDateQuestion.getId());
-        daytimeAndDateQuestion.setNextQuestionId(timeIntervallQuestion.getId());
-        timeIntervallQuestion.setNextQuestionId(0);
+        daytimeAndDateQuestion.setNextQuestionId(hoursMinutesQuestion.getId());
+        hoursMinutesQuestion.setNextQuestionId(yearsMonthsDaysQuestion.getId());
+        yearsMonthsDaysQuestion.setNextQuestionId(minutesSecondsQuestion.getId());
+        minutesSecondsQuestion.setNextQuestionId(0);
         /*
         likertQuestion.setNextQuestionId(0);
         // Adding questions to questionnaire
@@ -444,7 +464,9 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         questionnaire.addQuestion(dateQuestion);
         questionnaire.addQuestion(daytimeQuestion);
         questionnaire.addQuestion(daytimeAndDateQuestion);
-        questionnaire.addQuestion(timeIntervallQuestion);
+        questionnaire.addQuestion(hoursMinutesQuestion);
+        questionnaire.addQuestion(yearsMonthsDaysQuestion);
+        questionnaire.addQuestion(minutesSecondsQuestion);
 
         // Filling surveys with steps
         for (int i = 0; i < instructions.size(); i++) {

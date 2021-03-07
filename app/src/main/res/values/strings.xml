@@ -1,3 +1,4 @@
+<!-- TODO: Clean up-->
 <resources>
 
     <!-- Layout Strings -->
@@ -36,7 +37,6 @@
     <string name="create_vp_start_time_hint">Weckzeit</string>
     <string name="create_vp_buttontext">Experiment starten</string>
 
-    <!-- TODO: Into Config-->
     <string name="fos_alert_title">Fehler beim Speichern</string>
     <string name="fos_alert_text">Die Speicherung im Internal Storage konnte nur teilweise oder gar nicht durchgeführt werden. Bitte den Support kontaktieren.</string>
     <string name="fis_alert_title">Fehler beim Laden</string>
@@ -94,5 +94,13 @@
     <string name="_00d_00h_00m">00d 00h 00m</string>
     <string name="intervall">intervall</string>
     <string name="tage_stunden_minuten">(Tage, Stunden, Minuten)</string>
+    <string name="_0">0</string>
+    <string name="wie_viele">Wie viele…</string>
+    <string name="jahre">Jahre</string>
+    <string name="monate">Monate</string>
+    <string name="tage">Tage</string>
+    <string name="stunden">Stunden</string>
+    <string name="minuten">Minuten</string>
+    <string name="sekunden">Sekunden</string>
 
 </resources>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor">
 
     <TextView
         android:id="@+id/timeIntervallQuestionText"
@@ -36,42 +36,89 @@
         app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionText" />
 
     <EditText
-        android:id="@+id/timeIntervallQuestionAnswerField"
-        android:layout_width="0dp"
+        android:id="@+id/timeIntervallQuestionYearAnswerField"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:cursorVisible="false"
+        android:layout_marginEnd="8dp"
+        android:hint="@string/wie_viele"
         android:importantForAutofill="no"
         android:inputType="number"
-        android:labelFor="@+id/timeIntervallQuestionAnswerField"
-        android:textAlignment="center"
-        android:textColor="@android:color/transparent"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionHint" />
-
-    <TextView
-        android:id="@+id/timeIntervallQuestionAnswerView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/_00d_00h_00m"
-        android:textAlignment="center"
+        android:textAlignment="textEnd"
         android:textColor="@color/textColor"
         android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionHint" />
 
-    <TextView
-        android:id="@+id/textView"
+    <EditText
+        android:id="@+id/timeIntervallQuestionSecondAnswerField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/tage_stunden_minuten"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionAnswerField" />
+        android:layout_marginEnd="8dp"
+        android:hint="@string/wie_viele"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        android:textAlignment="textEnd"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionMinuteAnswerField" />
+
+    <EditText
+        android:id="@+id/timeIntervallQuestionMonthAnswerField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:hint="@string/wie_viele"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        android:textAlignment="textEnd"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionYearAnswerField" />
+
+    <EditText
+        android:id="@+id/timeIntervallQuestionDayAnswerField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:hint="@string/wie_viele"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        android:textAlignment="textEnd"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionMonthAnswerField" />
+
+    <EditText
+        android:id="@+id/timeIntervallQuestionHourAnswerField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:hint="@string/wie_viele"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        android:textAlignment="textEnd"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionDayAnswerField" />
+
+    <EditText
+        android:id="@+id/timeIntervallQuestionMinuteAnswerField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:hint="@string/wie_viele"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        android:textAlignment="textEnd"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionHourAnswerField" />
 
     <Button
         android:id="@+id/timeIntervallQuestionNextButton"
@@ -88,4 +135,84 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <TextView
+        android:id="@+id/timeIntervallQuestionYearSuffix"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/jahre"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="@+id/timeIntervallQuestionYearAnswerField"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="@+id/timeIntervallQuestionYearAnswerField" />
+
+    <TextView
+        android:id="@+id/timeIntervallQuestionMonthSuffix"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/monate"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="@+id/timeIntervallQuestionMonthAnswerField"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionYearAnswerField" />
+
+    <TextView
+        android:id="@+id/timeIntervallQuestionDaySuffix"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/tage"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="@+id/timeIntervallQuestionDayAnswerField"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionMonthAnswerField" />
+
+    <TextView
+        android:id="@+id/timeIntervallQuestionHourSuffix"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/stunden"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="@+id/timeIntervallQuestionHourAnswerField"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionDayAnswerField" />
+
+    <TextView
+        android:id="@+id/timeIntervallQuestionMinuteSuffix"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/minuten"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@+id/timeIntervallQuestionSecondAnswerField"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="@+id/timeIntervallQuestionMinuteAnswerField" />
+
+    <TextView
+        android:id="@+id/timeIntervallQuestionSecondSuffix"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/sekunden"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="@+id/timeIntervallQuestionSecondAnswerField"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="@+id/timeIntervallQuestionSecondAnswerField" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

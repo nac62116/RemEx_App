@@ -341,7 +341,9 @@ public class ExperimentController implements Observer {
             intent.putExtra(Config.POINT_OF_TIME_TYPES_KEY, pointOfTimeQuestion.getPointOfTimeTypeNames());
         }
         else if (question.getType().equals(QuestionType.TIME_INTERVALL)) {
+            TimeIntervallQuestion timeIntervallQuestion = (TimeIntervallQuestion) question;
             intent = new Intent(currentContext, TimeIntervallQuestionActivity.class);
+            intent.putExtra(Config.TIME_INTERVALL_TYPES_KEY, timeIntervallQuestion.getTimeIntervallTypeNames());
         }
         intent.putExtra(Config.QUESTION_TEXT_KEY, question.getText());
         intent.putExtra(Config.QUESTION_HINT_KEY, question.getHint());

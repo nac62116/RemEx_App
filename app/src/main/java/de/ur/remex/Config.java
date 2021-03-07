@@ -6,6 +6,7 @@ package de.ur.remex;
 public final class Config {
 
 
+
     private Config() {
         // Can't be instantiated
     }
@@ -60,8 +61,9 @@ public final class Config {
     public static final String BREATHING_FREQUENCY_KEY = "breathingFrequency";
     public static final String QUESTION_TEXT_KEY = "questionText";
     public static final String QUESTION_HINT_KEY = "questionHint";
-    public static final String CHOICE_TYPE_KEY = "questionType";
+    public static final String CHOICE_TYPE_KEY = "choiceType";
     public static final String POINT_OF_TIME_TYPES_KEY = "pointOfTimeTypes";
+    public static final String TIME_INTERVALL_TYPES_KEY = "timeIntervallTypes";
     public static final String ANSWER_TEXTS_KEY = "answerTexts";
 
     // Alarm purposes
