@@ -18,12 +18,12 @@ import de.ur.remex.model.experiment.Step;
 import de.ur.remex.model.experiment.StepType;
 import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
+import de.ur.remex.model.experiment.questionnaire.ChoiceType;
 import de.ur.remex.model.experiment.questionnaire.PointOfTimeQuestion;
-import de.ur.remex.model.experiment.questionnaire.MultipleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.Question;
 import de.ur.remex.model.experiment.questionnaire.QuestionType;
 import de.ur.remex.model.experiment.questionnaire.Questionnaire;
-import de.ur.remex.model.experiment.questionnaire.SingleChoiceQuestion;
+import de.ur.remex.model.experiment.questionnaire.ChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.TextQuestion;
 import de.ur.remex.model.experiment.questionnaire.TimeIntervallQuestion;
 import de.ur.remex.model.storage.InternalStorage;
@@ -210,25 +210,26 @@ public class ExperimentController implements Observer {
         Questionnaire currentQuestionnaire = (Questionnaire) currentStep;
         Question currentQuestion = currentQuestionnaire.getQuestionById(currentQuestionId);
         Question nextQuestion = null;
-        if (currentQuestion.getType().equals(QuestionType.SINGLE_CHOICE)) {
-            SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) currentQuestion;
-            String answerText = (String) event.getData();
-            String answerCode = singleChoiceQuestion.getCodeByAnswerText(answerText);
-            csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
-                    answerCode, calendar.getTime().toString());
-            nextQuestion = currentQuestionnaire.getQuestionById(singleChoiceQuestion.getNextQuestionIdByAnswerText(answerText));
-        }
-        else if (currentQuestion.getType().equals(QuestionType.MULTIPLE_CHOICE)) {
-            MultipleChoiceQuestion multipleChoiceQuestion = (MultipleChoiceQuestion) currentQuestion;
-            @SuppressWarnings("unchecked")
-            ArrayList<String> answerTexts = (ArrayList<String>) event.getData();
-            StringBuilder answerCode = new StringBuilder();
-            for (String answerText: answerTexts) {
-                answerCode.append(multipleChoiceQuestion.getCodeByAnswerText(answerText));
+        if (currentQuestion.getType().equals(QuestionType.CHOICE)) {
+            ChoiceQuestion choiceQuestion = (ChoiceQuestion) currentQuestion;
+            if (choiceQuestion.getChoiceType().equals(ChoiceType.SINGLE_CHOICE)) {
+                String answerText = (String) event.getData();
+                String answerCode = choiceQuestion.getCodeByAnswerText(answerText);
+                csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                        answerCode, calendar.getTime().toString());
+                nextQuestion = currentQuestionnaire.getQuestionById(choiceQuestion.getNextQuestionIdByAnswerText(answerText));
             }
-            csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
-                    answerCode.toString(), calendar.getTime().toString());
-            nextQuestion = currentQuestionnaire.getQuestionById(multipleChoiceQuestion.getNextQuestionId());
+            else {
+                @SuppressWarnings("unchecked")
+                ArrayList<String> answerTexts = (ArrayList<String>) event.getData();
+                StringBuilder answerCode = new StringBuilder();
+                for (String answerText: answerTexts) {
+                    answerCode.append(choiceQuestion.getCodeByAnswerText(answerText));
+                }
+                csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                        answerCode.toString(), calendar.getTime().toString());
+                nextQuestion = currentQuestionnaire.getQuestionById(choiceQuestion.getNextQuestionId());
+            }
         }
         else if (currentQuestion.getType().equals(QuestionType.TEXT)) {
             TextQuestion textQuestion = (TextQuestion) currentQuestion;
@@ -325,17 +326,11 @@ public class ExperimentController implements Observer {
 
     private void navigateToQuestion(Question question) {
         Intent intent = new Intent();
-        if (question.getType().equals(QuestionType.SINGLE_CHOICE)) {
-            SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) question;
+        if (question.getType().equals(QuestionType.CHOICE)) {
+            ChoiceQuestion choiceQuestion = (ChoiceQuestion) question;
             intent = new Intent(currentContext, ChoiceQuestionActivity.class);
-            intent.putExtra(Config.ANSWER_TEXTS_KEY, singleChoiceQuestion.getAnswerTexts());
-            intent.putExtra(Config.QUESTION_TYPE_KEY, singleChoiceQuestion.getType());
-        }
-        else if (question.getType().equals(QuestionType.MULTIPLE_CHOICE)) {
-            MultipleChoiceQuestion multipleChoiceQuestion = (MultipleChoiceQuestion) question;
-            intent = new Intent(currentContext, ChoiceQuestionActivity.class);
-            intent.putExtra(Config.ANSWER_TEXTS_KEY, multipleChoiceQuestion.getAnswerTexts());
-            intent.putExtra(Config.QUESTION_TYPE_KEY, multipleChoiceQuestion.getType());
+            intent.putExtra(Config.ANSWER_TEXTS_KEY, choiceQuestion.getAnswerTexts());
+            intent.putExtra(Config.CHOICE_TYPE_KEY, choiceQuestion.getChoiceType());
         }
         else if (question.getType().equals(QuestionType.TEXT)) {
             intent = new Intent(currentContext, TextQuestionActivity.class);

@@ -29,11 +29,11 @@ import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
 import de.ur.remex.model.experiment.breathingExercise.BreathingMode;
 import de.ur.remex.model.experiment.questionnaire.Answer;
+import de.ur.remex.model.experiment.questionnaire.ChoiceType;
 import de.ur.remex.model.experiment.questionnaire.PointOfTimeQuestion;
-import de.ur.remex.model.experiment.questionnaire.MultipleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.PointOfTimeType;
 import de.ur.remex.model.experiment.questionnaire.Questionnaire;
-import de.ur.remex.model.experiment.questionnaire.SingleChoiceQuestion;
+import de.ur.remex.model.experiment.questionnaire.ChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.TextQuestion;
 import de.ur.remex.model.experiment.questionnaire.TimeIntervallQuestion;
 import de.ur.remex.model.storage.InternalStorage;
@@ -322,17 +322,19 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         textQuestion.setText("Wie hat sich das ganze angefühlt?");
         textQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc...");
         // Single choice
-        SingleChoiceQuestion singleChoiceQuestion = new SingleChoiceQuestion();
+        ChoiceQuestion singleChoiceQuestion = new ChoiceQuestion();
         singleChoiceQuestion.setId(2);
+        singleChoiceQuestion.setChoiceType(ChoiceType.SINGLE_CHOICE);
         singleChoiceQuestion.setName("singleChoiceQuestion_0");
         singleChoiceQuestion.setText("Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt?");
         singleChoiceQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc... Warst du verägert, fröhlich, optimistisc");
         // Multiple choice
-        MultipleChoiceQuestion multipleChoiceQuestion = new MultipleChoiceQuestion();
+        ChoiceQuestion multipleChoiceQuestion = new ChoiceQuestion();
         multipleChoiceQuestion.setId(3);
+        multipleChoiceQuestion.setChoiceType(ChoiceType.MULTIPLE_CHOICE);
         multipleChoiceQuestion.setName("multipleChoiceQuestion_0");
-        multipleChoiceQuestion.setText("Wie hat sich das ganze angefühlt?");
-        multipleChoiceQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc...");
+        multipleChoiceQuestion.setText("Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt?");
+        multipleChoiceQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc... Warst du verägert, fröhlich, optimistisc");
         // Daytime
         PointOfTimeQuestion daytimeQuestion = new PointOfTimeQuestion();
         daytimeQuestion.setId(4);
@@ -408,6 +410,22 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         answerM2.setText("Fröhlich");
         answerM2.setCode("2");
         multipleChoiceQuestion.addAnswer(answerM2);
+        Answer answerM3 = new Answer();
+        answerM3.setText("Schlecht");
+        answerM3.setCode("3");
+        multipleChoiceQuestion.addAnswer(answerM3);
+        Answer answerM4 = new Answer();
+        answerM4.setText("Gut");
+        answerM4.setCode("4");
+        multipleChoiceQuestion.addAnswer(answerM4);
+        Answer answerM5 = new Answer();
+        answerM5.setText("Hervorragend");
+        answerM5.setCode("5");
+        multipleChoiceQuestion.addAnswer(answerM5);
+        Answer answerM6 = new Answer();
+        answerM6.setText("Besser gehts nicht");
+        answerM6.setCode("6");
+        multipleChoiceQuestion.addAnswer(answerM6);
         // Connecting questions together
         multipleChoiceQuestion.setNextQuestionId(textQuestion.getId());
         textQuestion.setNextQuestionId(dateQuestion.getId());

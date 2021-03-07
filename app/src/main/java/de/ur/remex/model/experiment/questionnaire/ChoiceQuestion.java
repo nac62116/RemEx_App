@@ -2,14 +2,15 @@ package de.ur.remex.model.experiment.questionnaire;
 
 import java.util.ArrayList;
 
-// TODO: Combine with MultipleChoiceQuestion to ChoiceQuestion
+public class ChoiceQuestion extends Question {
 
-public class SingleChoiceQuestion extends Question {
-
+    private int nextQuestionId;
     private ArrayList<Answer> answers;
+    // Has to contain either ChoiceType.SINGLE or ChoiceType.MULTIPLE
+    private ChoiceType choiceType;
 
-    public SingleChoiceQuestion() {
-        type = QuestionType.SINGLE_CHOICE;
+    public ChoiceQuestion() {
+        type = QuestionType.CHOICE;
         answers = new ArrayList<>();
     }
 
@@ -45,5 +46,21 @@ public class SingleChoiceQuestion extends Question {
             }
         }
         return 0;
+    }
+
+    public int getNextQuestionId() {
+        return nextQuestionId;
+    }
+
+    public void setNextQuestionId(int nextQuestionId) {
+        this.nextQuestionId = nextQuestionId;
+    }
+
+    public ChoiceType getChoiceType() {
+        return choiceType;
+    }
+
+    public void setChoiceType(ChoiceType choiceType) {
+        this.choiceType = choiceType;
     }
 }
