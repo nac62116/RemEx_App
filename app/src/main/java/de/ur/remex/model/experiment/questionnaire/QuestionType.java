@@ -5,7 +5,6 @@ public enum QuestionType {
     SINGLE_CHOICE,
     MULTIPLE_CHOICE,
     TEXT,
-    DATE,
-    DAYTIME,
-    TIME_INTERVALL
+    TIME_INTERVALL,
+    POINT_OF_TIME
 }

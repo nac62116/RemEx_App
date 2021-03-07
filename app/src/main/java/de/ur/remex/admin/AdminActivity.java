@@ -12,9 +12,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,9 +29,9 @@ import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
 import de.ur.remex.model.experiment.breathingExercise.BreathingMode;
 import de.ur.remex.model.experiment.questionnaire.Answer;
-import de.ur.remex.model.experiment.questionnaire.DateQuestion;
-import de.ur.remex.model.experiment.questionnaire.DaytimeQuestion;
+import de.ur.remex.model.experiment.questionnaire.PointOfTimeQuestion;
 import de.ur.remex.model.experiment.questionnaire.MultipleChoiceQuestion;
+import de.ur.remex.model.experiment.questionnaire.PointOfTimeType;
 import de.ur.remex.model.experiment.questionnaire.Questionnaire;
 import de.ur.remex.model.experiment.questionnaire.SingleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.TextQuestion;
@@ -337,18 +334,27 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         multipleChoiceQuestion.setText("Wie hat sich das ganze angefühlt?");
         multipleChoiceQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc...");
         // Daytime
-        DaytimeQuestion daytimeQuestion = new DaytimeQuestion();
+        PointOfTimeQuestion daytimeQuestion = new PointOfTimeQuestion();
         daytimeQuestion.setId(4);
+        daytimeQuestion.addPointOfTimeType(PointOfTimeType.DAYTIME);
         daytimeQuestion.setName("daytimeQuestion_0");
         daytimeQuestion.setText("Um wie viel Uhr bist du ins Bett gegangen?");
         // Date
-        DateQuestion dateQuestion = new DateQuestion();
+        PointOfTimeQuestion dateQuestion = new PointOfTimeQuestion();
         dateQuestion.setId(5);
+        dateQuestion.addPointOfTimeType(PointOfTimeType.DATE);
         dateQuestion.setName("dateQuestion_0");
         dateQuestion.setText("Wann hast du Geburtstag?");
+        // Daytime and Date
+        PointOfTimeQuestion daytimeAndDateQuestion = new PointOfTimeQuestion();
+        daytimeAndDateQuestion.setId(6);
+        daytimeAndDateQuestion.addPointOfTimeType(PointOfTimeType.DAYTIME);
+        daytimeAndDateQuestion.addPointOfTimeType(PointOfTimeType.DATE);
+        daytimeAndDateQuestion.setName("daytimeDateQuestion_0");
+        daytimeAndDateQuestion.setText("Wann ist deine nächste Schulaufgabe?");
         // Time Intervall
         TimeIntervallQuestion timeIntervallQuestion = new TimeIntervallQuestion();
-        timeIntervallQuestion.setId(6);
+        timeIntervallQuestion.setId(7);
         timeIntervallQuestion.setName("timeIntervallQuestion_0");
         timeIntervallQuestion.setText("Wie lange hast du gebraucht?");
         /* Likert
@@ -376,17 +382,17 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         Answer answerS3 = new Answer();
         answerS3.setText("Schlecht");
         answerS3.setCode("3");
-        answerS3.setNextQuestionId(daytimeQuestion.getId());
+        answerS3.setNextQuestionId(dateQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS3);
         Answer answerS4 = new Answer();
         answerS4.setText("Gut");
         answerS4.setCode("4");
-        answerS4.setNextQuestionId(dateQuestion.getId());
+        answerS4.setNextQuestionId(daytimeQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS4);
         Answer answerS5 = new Answer();
         answerS5.setText("Hervorragend");
         answerS5.setCode("5");
-        answerS5.setNextQuestionId(timeIntervallQuestion.getId());
+        answerS5.setNextQuestionId(daytimeAndDateQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS5);
         Answer answerS6 = new Answer();
         answerS6.setText("Besser gehts nicht");
@@ -404,9 +410,10 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         multipleChoiceQuestion.addAnswer(answerM2);
         // Connecting questions together
         multipleChoiceQuestion.setNextQuestionId(textQuestion.getId());
-        textQuestion.setNextQuestionId(daytimeQuestion.getId());
-        daytimeQuestion.setNextQuestionId(dateQuestion.getId());
-        dateQuestion.setNextQuestionId(timeIntervallQuestion.getId());
+        textQuestion.setNextQuestionId(dateQuestion.getId());
+        dateQuestion.setNextQuestionId(daytimeQuestion.getId());
+        daytimeQuestion.setNextQuestionId(daytimeAndDateQuestion.getId());
+        daytimeAndDateQuestion.setNextQuestionId(timeIntervallQuestion.getId());
         timeIntervallQuestion.setNextQuestionId(0);
         /*
         likertQuestion.setNextQuestionId(0);
@@ -416,8 +423,9 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         questionnaire.addQuestion(singleChoiceQuestion);
         questionnaire.addQuestion(multipleChoiceQuestion);
         questionnaire.addQuestion(textQuestion);
-        questionnaire.addQuestion(daytimeQuestion);
         questionnaire.addQuestion(dateQuestion);
+        questionnaire.addQuestion(daytimeQuestion);
+        questionnaire.addQuestion(daytimeAndDateQuestion);
         questionnaire.addQuestion(timeIntervallQuestion);
 
         // Filling surveys with steps

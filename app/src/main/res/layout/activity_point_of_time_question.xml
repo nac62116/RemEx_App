@@ -36,9 +36,26 @@
         app:layout_constraintTop_toBottomOf="@+id/pointOfTimeQuestionText" />
 
     <EditText
-        android:id="@+id/pointOfTimeQuestionAnswerField"
+        android:id="@+id/pointOfTimeQuestionDateAnswerField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:autofillHints=""
+        android:focusable="false"
+        android:hint="@string/datum_eingeben"
+        android:inputType="date"
+        android:textAlignment="center"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pointOfTimeQuestionHint" />
+
+    <EditText
+        android:id="@+id/pointOfTimeQuestionDaytimeAnswerField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:autofillHints=""
         android:focusable="false"
         android:hint="@string/uhrzeit_eingeben"
@@ -46,10 +63,9 @@
         android:textAlignment="center"
         android:textColor="@color/textColor"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/pointOfTimeQuestionNextButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pointOfTimeQuestionHint" />
+        app:layout_constraintTop_toBottomOf="@+id/pointOfTimeQuestionDateAnswerField" />
 
     <Button
         android:id="@+id/pointOfTimeQuestionNextButton"

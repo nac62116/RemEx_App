@@ -1,6 +1,5 @@
 package de.ur.remex.view;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.graphics.Color;
@@ -13,12 +12,13 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Observer;
 
 import de.ur.remex.Config;
 import de.ur.remex.R;
-import de.ur.remex.admin.CreateVPActivity;
+import de.ur.remex.model.experiment.questionnaire.PointOfTimeType;
 import de.ur.remex.model.experiment.questionnaire.QuestionType;
 import de.ur.remex.utilities.Event;
 import de.ur.remex.utilities.Observable;
@@ -29,8 +29,9 @@ public class PointOfTimeQuestionActivity extends AppCompatActivity implements Vi
 
     private String questionText;
     private String questionHint;
-    private QuestionType questionType;
-    private EditText answerTextField;
+    private ArrayList<String> pointOfTimeTypeNames;
+    private EditText dateAnswerTextField;
+    private EditText daytimeAnswerTextField;
     private Button nextButton;
 
     @Override
@@ -42,8 +43,8 @@ public class PointOfTimeQuestionActivity extends AppCompatActivity implements Vi
     }
 
     private void getIntentExtras() {
-        if (getIntent().getSerializableExtra(Config.QUESTION_TYPE_KEY) != null) {
-            questionType = (QuestionType) getIntent().getSerializableExtra(Config.QUESTION_TYPE_KEY);
+        if (getIntent().getStringArrayListExtra(Config.POINT_OF_TIME_TYPES_KEY) != null) {
+            pointOfTimeTypeNames = getIntent().getStringArrayListExtra(Config.POINT_OF_TIME_TYPES_KEY);
         }
         if (getIntent().getStringExtra(Config.QUESTION_TEXT_KEY) != null) {
             questionText = getIntent().getStringExtra(Config.QUESTION_TEXT_KEY);
@@ -66,13 +67,15 @@ public class PointOfTimeQuestionActivity extends AppCompatActivity implements Vi
         nextButton.setEnabled(false);
         nextButton.setBackground(ContextCompat.getDrawable(this, R.drawable.next_button_deactivated));
         nextButton.setTextColor(Color.LTGRAY);
-        answerTextField = findViewById(R.id.pointOfTimeQuestionAnswerField);
-        answerTextField.setOnClickListener(this);
-        if (questionType.equals(QuestionType.DAYTIME)) {
-            answerTextField.setHint(Config.DAYTIME_ANSWER_HINT);
+        dateAnswerTextField = findViewById(R.id.pointOfTimeQuestionDateAnswerField);
+        dateAnswerTextField.setOnClickListener(this);
+        daytimeAnswerTextField = findViewById(R.id.pointOfTimeQuestionDaytimeAnswerField);
+        daytimeAnswerTextField.setOnClickListener(this);
+        if (!pointOfTimeTypeNames.contains(PointOfTimeType.DATE.name())) {
+            dateAnswerTextField.setVisibility(View.GONE);
         }
-        else {
-            answerTextField.setHint(Config.DATE_ANSWER_HINT);
+        if (!pointOfTimeTypeNames.contains(PointOfTimeType.DAYTIME.name())) {
+            daytimeAnswerTextField.setVisibility(View.GONE);
         }
     }
 
@@ -84,21 +87,17 @@ public class PointOfTimeQuestionActivity extends AppCompatActivity implements Vi
     @Override
     public void onClick(View v) {
         if (v.equals(nextButton)) {
-            Event event = new Event(this, Config.EVENT_NEXT_QUESTION, answerTextField.getText().toString());
+            String answerString = dateAnswerTextField.getText().toString() + " " + daytimeAnswerTextField.getText().toString();
+            Event event = new Event(this, Config.EVENT_NEXT_QUESTION, answerString.trim());
             OBSERVABLE.notifyExperimentController(event);
         }
-        else if (v.equals(answerTextField)) {
-            nextButton.setEnabled(true);
-            nextButton.setBackground(ContextCompat.getDrawable(this, R.drawable.next_button));
-            nextButton.setTextColor(this.getResources().getColor(R.color.themeColor));
-            if (questionType.equals(QuestionType.DAYTIME)) {
-                TimePickerDialog timePickerDialog = createTimePickerDialog();
-                timePickerDialog.show();
-            }
-            else {
-                DatePickerDialog datePickerDialog = createDatePickerDialog();
-                datePickerDialog.show();
-            }
+        else if (v.equals(dateAnswerTextField)) {
+            DatePickerDialog datePickerDialog = createDatePickerDialog();
+            datePickerDialog.show();
+        }
+        else if (v.equals(daytimeAnswerTextField)) {
+            TimePickerDialog timePickerDialog = createTimePickerDialog();
+            timePickerDialog.show();
         }
     }
 
@@ -124,7 +123,8 @@ public class PointOfTimeQuestionActivity extends AppCompatActivity implements Vi
                 min = "" + minute;
             }
             String timeString = hour + ":" + min + " Uhr";
-            answerTextField.setText(timeString);
+            daytimeAnswerTextField.setText(timeString);
+            updateNextButton();
         }, currentHour, currentMinute, true);
         return timePickerDialog;
     }
@@ -153,9 +153,36 @@ public class PointOfTimeQuestionActivity extends AppCompatActivity implements Vi
                 dayString = "" + dayOfMonth;
             }
             String dateString = dayString + "." + monthString + "." + year;
-            answerTextField.setText(dateString);
+            dateAnswerTextField.setText(dateString);
+            updateNextButton();
         }, currentYear, currentMonth, currentDay);
         return datePickerDialog;
+    }
+
+    private void updateNextButton() {
+        if (pointOfTimeTypeNames.contains(PointOfTimeType.DATE.name()) &&
+                pointOfTimeTypeNames.contains(PointOfTimeType.DAYTIME.name())) {
+            if (!dateAnswerTextField.getText().toString().equals("") &&
+                    !daytimeAnswerTextField.getText().toString().equals("")) {
+                nextButton.setEnabled(true);
+                nextButton.setBackground(ContextCompat.getDrawable(this, R.drawable.next_button));
+                nextButton.setTextColor(this.getResources().getColor(R.color.themeColor));
+            }
+        }
+        else if (pointOfTimeTypeNames.contains(PointOfTimeType.DATE.name())) {
+            if (!dateAnswerTextField.getText().toString().equals("")) {
+                nextButton.setEnabled(true);
+                nextButton.setBackground(ContextCompat.getDrawable(this, R.drawable.next_button));
+                nextButton.setTextColor(this.getResources().getColor(R.color.themeColor));
+            }
+        }
+        else {
+            if (!daytimeAnswerTextField.getText().toString().equals("")) {
+                nextButton.setEnabled(true);
+                nextButton.setBackground(ContextCompat.getDrawable(this, R.drawable.next_button));
+                nextButton.setTextColor(this.getResources().getColor(R.color.themeColor));
+            }
+        }
     }
 
     // Disabling the OS-Back Button

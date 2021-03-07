@@ -18,8 +18,7 @@ import de.ur.remex.model.experiment.Step;
 import de.ur.remex.model.experiment.StepType;
 import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
-import de.ur.remex.model.experiment.questionnaire.DateQuestion;
-import de.ur.remex.model.experiment.questionnaire.DaytimeQuestion;
+import de.ur.remex.model.experiment.questionnaire.PointOfTimeQuestion;
 import de.ur.remex.model.experiment.questionnaire.MultipleChoiceQuestion;
 import de.ur.remex.model.experiment.questionnaire.Question;
 import de.ur.remex.model.experiment.questionnaire.QuestionType;
@@ -121,6 +120,7 @@ public class ExperimentController implements Observer {
         NotificationSender notificationSender = new NotificationSender(currentContext);
         InternalStorage internalStorage = new InternalStorage(currentContext);
         Calendar calendar = Calendar.getInstance();
+        // Preparing current state
         Survey currentSurvey = getCurrentSurvey();
         Step currentStep;
         // Checking event type
@@ -237,19 +237,12 @@ public class ExperimentController implements Observer {
                     answerText, calendar.getTime().toString());
             nextQuestion = currentQuestionnaire.getQuestionById(textQuestion.getNextQuestionId());
         }
-        else if (currentQuestion.getType().equals(QuestionType.DAYTIME)) {
-            DaytimeQuestion daytimeQuestion = (DaytimeQuestion) currentQuestion;
+        else if (currentQuestion.getType().equals(QuestionType.POINT_OF_TIME)) {
+            PointOfTimeQuestion pointOfTimeQuestion = (PointOfTimeQuestion) currentQuestion;
             String answerText = (String) event.getData();
             csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
                     answerText, calendar.getTime().toString());
-            nextQuestion = currentQuestionnaire.getQuestionById(daytimeQuestion.getNextQuestionId());
-        }
-        else if (currentQuestion.getType().equals(QuestionType.DATE)) {
-            DateQuestion dateQuestion = (DateQuestion) currentQuestion;
-            String answerText = (String) event.getData();
-            csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
-                    answerText, calendar.getTime().toString());
-            nextQuestion = currentQuestionnaire.getQuestionById(dateQuestion.getNextQuestionId());
+            nextQuestion = currentQuestionnaire.getQuestionById(pointOfTimeQuestion.getNextQuestionId());
         }
         else if (currentQuestion.getType().equals(QuestionType.TIME_INTERVALL)) {
             TimeIntervallQuestion timeIntervallQuestion = (TimeIntervallQuestion) currentQuestion;
@@ -347,13 +340,10 @@ public class ExperimentController implements Observer {
         else if (question.getType().equals(QuestionType.TEXT)) {
             intent = new Intent(currentContext, TextQuestionActivity.class);
         }
-        else if (question.getType().equals(QuestionType.DAYTIME)) {
+        else if (question.getType().equals(QuestionType.POINT_OF_TIME)) {
+            PointOfTimeQuestion pointOfTimeQuestion = (PointOfTimeQuestion) question;
             intent = new Intent(currentContext, PointOfTimeQuestionActivity.class);
-            intent.putExtra(Config.QUESTION_TYPE_KEY, QuestionType.DAYTIME);
-        }
-        else if (question.getType().equals(QuestionType.DATE)) {
-            intent = new Intent(currentContext, PointOfTimeQuestionActivity.class);
-            intent.putExtra(Config.QUESTION_TYPE_KEY, QuestionType.DATE);
+            intent.putExtra(Config.POINT_OF_TIME_TYPES_KEY, pointOfTimeQuestion.getPointOfTimeTypeNames());
         }
         else if (question.getType().equals(QuestionType.TIME_INTERVALL)) {
             intent = new Intent(currentContext, TimeIntervallQuestionActivity.class);

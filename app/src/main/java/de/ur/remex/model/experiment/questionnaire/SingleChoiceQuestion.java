@@ -2,6 +2,8 @@ package de.ur.remex.model.experiment.questionnaire;
 
 import java.util.ArrayList;
 
+// TODO: Combine with MultipleChoiceQuestion to ChoiceQuestion
+
 public class SingleChoiceQuestion extends Question {
 
     private ArrayList<Answer> answers;

@@ -89,7 +89,8 @@
     <string name="choice_question_scroll_hint">Scrollen für weitere Antworten</string>
     <string name="mehrere_antworten_sind_m_glich">Mehrere Antworten sind möglich</string>
     <string name="deine_antwort">Deine Antwort…</string>
-    <string name="uhrzeit_eingeben">Uhrzeit/Datum eingeben…</string>
+    <string name="datum_eingeben">Datum eingeben…</string>
+    <string name="uhrzeit_eingeben">Uhrzeit eingeben…</string>
     <string name="_00d_00h_00m">00d 00h 00m</string>
     <string name="intervall">intervall</string>
     <string name="tage_stunden_minuten">(Tage, Stunden, Minuten)</string>
