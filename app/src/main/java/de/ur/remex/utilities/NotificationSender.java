@@ -23,7 +23,7 @@ public class NotificationSender {
         this.context = context;
     }
 
-    public void createNotification() {
+    public void sendNotification() {
         // Ring Alarm
         MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.notification_clock);
         mediaPlayer.start();

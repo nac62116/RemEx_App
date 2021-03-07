@@ -43,13 +43,16 @@ import de.ur.remex.view.TextQuestionActivity;
 import de.ur.remex.view.TimeIntervallQuestionActivity;
 import de.ur.remex.view.WaitingRoomActivity;
 
+// TODO: LikertQuestionActivity
+
 public class ExperimentController implements Observer {
 
     // Current Model
     private ExperimentGroup currentExperimentGroup;
-    private Survey currentSurvey;
-    private Step currentStep;
-    private Question currentQuestion;
+    // Current State
+    private int currentSurveyId;
+    private int currentStepId;
+    private int currentQuestionId;
     private boolean userIsAlreadyWaiting;
     // Current View
     private Context currentContext;
@@ -83,24 +86,25 @@ public class ExperimentController implements Observer {
 
     public void startExperiment(ExperimentGroup experimentGroup, long startTimeInMs) {
         Log.e("ExperimentController", "EVENT_EXPERIMENT_STARTED");
-        InternalStorage storage = new InternalStorage(currentContext);
+        InternalStorage internalStorage = new InternalStorage(currentContext);
         // Cancel possible ongoing alarms
-        AlarmSender alarmManager = new AlarmSender(currentContext);
-        alarmManager.cancelAllAlarms();
+        AlarmSender alarmSender = new AlarmSender(currentContext);
+        alarmSender.cancelAllAlarms();
         // Set internal storage values
-        storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, Config.EXPERIMENT_RUNNING);
-        storage.saveFileContent(Config.FILE_NAME_CSV_STATUS, Config.CSV_NOT_SAVED);
+        internalStorage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, Config.EXPERIMENT_RUNNING);
+        internalStorage.saveFileContent(Config.FILE_NAME_CSV_STATUS, Config.CSV_NOT_SAVED);
         // Init CSV
-        String vpId = storage.getFileContent(Config.FILE_NAME_ID);
-        String vpGroup = storage.getFileContent(Config.FILE_NAME_GROUP);
+        String vpId = internalStorage.getFileContent(Config.FILE_NAME_ID);
+        String vpGroup = internalStorage.getFileContent(Config.FILE_NAME_GROUP);
         csvCreator = new CsvCreator();
         csvCreator.initCsvMap(experimentGroup.getSurveys(), vpId, vpGroup);
-        storage.saveFileContent(Config.FILE_NAME_CSV, Config.INITIAL_CSV_VALUE);
+        internalStorage.saveFileContent(Config.FILE_NAME_CSV, Config.INITIAL_CSV_VALUE);
         // Init current state
         currentExperimentGroup = experimentGroup;
         currentExperimentGroup.setStartTimeInMillis(startTimeInMs);
-        currentSurvey = currentExperimentGroup.getFirstSurvey();
-        setSurveyAlarm(startTimeInMs);
+        Survey currentSurvey = currentExperimentGroup.getFirstSurvey();
+        currentSurveyId = currentSurvey.getId();
+        setSurveyAlarm(currentSurvey, alarmSender, startTimeInMs);
         // Inform user
         Toast toast = Toast.makeText(currentContext, Config.EXPERIMENT_STARTED_TOAST, Toast.LENGTH_LONG);
         toast.show();
@@ -113,10 +117,12 @@ public class ExperimentController implements Observer {
             currentContext = event.getContext();
         }
         // Preparing utilities
-        AlarmSender alarmManager = new AlarmSender(currentContext);
-        NotificationSender notificationManager = new NotificationSender(currentContext);
+        AlarmSender alarmSender = new AlarmSender(currentContext);
+        NotificationSender notificationSender = new NotificationSender(currentContext);
         InternalStorage internalStorage = new InternalStorage(currentContext);
         Calendar calendar = Calendar.getInstance();
+        Survey currentSurvey = getCurrentSurvey();
+        Step currentStep;
         // Checking event type
         switch (event.getType()) {
 
@@ -125,92 +131,47 @@ public class ExperimentController implements Observer {
                 // Making survey accessible via AdminActivity (App Launcher)
                 internalStorage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, Config.SURVEY_ENTRANCE_OPENED);
                 // Creating notification
-                notificationManager.createNotification();
+                notificationSender.sendNotification();
                 // Setting timer to close the AdminActivity (App Launcher) entrance after the notification expired
-                alarmManager.setNotificationTimeoutAlarm(currentSurvey.getNotificationDurationInMin());
+                alarmSender.setNotificationTimeoutAlarm(currentSurvey.getNotificationDurationInMin());
                 break;
 
             case Config.EVENT_NOTIFICATION_TIMEOUT:
                 Log.e("ExperimentController", "EVENT_NOTIFICATION_TIMEOUT");
                 // Cancel Notifications
-                notificationManager.cancelNotification();
+                notificationSender.cancelNotification();
                 // Closing the AdminActivity (App Launcher) entrance
                 internalStorage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, Config.SURVEY_ENTRANCE_CLOSED);
                 // Prepare next survey
                 long referenceTime = calendar.getTimeInMillis() - currentSurvey.getNotificationDurationInMin() * 60 * 1000;
-                prepareNextSurvey(referenceTime);
+                prepareNextSurvey(currentSurvey, internalStorage, alarmSender, referenceTime);
                 break;
 
             case Config.EVENT_SURVEY_STARTED:
                 Log.e("ExperimentController", "EVENT_SURVEY_STARTED");
-                alarmManager.cancelNotificationTimeoutAlarm();
-                alarmManager.setSurveyTimeoutAlarm(currentSurvey.getId(), currentSurvey.getMaxDurationInMin());
+                alarmSender.cancelNotificationTimeoutAlarm();
+                alarmSender.setSurveyTimeoutAlarm(currentSurvey.getId(), currentSurvey.getMaxDurationInMin());
                 currentStep = currentSurvey.getFirstStep();
+                currentStepId = currentStep.getId();
                 navigateToStep(currentStep);
                 break;
 
             case Config.EVENT_NEXT_STEP:
                 Log.e("ExperimentController", "EVENT_NEXT_STEP");
-                switchToNextStep(alarmManager, calendar);
+                currentStep = getCurrentStep();
+                switchToNextStep(currentSurvey, currentStep, internalStorage, alarmSender, calendar);
                 break;
 
             case Config.EVENT_NEXT_QUESTION:
                 Log.e("ExperimentController", "EVENT_NEXT_QUESTION");
-                // TODO: Outsource in method
-                Questionnaire currentQuestionnaire = (Questionnaire) currentStep;
-                if (currentQuestion.getType().equals(QuestionType.SINGLE_CHOICE)) {
-                    SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) currentQuestion;
-                    String answerText = (String) event.getData();
-                    String answerCode = singleChoiceQuestion.getCodeByAnswerText(answerText);
-                    csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
-                            answerCode, calendar.getTime().toString());
-                    currentQuestion = currentQuestionnaire.getQuestionById(singleChoiceQuestion.getNextQuestionIdByAnswerText(answerText));
-                }
-                else if (currentQuestion.getType().equals(QuestionType.MULTIPLE_CHOICE)) {
-                    MultipleChoiceQuestion multipleChoiceQuestion = (MultipleChoiceQuestion) currentQuestion;
-                    @SuppressWarnings("unchecked")
-                    ArrayList<String> answerTexts = (ArrayList<String>) event.getData();
-                    StringBuilder answerCode = new StringBuilder();
-                    for (String answerText: answerTexts) {
-                        answerCode.append(multipleChoiceQuestion.getCodeByAnswerText(answerText));
-                    }
-                    csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
-                            answerCode.toString(), calendar.getTime().toString());
-                    currentQuestion = currentQuestionnaire.getQuestionById(multipleChoiceQuestion.getNextQuestionId());
-                }
-                else if (currentQuestion.getType().equals(QuestionType.TEXT)) {
-                    TextQuestion textQuestion = (TextQuestion) currentQuestion;
-                    String answerText = (String) event.getData();
-                    csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
-                            answerText, calendar.getTime().toString());
-                    currentQuestion = currentQuestionnaire.getQuestionById(textQuestion.getNextQuestionId());
-                }
-                else if (currentQuestion.getType().equals(QuestionType.DAYTIME)) {
-                    DaytimeQuestion daytimeQuestion = (DaytimeQuestion) currentQuestion;
-                    String answerText = (String) event.getData();
-                    csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
-                            answerText, calendar.getTime().toString());
-                    currentQuestion = currentQuestionnaire.getQuestionById(daytimeQuestion.getNextQuestionId());
-                }
-                else if (currentQuestion.getType().equals(QuestionType.DATE)) {
-                    DateQuestion dateQuestion = (DateQuestion) currentQuestion;
-                    String answerText = (String) event.getData();
-                    csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
-                            answerText, calendar.getTime().toString());
-                    currentQuestion = currentQuestionnaire.getQuestionById(dateQuestion.getNextQuestionId());
-                }
-                else if (currentQuestion.getType().equals(QuestionType.TIME_INTERVALL)) {
-                    TimeIntervallQuestion timeIntervallQuestion = (TimeIntervallQuestion) currentQuestion;
-                    String answerText = (String) event.getData();
-                    csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
-                            answerText, calendar.getTime().toString());
-                    currentQuestion = currentQuestionnaire.getQuestionById(timeIntervallQuestion.getNextQuestionId());
-                }
-                if (currentQuestion != null) {
-                    navigateToQuestion(currentQuestion);
+                currentStep = getCurrentStep();
+                Question nextQuestion = switchToNextQuestion(currentSurvey, currentStep, event, calendar);
+                if (nextQuestion != null) {
+                    currentQuestionId = nextQuestion.getId();
+                    navigateToQuestion(nextQuestion);
                 }
                 else {
-                    switchToNextStep(alarmManager, calendar);
+                    switchToNextStep(currentSurvey, currentStep, internalStorage, alarmSender, calendar);
                 }
                 break;
 
@@ -222,6 +183,7 @@ public class ExperimentController implements Observer {
                 if (userIsAlreadyWaiting) {
                     userIsAlreadyWaiting = false;
                     Log.e("ExperimentController:", "Instruction to wait for is finished now and user is in the waiting room");
+                    currentStep = getCurrentStep();
                     navigateToStep(currentStep);
                 }
                 break;
@@ -230,56 +192,119 @@ public class ExperimentController implements Observer {
                 Log.e("ExperimentController", "EVENT_SURVEY_TIMEOUT");
                 Toast toast = Toast.makeText(currentContext, Config.MESSAGE_SURVEY_TIMEOUT, Toast.LENGTH_LONG);
                 toast.show();
-                prepareNextSurvey(calendar.getTimeInMillis());
-                exitApp();
+                prepareNextSurvey(currentSurvey, internalStorage, alarmSender, calendar.getTimeInMillis());
+                exitApp(internalStorage);
                 break;
 
             case Config.EVENT_CSV_REQUEST:
                 Log.e("ExperimentController", "EVENT_CSV_REQUEST");
-                saveCsvInternalStorage();
+                saveCsvInternalStorage(internalStorage);
 
             default:
                 break;
         }
     }
 
-    private void prepareNextSurvey(long referenceTime) {
-        currentSurvey = currentExperimentGroup.getSurveyById(currentSurvey.getNextSurveyId());
-        if (currentSurvey != null) {
-            setSurveyAlarm(referenceTime);
+    private Question switchToNextQuestion(Survey currentSurvey, Step currentStep,
+                                          Event event, Calendar calendar) {
+        Questionnaire currentQuestionnaire = (Questionnaire) currentStep;
+        Question currentQuestion = currentQuestionnaire.getQuestionById(currentQuestionId);
+        Question nextQuestion = null;
+        if (currentQuestion.getType().equals(QuestionType.SINGLE_CHOICE)) {
+            SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) currentQuestion;
+            String answerText = (String) event.getData();
+            String answerCode = singleChoiceQuestion.getCodeByAnswerText(answerText);
+            csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                    answerCode, calendar.getTime().toString());
+            nextQuestion = currentQuestionnaire.getQuestionById(singleChoiceQuestion.getNextQuestionIdByAnswerText(answerText));
+        }
+        else if (currentQuestion.getType().equals(QuestionType.MULTIPLE_CHOICE)) {
+            MultipleChoiceQuestion multipleChoiceQuestion = (MultipleChoiceQuestion) currentQuestion;
+            @SuppressWarnings("unchecked")
+            ArrayList<String> answerTexts = (ArrayList<String>) event.getData();
+            StringBuilder answerCode = new StringBuilder();
+            for (String answerText: answerTexts) {
+                answerCode.append(multipleChoiceQuestion.getCodeByAnswerText(answerText));
+            }
+            csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                    answerCode.toString(), calendar.getTime().toString());
+            nextQuestion = currentQuestionnaire.getQuestionById(multipleChoiceQuestion.getNextQuestionId());
+        }
+        else if (currentQuestion.getType().equals(QuestionType.TEXT)) {
+            TextQuestion textQuestion = (TextQuestion) currentQuestion;
+            String answerText = (String) event.getData();
+            csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                    answerText, calendar.getTime().toString());
+            nextQuestion = currentQuestionnaire.getQuestionById(textQuestion.getNextQuestionId());
+        }
+        else if (currentQuestion.getType().equals(QuestionType.DAYTIME)) {
+            DaytimeQuestion daytimeQuestion = (DaytimeQuestion) currentQuestion;
+            String answerText = (String) event.getData();
+            csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                    answerText, calendar.getTime().toString());
+            nextQuestion = currentQuestionnaire.getQuestionById(daytimeQuestion.getNextQuestionId());
+        }
+        else if (currentQuestion.getType().equals(QuestionType.DATE)) {
+            DateQuestion dateQuestion = (DateQuestion) currentQuestion;
+            String answerText = (String) event.getData();
+            csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                    answerText, calendar.getTime().toString());
+            nextQuestion = currentQuestionnaire.getQuestionById(dateQuestion.getNextQuestionId());
+        }
+        else if (currentQuestion.getType().equals(QuestionType.TIME_INTERVALL)) {
+            TimeIntervallQuestion timeIntervallQuestion = (TimeIntervallQuestion) currentQuestion;
+            String answerText = (String) event.getData();
+            csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                    answerText, calendar.getTime().toString());
+            nextQuestion = currentQuestionnaire.getQuestionById(timeIntervallQuestion.getNextQuestionId());
+        }
+        return nextQuestion;
+    }
+
+    private Step getCurrentStep() {
+        return currentExperimentGroup.getSurveyById(currentSurveyId).getStepById(currentStepId);
+    }
+
+    private Survey getCurrentSurvey() {
+        return currentExperimentGroup.getSurveyById(currentSurveyId);
+    }
+
+    private void prepareNextSurvey(Survey currentSurvey, InternalStorage internalStorage,
+                                   AlarmSender alarmSender, long referenceTime) {
+        Survey nextSurvey = currentExperimentGroup.getSurveyById(currentSurvey.getNextSurveyId());
+        if (nextSurvey != null) {
+            currentSurveyId = nextSurvey.getId();
+            setSurveyAlarm(nextSurvey, alarmSender, referenceTime);
         }
         else {
-            finishExperiment();
+            finishExperiment(internalStorage);
         }
     }
-    private void setSurveyAlarm(long referenceTime) {
-        AlarmSender alarmManager = new AlarmSender(currentContext);
-        if (currentSurvey.isRelative()) {
-            long relativeStartTimeInMillis = currentSurvey.getRelativeStartTimeInMin() * 60 * 1000;
-            alarmManager.setRelativeSurveyAlarm(currentSurvey.getId(),
+    private void setSurveyAlarm(Survey survey, AlarmSender alarmSender, long referenceTime) {
+        if (survey.isRelative()) {
+            long relativeStartTimeInMillis = survey.getRelativeStartTimeInMin() * 60 * 1000;
+            alarmSender.setRelativeSurveyAlarm(survey.getId(),
                     referenceTime,
                     relativeStartTimeInMillis);
         }
         else {
-            alarmManager.setAbsoluteSurveyAlarm(currentSurvey.getId(),
+            alarmSender.setAbsoluteSurveyAlarm(survey.getId(),
                     currentExperimentGroup.getStartTimeInMillis(),
-                    currentSurvey.getAbsoluteStartAtHour(),
-                    currentSurvey.getAbsoluteStartAtMinute(),
-                    currentSurvey.getAbsoluteStartDaysOffset());
+                    survey.getAbsoluteStartAtHour(),
+                    survey.getAbsoluteStartAtMinute(),
+                    survey.getAbsoluteStartDaysOffset());
         }
     }
-    private void finishExperiment() {
+    private void finishExperiment(InternalStorage internalStorage) {
         Log.e("ExperimentController", "EVENT_EXPERIMENT_FINISHED");
         // Set running value
-        InternalStorage storage = new InternalStorage(currentContext);
-        storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, Config.EXPERIMENT_FINISHED);
-
+        internalStorage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, Config.EXPERIMENT_FINISHED);
     }
 
-    private void navigateToStep(Step nextStep) {
-        if (nextStep.getType().equals(StepType.INSTRUCTION)) {
+    private void navigateToStep(Step step) {
+        if (step.getType().equals(StepType.INSTRUCTION)) {
             Log.e("ExperimentController", "Init InstructionStep");
-            Instruction instruction = (Instruction) nextStep;
+            Instruction instruction = (Instruction) step;
             Intent intent = new Intent(currentContext, InstructionActivity.class);
             intent.putExtra(Config.INSTRUCTION_HEADER_KEY, instruction.getHeader());
             intent.putExtra(Config.INSTRUCTION_TEXT_KEY, instruction.getText());
@@ -287,76 +312,79 @@ public class ExperimentController implements Observer {
             intent.putExtra(Config.INSTRUCTION_VIDEO_KEY, instruction.getVideoFileName());
             currentContext.startActivity(intent);
         }
-        else if (nextStep.getType().equals(StepType.BREATHING_EXERCISE)) {
+        else if (step.getType().equals(StepType.BREATHING_EXERCISE)) {
             Log.e("ExperimentController", "Init BreathingExercise");
-            BreathingExercise breathingExercise = (BreathingExercise) nextStep;
+            BreathingExercise breathingExercise = (BreathingExercise) step;
             Intent intent = new Intent(currentContext, BreathingExerciseActivity.class);
             intent.putExtra(Config.BREATHING_MODE_KEY, breathingExercise.getMode());
             intent.putExtra(Config.BREATHING_DURATION_KEY, breathingExercise.getDurationInMin());
             intent.putExtra(Config.BREATHING_FREQUENCY_KEY, breathingExercise.getBreathingFrequencyInSec());
             currentContext.startActivity(intent);
         }
-        else if (nextStep.getType().equals(StepType.QUESTIONNAIRE)) {
+        else if (step.getType().equals(StepType.QUESTIONNAIRE)) {
             Log.e("ExperimentController", "Init Questionnaire");
-            Questionnaire questionnaire = (Questionnaire) nextStep;
-            currentQuestion = questionnaire.getFirstQuestion();
+            Questionnaire questionnaire = (Questionnaire) step;
+            Question currentQuestion = questionnaire.getFirstQuestion();
+            currentQuestionId = currentQuestion.getId();
             navigateToQuestion(currentQuestion);
         }
     }
 
-    private void navigateToQuestion(Question nextQuestion) {
+    private void navigateToQuestion(Question question) {
         Intent intent = new Intent();
-        if (nextQuestion.getType().equals(QuestionType.SINGLE_CHOICE)) {
-            SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) currentQuestion;
+        if (question.getType().equals(QuestionType.SINGLE_CHOICE)) {
+            SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) question;
             intent = new Intent(currentContext, ChoiceQuestionActivity.class);
             intent.putExtra(Config.ANSWER_TEXTS_KEY, singleChoiceQuestion.getAnswerTexts());
             intent.putExtra(Config.QUESTION_TYPE_KEY, singleChoiceQuestion.getType());
         }
-        else if (nextQuestion.getType().equals(QuestionType.MULTIPLE_CHOICE)) {
-            MultipleChoiceQuestion multipleChoiceQuestion = (MultipleChoiceQuestion) currentQuestion;
+        else if (question.getType().equals(QuestionType.MULTIPLE_CHOICE)) {
+            MultipleChoiceQuestion multipleChoiceQuestion = (MultipleChoiceQuestion) question;
             intent = new Intent(currentContext, ChoiceQuestionActivity.class);
             intent.putExtra(Config.ANSWER_TEXTS_KEY, multipleChoiceQuestion.getAnswerTexts());
             intent.putExtra(Config.QUESTION_TYPE_KEY, multipleChoiceQuestion.getType());
         }
-        else if (nextQuestion.getType().equals(QuestionType.TEXT)) {
+        else if (question.getType().equals(QuestionType.TEXT)) {
             intent = new Intent(currentContext, TextQuestionActivity.class);
         }
-        else if (nextQuestion.getType().equals(QuestionType.DAYTIME)) {
+        else if (question.getType().equals(QuestionType.DAYTIME)) {
             intent = new Intent(currentContext, PointOfTimeQuestionActivity.class);
             intent.putExtra(Config.QUESTION_TYPE_KEY, QuestionType.DAYTIME);
         }
-        else if (nextQuestion.getType().equals(QuestionType.DATE)) {
+        else if (question.getType().equals(QuestionType.DATE)) {
             intent = new Intent(currentContext, PointOfTimeQuestionActivity.class);
             intent.putExtra(Config.QUESTION_TYPE_KEY, QuestionType.DATE);
         }
-        else if (nextQuestion.getType().equals(QuestionType.TIME_INTERVALL)) {
+        else if (question.getType().equals(QuestionType.TIME_INTERVALL)) {
             intent = new Intent(currentContext, TimeIntervallQuestionActivity.class);
         }
-        intent.putExtra(Config.QUESTION_TEXT_KEY, currentQuestion.getText());
-        intent.putExtra(Config.QUESTION_HINT_KEY, currentQuestion.getHint());
+        intent.putExtra(Config.QUESTION_TEXT_KEY, question.getText());
+        intent.putExtra(Config.QUESTION_HINT_KEY, question.getHint());
         currentContext.startActivity(intent);
     }
 
-    private void switchToNextStep(AlarmSender alarmManager, Calendar calendar) {
+    private void switchToNextStep(Survey currentSurvey, Step currentStep, InternalStorage internalStorage,
+                                  AlarmSender alarmSender, Calendar calendar) {
         // Set step timer if the current step was an ongoing step
-        setStepTimer(alarmManager);
+        setStepTimer(currentStep, alarmSender);
         // Switching to next step
-        currentStep = currentSurvey.getStepById(currentStep.getNextStepId());
+        Step nextStep = currentSurvey.getStepById(currentStep.getNextStepId());
         // There is a next step
-        if (currentStep != null) {
+        if (nextStep != null) {
+            currentStepId = nextStep.getId();
             // Moving on to next step after a little checkup
-            checkWaitingRequestAndNavigateToNextStep();
+            checkWaitingRequestAndNavigateToStep(currentSurvey, nextStep);
         }
         // There is no next step and the survey gets finished
         else {
             Log.e("ExperimentController", "EVENT_SURVEY_FINISHED");
-            alarmManager.cancelAllAlarms();
-            updateProgress();
-            prepareNextSurvey(calendar.getTimeInMillis());
-            exitApp();
+            alarmSender.cancelAllAlarms();
+            updateProgress(internalStorage);
+            prepareNextSurvey(currentSurvey, internalStorage, alarmSender, calendar.getTimeInMillis());
+            exitApp(internalStorage);
         }
     }
-    private void setStepTimer(AlarmSender alarmManager) {
+    private void setStepTimer(Step step, AlarmSender alarmSender) {
         /* Description:
                 Checking if the step that was finished just now is an ongoing step.
                 That means that another step waits for the completion of this step.
@@ -368,20 +396,20 @@ public class ExperimentController implements Observer {
                     -> Here we have to check if the "cotton bud"-Instruction is already finished (2 minutes passed)
                 */
         // If the step is ongoing we set a step timer and pass the step name to it
-        if (currentStep.getType().equals(StepType.INSTRUCTION)) {
-            Instruction instructionStep = (Instruction) currentStep;
+        if (step.getType().equals(StepType.INSTRUCTION)) {
+            Instruction instructionStep = (Instruction) step;
             if (instructionStep.getDurationInMin() != 0) {
                 Log.e("ExperimentController:", "StepTimer set");
-                alarmManager.setStepTimer(instructionStep.getId(), instructionStep.getDurationInMin());
+                alarmSender.setStepTimer(instructionStep.getId(), instructionStep.getDurationInMin());
             }
         }
     }
-    private void checkWaitingRequestAndNavigateToNextStep() {
+    private void checkWaitingRequestAndNavigateToStep(Survey currentSurvey, Step step) {
         // Here we're checking if the next step waits for another step,
         // like in the "cotton-bud"-example in "setStepTimer()" explained.
-        if (currentStep.getWaitForStep() != 0) {
+        if (step.getWaitForStep() != 0) {
             Log.e("ExperimentController:", "Next step has to wait");
-            Instruction instructionToWaitFor = (Instruction) currentSurvey.getStepById(currentStep.getWaitForStep());
+            Instruction instructionToWaitFor = (Instruction) currentSurvey.getStepById(step.getWaitForStep());
             // The next step waits for the instruction "instructionToWaitFor".
             // If its not finished the user gets directed to the WaitingRoomActivity
             if (!instructionToWaitFor.isFinished()) {
@@ -392,32 +420,29 @@ public class ExperimentController implements Observer {
                 currentContext.startActivity(intent);
             }
             else {
-                navigateToStep(currentStep);
+                navigateToStep(step);
             }
         }
         else {
-            navigateToStep(currentStep);
+            navigateToStep(step);
         }
     }
 
-    private void updateProgress() {
-        InternalStorage internalStorage = new InternalStorage(currentContext);
+    private void updateProgress(InternalStorage internalStorage) {
         String progress = internalStorage.getFileContent(Config.FILE_NAME_PROGRESS);
         int prog = Integer.parseInt(progress) + 1;
         internalStorage.saveFileContent(Config.FILE_NAME_PROGRESS, Integer.toString(prog));
     }
 
-    private void exitApp() {
-        InternalStorage storage = new InternalStorage(currentContext);
-        storage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, Config.SURVEY_ENTRANCE_CLOSED);
+    private void exitApp(InternalStorage internalStorage) {
+        internalStorage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, Config.SURVEY_ENTRANCE_CLOSED);
         Intent intent = new Intent(currentContext, LoginActivity.class);
         intent.putExtra(Config.EXIT_APP_KEY, true);
         currentContext.startActivity(intent);
     }
 
-    private void saveCsvInternalStorage() {
+    private void saveCsvInternalStorage(InternalStorage internalStorage) {
         String csv = csvCreator.getCsvString();
-        InternalStorage internalStorage = new InternalStorage(currentContext);
         internalStorage.saveFileContent(Config.FILE_NAME_CSV, csv);
     }
 }

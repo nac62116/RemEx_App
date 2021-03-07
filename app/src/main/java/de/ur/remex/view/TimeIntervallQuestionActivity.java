@@ -18,6 +18,9 @@ import de.ur.remex.R;
 import de.ur.remex.utilities.Event;
 import de.ur.remex.utilities.Observable;
 
+// TODO: Implement EditTexts beneath each other for each time intervall (years, months, days, hours, minutes, seconds)
+//  -> Get information which one has to be shown from model (TimeIntervallType.YEARS, etc...)
+
 public class TimeIntervallQuestionActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final Observable OBSERVABLE = new Observable();
