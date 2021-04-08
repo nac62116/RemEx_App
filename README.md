@@ -1,2 +1,2 @@
 # RemEx_App
-Remote experimentGroup application for Android devices
+Remote experiment application for Android devices
