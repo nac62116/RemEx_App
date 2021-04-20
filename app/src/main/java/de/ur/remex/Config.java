@@ -5,6 +5,7 @@ package de.ur.remex;
 // Can't be extended
 public final class Config {
 
+
     private Config() {
         // Can't be instantiated
     }
@@ -30,15 +31,16 @@ public final class Config {
     public static final String MESSAGE_SURVEY_TIMEOUT = "Zeit abgelaufen.\nBefragung beendet.";
 
     // Event types
-    public static final String EVENT_NEXT_STEP = "nextStep";
-    public static final String EVENT_SURVEY_STARTED = "surveyStarted";
+    public static final String EVENT_NEXT_STEP = "nextStepEvent";
+    public static final String EVENT_SURVEY_STARTED = "surveyStartedEvent";
     public static final String EVENT_SURVEY_TIMEOUT = "surveyTimeoutEvent";
     public static final String EVENT_SURVEY_ALARM = "surveyAlarmEvent";
     public static final String EVENT_NOTIFICATION_TIMEOUT = "notificationTimeoutEvent";
     public static final String EVENT_STEP_TIMER = "stepTimeoutEvent";
-    public static final String EVENT_WAITING_ROOM_ENTERED = "waitingRoomEntered";
-    public static final String EVENT_NEXT_QUESTION = "eventNextQuestion";
-    public static final String EVENT_CSV_REQUEST = "eventCsvRequest";
+    public static final String EVENT_WAITING_ROOM_ENTERED = "waitingRoomEnteredEvent";
+    public static final String EVENT_NEXT_QUESTION = "nextQuestionEvent";
+    public static final String EVENT_CSV_REQUEST = "csvRequestEvent";
+    public static final String EVENT_APP_KILLED = "appKilledEvent";
 
     // Intent Extra Keys
     public static final String EXIT_APP_KEY = "exitApp";

@@ -33,6 +33,10 @@
         <activity android:name=".view.TimeIntervallQuestionActivity" android:screenOrientation="portrait"/>
         <activity android:name=".view.LikertQuestionActivity" android:screenOrientation="portrait"/>
 
+        <service
+            android:name=".utilities.AppDestroyCallbackService"
+            android:stopWithTask="false" />
+
         <receiver android:name=".utilities.AlarmReceiver">
         </receiver>
         <receiver android:name=".utilities.BootListener" android:enabled="true" android:exported="true">

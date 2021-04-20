@@ -44,7 +44,6 @@ import de.ur.remex.utilities.AlarmSender;
 import de.ur.remex.utilities.Observable;
 
 // TODO: Make password changeable
-// TODO: Implement Activity Lifecycle functionality (Home Button, etc...)
 
 public class AdminActivity extends AppCompatActivity implements View.OnClickListener {
 

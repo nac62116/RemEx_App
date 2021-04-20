@@ -29,6 +29,7 @@ import de.ur.remex.model.experiment.questionnaire.TextQuestion;
 import de.ur.remex.model.experiment.questionnaire.TimeIntervallQuestion;
 import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.utilities.AlarmReceiver;
+import de.ur.remex.utilities.AppDestroyCallbackService;
 import de.ur.remex.utilities.CsvCreator;
 import de.ur.remex.utilities.Event;
 import de.ur.remex.Config;
@@ -71,6 +72,7 @@ public class ExperimentController implements Observer {
         PointOfTimeQuestionActivity pointOfTimeQuestionActivity = new PointOfTimeQuestionActivity();
         TimeIntervallQuestionActivity timeIntervallQuestionActivity = new TimeIntervallQuestionActivity();
         LikertQuestionActivity likertQuestionActivity = new LikertQuestionActivity();
+        AppDestroyCallbackService service = new AppDestroyCallbackService();
         instructionActivity.addObserver(this);
         breathingExerciseActivity.addObserver(this);
         surveyEntranceActivity.addObserver(this);
@@ -82,6 +84,7 @@ public class ExperimentController implements Observer {
         pointOfTimeQuestionActivity.addObserver(this);
         timeIntervallQuestionActivity.addObserver(this);
         likertQuestionActivity.addObserver(this);
+        service.addObserver(this);
         userIsAlreadyWaiting = false;
     }
 
@@ -151,6 +154,8 @@ public class ExperimentController implements Observer {
 
             case Config.EVENT_SURVEY_STARTED:
                 Log.e("ExperimentController", "EVENT_SURVEY_STARTED");
+                // Start service to receive a callback, when the user kills the app by swiping it in the recent apps list.
+                currentContext.startService(new Intent(currentContext, AppDestroyCallbackService.class));
                 alarmSender.cancelNotificationTimeoutAlarm();
                 alarmSender.setSurveyTimeoutAlarm(currentSurvey.getId(), currentSurvey.getMaxDurationInMin());
                 currentStep = currentSurvey.getFirstStep();
@@ -194,13 +199,16 @@ public class ExperimentController implements Observer {
                 Log.e("ExperimentController", "EVENT_SURVEY_TIMEOUT");
                 Toast toast = Toast.makeText(currentContext, Config.MESSAGE_SURVEY_TIMEOUT, Toast.LENGTH_LONG);
                 toast.show();
-                prepareNextSurvey(currentSurvey, internalStorage, alarmSender, calendar.getTimeInMillis());
-                exitApp(internalStorage);
+                exitApp(currentSurvey, internalStorage, alarmSender, calendar);
                 break;
 
             case Config.EVENT_CSV_REQUEST:
                 Log.e("ExperimentController", "EVENT_CSV_REQUEST");
                 saveCsvInternalStorage(internalStorage);
+
+            case Config.EVENT_APP_KILLED:
+                Log.e("ExperimentController", "EVENT_APP_KILLED");
+                exitApp(currentSurvey, internalStorage, alarmSender, calendar);
 
             default:
                 break;
@@ -384,8 +392,7 @@ public class ExperimentController implements Observer {
             Log.e("ExperimentController", "EVENT_SURVEY_FINISHED");
             alarmSender.cancelAllAlarms();
             updateProgress(internalStorage);
-            prepareNextSurvey(currentSurvey, internalStorage, alarmSender, calendar.getTimeInMillis());
-            exitApp(internalStorage);
+            exitApp(currentSurvey, internalStorage, alarmSender, calendar);
         }
     }
     private void setStepTimer(Step step, AlarmSender alarmSender) {
@@ -438,8 +445,10 @@ public class ExperimentController implements Observer {
         internalStorage.saveFileContent(Config.FILE_NAME_PROGRESS, Integer.toString(prog));
     }
 
-    private void exitApp(InternalStorage internalStorage) {
+    private void exitApp(Survey currentSurvey, InternalStorage internalStorage, AlarmSender alarmSender, Calendar calendar) {
+        prepareNextSurvey(currentSurvey, internalStorage, alarmSender, calendar.getTimeInMillis());
         internalStorage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, Config.SURVEY_ENTRANCE_CLOSED);
+        currentContext.stopService(new Intent(currentContext, AppDestroyCallbackService.class));
         Intent intent = new Intent(currentContext, LoginActivity.class);
         intent.putExtra(Config.EXIT_APP_KEY, true);
         currentContext.startActivity(intent);
