@@ -23,15 +23,15 @@
         <activity android:name=".admin.AdminActivity" android:screenOrientation="portrait"/>
         <activity android:name=".admin.CurrentVPActivity" android:screenOrientation="portrait" android:noHistory="true"/>
         <activity android:name=".admin.CreateVPActivity" android:screenOrientation="portrait" android:noHistory="true"/>
-        <activity android:name=".view.InstructionActivity" android:screenOrientation="portrait" android:noHistory="true"/>
-        <activity android:name=".view.SurveyEntranceActivity" android:screenOrientation="portrait" android:noHistory="true"/>
-        <activity android:name=".view.WaitingRoomActivity" android:screenOrientation="portrait" android:noHistory="true"/>
-        <activity android:name=".view.BreathingExerciseActivity" android:screenOrientation="portrait" android:noHistory="true"/>
-        <activity android:name=".view.ChoiceQuestionActivity" android:screenOrientation="portrait" android:noHistory="true"/>
-        <activity android:name=".view.TextQuestionActivity" android:screenOrientation="portrait" android:noHistory="true"/>
-        <activity android:name=".view.PointOfTimeQuestionActivity" android:screenOrientation="portrait" android:noHistory="true"/>
-        <activity android:name=".view.TimeIntervallQuestionActivity" android:screenOrientation="portrait" android:noHistory="true"/>
-        <activity android:name=".view.LikertQuestionActivity" android:screenOrientation="portrait" android:noHistory="true"/>
+        <activity android:name=".view.InstructionActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".view.SurveyEntranceActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".view.WaitingRoomActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".view.BreathingExerciseActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".view.ChoiceQuestionActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".view.TextQuestionActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".view.PointOfTimeQuestionActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".view.TimeIntervallQuestionActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".view.LikertQuestionActivity" android:screenOrientation="portrait"/>
 
         <receiver android:name=".utilities.AlarmReceiver">
         </receiver>
