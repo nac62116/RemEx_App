@@ -49,16 +49,16 @@ public class TextQuestionActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void initViews() {
-        TextView questionTextView = findViewById(R.id.timeIntervallQuestionText);
+        TextView questionTextView = findViewById(R.id.textQuestionText);
         questionTextView.setText(questionText);
-        TextView questionHintView = findViewById(R.id.timeIntervallQuestionHint);
+        TextView questionHintView = findViewById(R.id.textQuestionHint);
         questionHintView.setText(questionHint);
-        nextButton = findViewById(R.id.timeIntervallQuestionNextButton);
+        nextButton = findViewById(R.id.textQuestionNextButton);
         nextButton.setOnClickListener(this);
         nextButton.setEnabled(false);
         nextButton.setBackground(ContextCompat.getDrawable(this, R.drawable.next_button_deactivated));
         nextButton.setTextColor(Color.LTGRAY);
-        answerTextField = findViewById(R.id.timeIntervallQuestionAnswerField);
+        answerTextField = findViewById(R.id.textQuestionAnswerField);
         answerTextField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}

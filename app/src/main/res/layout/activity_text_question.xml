@@ -7,7 +7,7 @@
     android:background="@color/backgroundColor">
 
     <TextView
-        android:id="@+id/timeIntervallQuestionText"
+        android:id="@+id/textQuestionText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -22,7 +22,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/timeIntervallQuestionHint"
+        android:id="@+id/textQuestionHint"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -34,10 +34,10 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionText" />
+        app:layout_constraintTop_toBottomOf="@+id/textQuestionText" />
 
     <EditText
-        android:id="@+id/timeIntervallQuestionAnswerField"
+        android:id="@+id/textQuestionAnswerField"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -49,14 +49,14 @@
         android:gravity="start|top"
         android:inputType="textMultiLine"
         android:textColor="@color/textColor"
-        app:layout_constraintBottom_toTopOf="@+id/timeIntervallQuestionNextButton"
+        app:layout_constraintBottom_toTopOf="@+id/textQuestionNextButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionHint"
+        app:layout_constraintTop_toBottomOf="@+id/textQuestionHint"
         android:importantForAutofill="no" />
 
     <Button
-        android:id="@+id/timeIntervallQuestionNextButton"
+        android:id="@+id/textQuestionNextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"

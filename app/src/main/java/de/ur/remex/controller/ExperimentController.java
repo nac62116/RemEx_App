@@ -19,6 +19,7 @@ import de.ur.remex.model.experiment.StepType;
 import de.ur.remex.model.experiment.Survey;
 import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
 import de.ur.remex.model.experiment.questionnaire.ChoiceType;
+import de.ur.remex.model.experiment.questionnaire.LikertQuestion;
 import de.ur.remex.model.experiment.questionnaire.PointOfTimeQuestion;
 import de.ur.remex.model.experiment.questionnaire.Question;
 import de.ur.remex.model.experiment.questionnaire.QuestionType;
@@ -34,6 +35,7 @@ import de.ur.remex.Config;
 import de.ur.remex.utilities.AlarmSender;
 import de.ur.remex.utilities.NotificationSender;
 import de.ur.remex.view.BreathingExerciseActivity;
+import de.ur.remex.view.LikertQuestionActivity;
 import de.ur.remex.view.PointOfTimeQuestionActivity;
 import de.ur.remex.view.InstructionActivity;
 import de.ur.remex.view.ChoiceQuestionActivity;
@@ -41,8 +43,6 @@ import de.ur.remex.view.SurveyEntranceActivity;
 import de.ur.remex.view.TextQuestionActivity;
 import de.ur.remex.view.TimeIntervallQuestionActivity;
 import de.ur.remex.view.WaitingRoomActivity;
-
-// TODO: LikertQuestionActivity
 
 public class ExperimentController implements Observer {
 
@@ -70,6 +70,7 @@ public class ExperimentController implements Observer {
         TextQuestionActivity textQuestionActivity = new TextQuestionActivity();
         PointOfTimeQuestionActivity pointOfTimeQuestionActivity = new PointOfTimeQuestionActivity();
         TimeIntervallQuestionActivity timeIntervallQuestionActivity = new TimeIntervallQuestionActivity();
+        LikertQuestionActivity likertQuestionActivity = new LikertQuestionActivity();
         instructionActivity.addObserver(this);
         breathingExerciseActivity.addObserver(this);
         surveyEntranceActivity.addObserver(this);
@@ -80,6 +81,7 @@ public class ExperimentController implements Observer {
         textQuestionActivity.addObserver(this);
         pointOfTimeQuestionActivity.addObserver(this);
         timeIntervallQuestionActivity.addObserver(this);
+        likertQuestionActivity.addObserver(this);
         userIsAlreadyWaiting = false;
     }
 
@@ -252,6 +254,13 @@ public class ExperimentController implements Observer {
                     answerText, calendar.getTime().toString());
             nextQuestion = currentQuestionnaire.getQuestionById(timeIntervallQuestion.getNextQuestionId());
         }
+        else if (currentQuestion.getType().equals(QuestionType.LIKERT)) {
+            LikertQuestion likertQuestion = (LikertQuestion) currentQuestion;
+            String answerText = (String) event.getData();
+            csvCreator.updateCsvMap(currentSurvey.getName(), currentQuestion.getName(),
+                    answerText, calendar.getTime().toString());
+            nextQuestion = currentQuestionnaire.getQuestionById(likertQuestion.getNextQuestionId());
+        }
         return nextQuestion;
     }
 
@@ -344,6 +353,14 @@ public class ExperimentController implements Observer {
             TimeIntervallQuestion timeIntervallQuestion = (TimeIntervallQuestion) question;
             intent = new Intent(currentContext, TimeIntervallQuestionActivity.class);
             intent.putExtra(Config.TIME_INTERVALL_TYPES_KEY, timeIntervallQuestion.getTimeIntervallTypeNames());
+        }
+        else if (question.getType().equals(QuestionType.LIKERT)) {
+            LikertQuestion likertQuestion = (LikertQuestion) question;
+            intent = new Intent(currentContext, LikertQuestionActivity.class);
+            intent.putExtra(Config.SCALE_LABEL_MIN_KEY, likertQuestion.getScaleMinimumLabel());
+            intent.putExtra(Config.SCALE_LABEL_MAX_KEY, likertQuestion.getScaleMaximumLabel());
+            intent.putExtra(Config.INITIAL_SCALE_VALUE_KEY, likertQuestion.getInitialValue());
+            intent.putExtra(Config.SCALE_ITEM_COUNT_KEY, likertQuestion.getItemCount());
         }
         intent.putExtra(Config.QUESTION_TEXT_KEY, question.getText());
         intent.putExtra(Config.QUESTION_HINT_KEY, question.getHint());

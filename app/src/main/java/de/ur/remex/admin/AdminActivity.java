@@ -30,6 +30,7 @@ import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
 import de.ur.remex.model.experiment.breathingExercise.BreathingMode;
 import de.ur.remex.model.experiment.questionnaire.Answer;
 import de.ur.remex.model.experiment.questionnaire.ChoiceType;
+import de.ur.remex.model.experiment.questionnaire.LikertQuestion;
 import de.ur.remex.model.experiment.questionnaire.PointOfTimeQuestion;
 import de.ur.remex.model.experiment.questionnaire.PointOfTimeType;
 import de.ur.remex.model.experiment.questionnaire.Questionnaire;
@@ -377,22 +378,21 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         minutesSecondsQuestion.addTimeIntervallType(TimeIntervallType.SECONDS);
         minutesSecondsQuestion.setName("minutesSecondsQuestion_0");
         minutesSecondsQuestion.setText("Wie lange kannst du die Luft anhalten?");
-        /* Likert
+        // Likert
         LikertQuestion likertQuestion = new LikertQuestion();
-        likertQuestion.setId(9);
+        likertQuestion.setId(10);
         likertQuestion.setName("likertQuestion_0");
         likertQuestion.setText("Wie unangenehm war die Situation?");
         likertQuestion.setScaleMinimumLabel("Sehr unangenehm");
         likertQuestion.setScaleMaximumLabel("Gar nicht unangenehm");
-        likertQuestion.setItemCount(5);
-        likertQuestion.setInitialValue(1);
-        */
+        likertQuestion.setItemCount(9);
+        likertQuestion.setInitialValue(3);
         // Building answers
         // Single choice
         Answer answerS1 = new Answer();
         answerS1.setText("Verärgert");
         answerS1.setCode("1");
-        answerS1.setNextQuestionId(multipleChoiceQuestion.getId());
+        answerS1.setNextQuestionId(likertQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS1);
         Answer answerS2 = new Answer();
         answerS2.setText("Fröhlich");
@@ -452,12 +452,9 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         daytimeAndDateQuestion.setNextQuestionId(hoursMinutesQuestion.getId());
         hoursMinutesQuestion.setNextQuestionId(yearsMonthsDaysQuestion.getId());
         yearsMonthsDaysQuestion.setNextQuestionId(minutesSecondsQuestion.getId());
-        minutesSecondsQuestion.setNextQuestionId(0);
-        /*
+        minutesSecondsQuestion.setNextQuestionId(likertQuestion.getId());
         likertQuestion.setNextQuestionId(0);
         // Adding questions to questionnaire
-        questionnaire.addQuestion(likertQuestion);
-         */
         questionnaire.addQuestion(singleChoiceQuestion);
         questionnaire.addQuestion(multipleChoiceQuestion);
         questionnaire.addQuestion(textQuestion);
@@ -467,6 +464,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         questionnaire.addQuestion(hoursMinutesQuestion);
         questionnaire.addQuestion(yearsMonthsDaysQuestion);
         questionnaire.addQuestion(minutesSecondsQuestion);
+        questionnaire.addQuestion(likertQuestion);
 
         // Filling surveys with steps
         for (int i = 0; i < instructions.size(); i++) {

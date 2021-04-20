@@ -102,5 +102,7 @@
     <string name="stunden">Stunden</string>
     <string name="minuten">Minuten</string>
     <string name="sekunden">Sekunden</string>
+    <string name="label">Label</string>
+    <string name="value">Value</string>
 
 </resources>

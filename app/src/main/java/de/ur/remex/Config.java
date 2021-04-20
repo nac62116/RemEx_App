@@ -5,8 +5,6 @@ package de.ur.remex;
 // Can't be extended
 public final class Config {
 
-
-
     private Config() {
         // Can't be instantiated
     }
@@ -65,6 +63,10 @@ public final class Config {
     public static final String POINT_OF_TIME_TYPES_KEY = "pointOfTimeTypes";
     public static final String TIME_INTERVALL_TYPES_KEY = "timeIntervallTypes";
     public static final String ANSWER_TEXTS_KEY = "answerTexts";
+    public static final String SCALE_LABEL_MIN_KEY = "scaleLabelMin";
+    public static final String SCALE_LABEL_MAX_KEY = "scaleLabelMax";
+    public static final String INITIAL_SCALE_VALUE_KEY = "initialScaleValue";
+    public static final String SCALE_ITEM_COUNT_KEY = "scaleItemCount";
 
     // Alarm purposes
     public static final String PURPOSE_SURVEY_ALARM = "surveyAlarm";
