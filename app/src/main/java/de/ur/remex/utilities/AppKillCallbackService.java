@@ -12,7 +12,7 @@ import java.util.Observer;
 
 import de.ur.remex.Config;
 
-public class AppDestroyCallbackService extends Service {
+public class AppKillCallbackService extends Service {
 
     private static final Observable OBSERVABLE = new Observable();
 

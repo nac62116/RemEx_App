@@ -29,7 +29,7 @@ import de.ur.remex.model.experiment.questionnaire.TextQuestion;
 import de.ur.remex.model.experiment.questionnaire.TimeIntervallQuestion;
 import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.utilities.AlarmReceiver;
-import de.ur.remex.utilities.AppDestroyCallbackService;
+import de.ur.remex.utilities.AppKillCallbackService;
 import de.ur.remex.utilities.CsvCreator;
 import de.ur.remex.utilities.Event;
 import de.ur.remex.Config;
@@ -72,7 +72,7 @@ public class ExperimentController implements Observer {
         PointOfTimeQuestionActivity pointOfTimeQuestionActivity = new PointOfTimeQuestionActivity();
         TimeIntervallQuestionActivity timeIntervallQuestionActivity = new TimeIntervallQuestionActivity();
         LikertQuestionActivity likertQuestionActivity = new LikertQuestionActivity();
-        AppDestroyCallbackService service = new AppDestroyCallbackService();
+        AppKillCallbackService service = new AppKillCallbackService();
         instructionActivity.addObserver(this);
         breathingExerciseActivity.addObserver(this);
         surveyEntranceActivity.addObserver(this);
@@ -155,7 +155,7 @@ public class ExperimentController implements Observer {
             case Config.EVENT_SURVEY_STARTED:
                 Log.e("ExperimentController", "EVENT_SURVEY_STARTED");
                 // Start service to receive a callback, when the user kills the app by swiping it in the recent apps list.
-                currentContext.startService(new Intent(currentContext, AppDestroyCallbackService.class));
+                currentContext.startService(new Intent(currentContext, AppKillCallbackService.class));
                 alarmSender.cancelNotificationTimeoutAlarm();
                 alarmSender.setSurveyTimeoutAlarm(currentSurvey.getId(), currentSurvey.getMaxDurationInMin());
                 currentStep = currentSurvey.getFirstStep();
@@ -448,7 +448,7 @@ public class ExperimentController implements Observer {
     private void exitApp(Survey currentSurvey, InternalStorage internalStorage, AlarmSender alarmSender, Calendar calendar) {
         prepareNextSurvey(currentSurvey, internalStorage, alarmSender, calendar.getTimeInMillis());
         internalStorage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, Config.SURVEY_ENTRANCE_CLOSED);
-        currentContext.stopService(new Intent(currentContext, AppDestroyCallbackService.class));
+        currentContext.stopService(new Intent(currentContext, AppKillCallbackService.class));
         Intent intent = new Intent(currentContext, LoginActivity.class);
         intent.putExtra(Config.EXIT_APP_KEY, true);
         currentContext.startActivity(intent);

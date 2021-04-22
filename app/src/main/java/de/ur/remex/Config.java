@@ -5,25 +5,29 @@ package de.ur.remex;
 // Can't be extended
 public final class Config {
 
-
     private Config() {
         // Can't be instantiated
     }
 
     // General app settings
     public static final int ADMIN_TIMEOUT_MIN = 10;
-    public static final String INITIAL_PASSWORD = "";
+    public static final String INITIAL_PASSWORD = ""; // TODO
     public static final String PASSWORD_ALERT_TITLE = "Login fehlgeschlagen";
     public static final String PASSWORD_ALERT_MESSAGE = "Das eingegebene Passwort ist falsch.";
     public static final String EXPERIMENT_NOT_FINISHED_ALERT_TITLE = "Experiment läuft noch";
     public static final String EXPERIMENT_NOT_FINISHED_ALERT_MESSAGE = "Das Experiment der aktuellen Versuchsperson läuft noch. Möchten Sie trotzdem das Experiment mit einer neuen Versuchsperson starten? Dadurch wird das aktuelle Experiment gestoppt und die dazugehörige CSV-Datei geht verloren.";
     public static final String EXTERNAL_WRITE_ALERT_TITLE = "Speichern fehlgeschlagen";
     public static final String EXTERNAL_WRITE_ALERT_MESSAGE = "Die CSV-Datei konnte nicht gespeichert werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
+    public static final String EXTERNAL_READ_ALERT_TITLE = "Laden fehlgeschlagen";
+    public static final String EXTERNAL_READ_ALERT_MESSAGE = "Die JSON-Datei konnte nicht geladen werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
+    public static final String JSON_PARSE_ALERT_TITLE = "Parse fehlgeschlagen.";
+    public static final String JSON_PARSE_ALERT_MESSAGE = "Die JSON-Datei konnte nicht richtig geparsed werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
     public static final String INPUT_INVALID_ALERT_TITLE = "Angaben unvollständig";
     public static final String INPUT_INVALID_ALERT_MESSAGE = "Es wurden nicht alle Felder ausgefüllt.";
     public static final String DATE_INVALID_ALERT_TITLE = "Falsches Datum";
     public static final String DATE_INVALID_ALERT_MESSAGE = "Das gewählte Datum ist heute oder liegt in der Vergangenheit.";
     public static final String CSV_SAVED_TOAST = "CSV-Datei gespeichert";
+    public static final String EXPERIMENT_LOADED_TOAST = "Experiment erfolgreich geladen";
     public static final String EXPERIMENT_STARTED_TOAST = "Experiment gestartet";
     public static final String OK = "Ok";
     public static final String JA = "Ja";
@@ -101,6 +105,8 @@ public final class Config {
     public static final String FILE_NAME_SURVEY_ENTRANCE = "surveyEntrance";
     public static final String FILE_NAME_PASSWORD = "password";
     public static final String FILE_NAME_EXPERIMENT_STATUS = "experimentStatus";
+    public static final String FILE_NAME_EXPERIMENT_JSON = "experimentJSON";
+    public static final String FILE_NAME_TEST_EXPERIMENT_JSON = "testExperimentJSON";
 
     // File Values
     public static final String SURVEY_ENTRANCE_OPENED = "surveyEntranceOpened";

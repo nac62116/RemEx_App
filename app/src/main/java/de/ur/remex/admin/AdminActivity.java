@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -12,8 +13,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -43,8 +50,6 @@ import de.ur.remex.utilities.Event;
 import de.ur.remex.utilities.AlarmSender;
 import de.ur.remex.utilities.Observable;
 
-// TODO: Make password changeable
-
 public class AdminActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button currentVPButton;
@@ -57,15 +62,20 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
 
     private static final Observable OBSERVABLE = new Observable();
 
-    // Request code for creating a CSV document.
+    // Request codes for external storage operations.
     private static final int CREATE_CSV_FILE = 1;
+    private static final int GET_EXPERIMENT_JSON_FILE = 2;
+    private static final int GET_TEST_EXPERIMENT_JSON_FILE = 3;
+    // TODO: Remove this
+    private static final int CREATE_JSON_FILE = 4;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
         // Get current experiment
-        experiment = getExperiment();
+        getExperimentFromInternalStorage();
+
         // Check for create CSV request
         boolean createCsv = this.getIntent().getBooleanExtra(Config.CREATE_CSV_KEY, false);
         if (createCsv) {
@@ -74,17 +84,19 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         // Check for start experiment request
         boolean startExperiment = this.getIntent().getBooleanExtra(Config.START_EXPERIMENT_KEY, false);
         if (startExperiment) {
-            startExperiment();
+            if (experiment != null) {
+                InternalStorage storage = new InternalStorage(this);
+                String vpGroup = storage.getFileContent(Config.FILE_NAME_GROUP);
+                ExperimentGroup group = experiment.getExperimentGroupByName(vpGroup);
+                long startTimeInMs = this.getIntent().getLongExtra(Config.START_TIME_MS_KEY, 0);
+                startExperiment(group, startTimeInMs);
+            }
         }
         initAdminScreen();
     }
 
-    private void startExperiment() {
+    private void startExperiment(ExperimentGroup group, long startTimeInMs) {
         // Create new ExperimentController and start experiment
-        InternalStorage storage = new InternalStorage(this);
-        String vpGroup = storage.getFileContent(Config.FILE_NAME_GROUP);
-        ExperimentGroup group = experiment.getExperimentGroupByName(vpGroup);
-        long startTimeInMs = this.getIntent().getLongExtra(Config.START_TIME_MS_KEY, 0);
         ExperimentController experimentController = new ExperimentController(this);
         experimentController.startExperiment(group, startTimeInMs);
     }
@@ -92,44 +104,48 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
     private void createCsv() {
         Event event = new Event(null, Config.EVENT_CSV_REQUEST, null);
         OBSERVABLE.notifyExperimentController(event);
-        saveCsvExternalStorage();
+        saveCsvInExternalStorage();
     }
 
-    public void saveCsvExternalStorage() {
+    private void saveCsvInExternalStorage() {
         InternalStorage storage = new InternalStorage(this);
         String vpId = storage.getFileContent(Config.FILE_NAME_ID);
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("text/csv");
-        // TODO: Remove this
-        //intent.putExtra(Intent.EXTRA_TITLE, vpId + ".json");
         intent.putExtra(Intent.EXTRA_TITLE, vpId + ".csv");
         startActivityForResult(intent, CREATE_CSV_FILE);
+    }
+
+    private void loadExperimentJSONFromExternalStorage(boolean isTestExperiment) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/json");
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        if (isTestExperiment) {
+            startActivityForResult(intent, GET_TEST_EXPERIMENT_JSON_FILE);
+        }
+        else {
+            startActivityForResult(intent, GET_EXPERIMENT_JSON_FILE);
+        }
+    }
+
+    // TODO: Remove this
+    private void saveTestExperimentJSON() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/json");
+        intent.putExtra(Intent.EXTRA_TITLE, "Test_Experiment.json");
+        startActivityForResult(intent, CREATE_JSON_FILE);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         super.onActivityResult(requestCode, resultCode, resultData);
+        InternalStorage storage = new InternalStorage(this);
         if (requestCode == CREATE_CSV_FILE && resultCode == Activity.RESULT_OK) {
-            InternalStorage storage = new InternalStorage(this);
             String csv = storage.getFileContent(Config.FILE_NAME_CSV);
             csv = csv.replace("*","\n");
-
-            // TODO: Remove this
-            /*
-            ObjectMapper mapper = new ObjectMapper();
-            String experimentJSON = "";
-            try {
-                experimentJSON = mapper.writeValueAsString(experiment);
-            } catch (JsonProcessingException e) {
-                // AlertDialog: Systemfehler
-                new AlertDialog.Builder(this)
-                        .setTitle(this.getResources().getString(R.string.exception_alert_title))
-                        .setMessage(this.getResources().getString(R.string.exception_alert_text))
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show();
-            }*/
-
             // The resultData contains a URI for the document or directory that
             // the user selected.
             if (resultData != null) {
@@ -137,9 +153,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
                 Uri uri = resultData.getData();
                 if (uri != null) {
                     // Writing csv in selected uri
-                    success = writeInFile(uri, csv);
-                    // TODO: Remove this
-                    //success = writeInFile(uri, experimentJSON);
+                    success = writeFile(uri, csv);
                 }
                 if (success) {
                     storage.saveFileContent(Config.FILE_NAME_CSV_STATUS, Config.CSV_SAVED);
@@ -156,9 +170,95 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
                         .show();
             }
         }
+        else if ((requestCode == GET_EXPERIMENT_JSON_FILE || requestCode == GET_TEST_EXPERIMENT_JSON_FILE) && resultCode == Activity.RESULT_OK) {
+            // The resultData contains a URI for the document or directory that
+            // the user selected.
+            if (resultData != null) {
+                String experimentJSON = null;
+                Uri uri = resultData.getData();
+                if (uri != null) {
+                    // Reading Experiment JSON from selected uri
+                    experimentJSON = readFile(uri);
+                }
+                if (experimentJSON != null) {
+                    if (requestCode == GET_EXPERIMENT_JSON_FILE) {
+                        storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_JSON, experimentJSON);
+                        Toast toast = Toast.makeText(this, Config.EXPERIMENT_LOADED_TOAST, Toast.LENGTH_LONG);
+                        toast.show();
+                    }
+                    else {
+                        // TODO: Prove that this JSON file is correct
+                        Log.e("JSON", experimentJSON);
+                        // Convert JSON and start test experiment
+                        Experiment testExperiment = null;
+                        // JSON-String to Experiment testExperiment
+                        ObjectMapper mapper = new ObjectMapper();
+                        try {
+                            testExperiment = mapper.readValue(experimentJSON, Experiment.class);
+                        }
+                        catch (JsonProcessingException e) {
+                            Log.e("JSON Exception", e.getMessage());
+                            // AlertDialog: Systemfehler
+                            new AlertDialog.Builder(this)
+                                    .setTitle(Config.JSON_PARSE_ALERT_TITLE)
+                                    .setMessage(Config.JSON_PARSE_ALERT_MESSAGE)
+                                    .setPositiveButton(Config.OK, null)
+                                    .show();
+                        }
+                        if (testExperiment != null) {
+                            startExperiment(testExperiment.getExperimentGroups().get(0), 0);
+                        }
+                    }
+                }
+            }
+            else {
+                // AlertDialog: resultData == null
+                new AlertDialog.Builder(this)
+                        .setTitle(Config.EXTERNAL_READ_ALERT_TITLE)
+                        .setMessage(Config.EXTERNAL_READ_ALERT_MESSAGE)
+                        .setPositiveButton(Config.OK, null)
+                        .show();
+            }
+        }
+        /* TODO: Remove this
+        else if (requestCode == CREATE_JSON_FILE && resultCode == Activity.RESULT_OK) {
+            ObjectMapper mapper = new ObjectMapper();
+            String experimentJSON = "";
+            try {
+                experimentJSON = mapper.writeValueAsString(createExperiment());
+            } catch (JsonProcessingException e) {
+                // AlertDialog: Systemfehler
+                new AlertDialog.Builder(this)
+                        .setTitle(this.getResources().getString(R.string.exception_alert_title))
+                        .setMessage(this.getResources().getString(R.string.exception_alert_text))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+            }
+            // The resultData contains a URI for the document or directory that
+            // the user selected.
+            if (resultData != null) {
+                boolean success = false;
+                Uri uri = resultData.getData();
+                if (uri != null) {
+                    success = writeFile(uri, experimentJSON);
+                }
+                if (success) {
+                    Toast toast = Toast.makeText(this, "Test Experiment Saved", Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            }
+            else {
+                // AlertDialog: resultData == null
+                new AlertDialog.Builder(this)
+                        .setTitle(Config.EXTERNAL_WRITE_ALERT_TITLE)
+                        .setMessage(Config.EXTERNAL_WRITE_ALERT_MESSAGE)
+                        .setPositiveButton(Config.OK, null)
+                        .show();
+            }
+        }*/
     }
 
-    private boolean writeInFile(@NonNull Uri uri, @NonNull String text) {
+    private boolean writeFile(@NonNull Uri uri, @NonNull String text) {
         OutputStream outputStream;
         try {
             outputStream = getContentResolver().openOutputStream(uri);
@@ -177,6 +277,32 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
             return false;
         }
         return true;
+    }
+
+    // TODO: Reader does not read the JSON file correctly
+    private String readFile(@NonNull Uri uri) {
+        InputStream inputStream;
+        StringBuilder result = new StringBuilder();
+        try {
+            inputStream = getContentResolver().openInputStream(uri);
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+            int characterCode = br.read();
+            while (characterCode != -1) {
+                result.append((char) characterCode);
+                characterCode = br.read();
+            }
+            br.close();
+        }
+        catch (IOException e) {
+            // AlertDialog: I/O Exception
+            new AlertDialog.Builder(this)
+                    .setTitle(Config.EXTERNAL_READ_ALERT_TITLE)
+                    .setMessage(Config.EXTERNAL_READ_ALERT_MESSAGE)
+                    .setPositiveButton(Config.OK, null)
+                    .show();
+            return null;
+        }
+        return result.toString();
     }
 
     private void initAdminScreen() {
@@ -228,18 +354,37 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
             startActivity(intent);
         }
         else if (loadExperimentButton.equals(v)) {
-            // TODO: Implement Loading Experiment as JSON into internal storage and update experiment variable
-            // Save new experiment in internal storage
-            // experiment = getExperiment
+            //loadExperimentJSONFromExternalStorage(false);
+            saveTestExperimentJSON();
         }
         else if (testRunButton.equals(v)) {
-            // TODO: Implement Test Experiment
+            loadExperimentJSONFromExternalStorage(true);
+
         }
     }
     // TODO: Get experiment JSON from internal storage
-    private Experiment getExperiment() {
-        // Get experiment from internal storage
-        return createExperiment();
+    private void getExperimentFromInternalStorage() {
+        InternalStorage storage = new InternalStorage(this);
+        String experimentJSON = storage.getFileContent(Config.FILE_NAME_EXPERIMENT_JSON);
+        if (experimentJSON != null) {
+            // JSON-String to Experiment experiment
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                experiment = mapper.readValue(experimentJSON, Experiment.class);
+            }
+            catch (JsonProcessingException e) {
+                // AlertDialog: Systemfehler
+                new AlertDialog.Builder(this)
+                        .setTitle(Config.JSON_PARSE_ALERT_TITLE)
+                        .setMessage(Config.JSON_PARSE_ALERT_MESSAGE)
+                        .setPositiveButton(Config.OK, null)
+                        .show();
+                experiment = null;
+            }
+        }
+        else {
+            experiment = null;
+        }
     }
 
     private void restartAutoExitTimer() {
@@ -263,244 +408,235 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         //
     }
 
-    // TODO: The experiment object will be created by the RemEx Interface in the future.
+
+
+
+    /* TODO: The experiment object will be created by the RemEx Interface in the future.
     private Experiment createExperiment() {
         Experiment experiment = new Experiment("Test Experiment");
-        ExperimentGroup experimentGroup = new ExperimentGroup("Experiment Group");
-        ExperimentGroup controlGroup = new ExperimentGroup("Control Group");
+        ExperimentGroup experimentGroup = new ExperimentGroup("Test Group");
 
-        Survey survey1 = new Survey("Survey1 +1 Min", 0, 3, 5);
+        Survey survey1 = new Survey("Test Survey", 0, 15, 5);
         survey1.setId(1);
-        Survey survey2 = new Survey("Survey2 +2 Min", 1, 3, 5);
-        survey2.setId(2);
 
         // Building instruction steps
         ArrayList<Instruction> instructions = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             Instruction instruction = new Instruction();
             instruction.setId(i + 1);
-            instruction.setHeader("header1_" + i);
-            if (i == 1) {
-                instruction.setText("Super, vielen Dank. Deine aktive Teilnahme wird vermerkt. Toll gemacht! Denke daran, dass die zwei Tage der Befragung am Smartphone nun vorbei sind und dein Besuch am Lehrstuhl für Kinder- und Jugendpsychiatrie und -psychotherapie bevorsteht. Super, vielen Dank. Deine aktive Teilnahme wird vermerkt. Toll gemacht! Jetzt gibt's noch ein paar weitere Fragen.");
-            }
-            else {
-                instruction.setText("Super, vielen Dank. Deine aktive Teilnahme wird vermerkt. Toll gemacht! Denke daran, dass die zwei Tage der Befragung am Smartphone nun vorbei sind und dein Besuch am Lehrstuhl für Kinder- und Jugendpsychiatrie und -psychotherapie bevorsteht.");
-            }
-            if (i != 3 && i != 4) {
-                instruction.setImageFileName("salivette1");
-            }
-            if (i == 4) {
-                instruction.setVideoFileName("test_video");
-            }
-
-            /* Setting an ongoing instruction
             if (i == 0) {
-                instruction.setDurationInMin(1);
-                instruction.setWaitingText("Bitte warte noch wegen der ersten Instruktion.");
+                instruction.setHeader("Herzlich Willkommen zum Test Experiment");
+                instruction.setText("In den folgenden Schritten wird dir die Funktionalität dieser App anhand eines Test Experiments vorgestellt. Dabei werden dir die verschiedenen Fragentypen und Übungen vorgestellt, damit du bei dem echten Experiment möglichst wenig Schwierigkeiten bekommst. Falls noch Fragen aufkommen brauchst du nicht zu zögern und kannst dich gerne an den Versuchsleiter wenden.");
+                instruction.setDurationInMin(2);
+                instruction.setWaitingText("Die Watterolle ist noch nicht 2 Minuten lang in deinem Mund gewesen. Bitte warte noch einen Moment. Du wirst dann automatisch zum nächsten Schritt weitergeleitet.");
             }
-            // Defining a step that has to wait for that instruction to finish
+            if (i == 1) {
+                instruction.setHeader("Watterolle");
+                instruction.setImageFileName("salivette1");
+                instruction.setText("Nimm nun bitte die Watterolle aus dem Behälter und behalte sie solange im Mund bis du darauf hingewiesen wirst sie heraus zu nehmen.");
+            }
             if (i == 2) {
+                instruction.setHeader("Video");
+                instruction.setVideoFileName("test_video");
+                instruction.setText("Die Watterolle muss einige Zeit in deinem Mund bleiben. Damit du dich nicht langweilst kannst du dir das Video ansehen und danach zum nächsten Schritt über den \"Weiter\" Button fortfahren.");
+            }
+            if (i == 3) {
+                instruction.setHeader("Watterolle herausnehmen");
+                instruction.setImageFileName("salivette2");
+                instruction.setText("Sehr gut, du hast die Watterolle jetzt lange genug im Mund behalten. Nimm sie bitte heraus, stecke sie in den Behälter und beschrifte diesen mit \"Test Experiment\". Danach kannst du auf weiter drücken um die Atemübung kennen zu lernen.");
                 instruction.setWaitForStep(1);
-            }*/
-
+            }
             instructions.add(instruction);
         }
         // Building breathing exercises
+        Instruction breathingInstruction = new Instruction();
+        breathingInstruction.setId(5);
+        breathingInstruction.setHeader("Erklärung der Atemübung");
+        breathingInstruction.setText("Wie bereits angekündigt folgt jetzt eine Atemübung. Setze dich entspannt hin und versuche deinen Atem den Bewegungen und Tönen des Kreises folgen zu lassen. Das ganze wird eine Minute dauern und wenn du möchtest, kannst du dabei auch deine Augen schließen. Wenn du bereit bist drücke auf \"Weiter\". Der Kreis wird auftauchen und du wirst sehen in welchem Rythmus dein Atem ihm folgen muss.");
         BreathingExercise breathingExercise = new BreathingExercise();
         breathingExercise.setId(6);
         breathingExercise.setMode(BreathingMode.MOVING_CIRCLE);
-        breathingExercise.setDurationInMin(0);
+        breathingExercise.setDurationInMin(1);
         breathingExercise.setBreathingFrequencyInSec(5);
+        Instruction breathingDischarge = new Instruction();
+        breathingDischarge.setId(7);
+        breathingDischarge.setHeader("Atemübung geschafft");
+        breathingDischarge.setText("Sehr gut. Du hast die Atemübung erfolgreich absolviert. Zu guter Letzt werden dir jetzt die verschiedenen Fragentypen vorgestellt damit du dich mit deren Funktionalität vertraut machen kannst.");
 
         // Building questionnaire
         Questionnaire questionnaire = new Questionnaire();
-        questionnaire.setId(7);
+        questionnaire.setId(8);
         // Building questions
         // Text
         TextQuestion textQuestion = new TextQuestion();
         textQuestion.setId(1);
-        textQuestion.setName("textQuestion_0");
-        textQuestion.setText("Wie hat sich das ganze angefühlt?");
-        textQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc...");
+        textQuestion.setName("Text Question");
+        textQuestion.setText("Wie fühlst du dich vor deinem Experiment?");
+        textQuestion.setHint("Das hier ist eine Text Frage. Gebe deine Antwort einfach in das untere Feld ein und drücke anschließend auf \"Weiter\".");
         // Single choice
         ChoiceQuestion singleChoiceQuestion = new ChoiceQuestion();
         singleChoiceQuestion.setId(2);
         singleChoiceQuestion.setChoiceType(ChoiceType.SINGLE_CHOICE);
-        singleChoiceQuestion.setName("singleChoiceQuestion_0");
-        singleChoiceQuestion.setText("Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt?");
-        singleChoiceQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc... Warst du verägert, fröhlich, optimistisc");
+        singleChoiceQuestion.setName("Single Choice Question");
+        singleChoiceQuestion.setText("Wie gespannt bist du auf die Fragen in deinem Experiment?");
+        singleChoiceQuestion.setHint("Das hier ist eine Einzelauswahl Frage. Das bedeutet, dass du nur eine der Antworten in der unteren Liste auswählen kannst. Nachdem du sie ausgwählt hast kannst du dich natürlich trotzdem nochmal umentscheiden.");
         // Multiple choice
         ChoiceQuestion multipleChoiceQuestion = new ChoiceQuestion();
         multipleChoiceQuestion.setId(3);
         multipleChoiceQuestion.setChoiceType(ChoiceType.MULTIPLE_CHOICE);
-        multipleChoiceQuestion.setName("multipleChoiceQuestion_0");
-        multipleChoiceQuestion.setText("Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt? Wie hat sich das ganze angefühlt?");
-        multipleChoiceQuestion.setHint("Warst du verägert, fröhlich, optimistisch, etc... Warst du verägert, fröhlich, optimistisc");
+        multipleChoiceQuestion.setName("Multiple Choice Question");
+        multipleChoiceQuestion.setText("Wofür benutzt du normalerweise dein Smartphone?");
+        multipleChoiceQuestion.setHint("Das hier ist eine Mehrfachauswahl Frage. Das bedeutet, dass du mehrere Antworten in der unteren Liste auswählen kannst. Durch einen weiteres Drücken auf eine bereits ausgwählte Antwort kannst du sie auch wieder abwählen.");
         // Daytime
         PointOfTimeQuestion daytimeQuestion = new PointOfTimeQuestion();
         daytimeQuestion.setId(4);
         daytimeQuestion.addPointOfTimeType(PointOfTimeType.DAYTIME);
-        daytimeQuestion.setName("daytimeQuestion_0");
-        daytimeQuestion.setText("Um wie viel Uhr bist du ins Bett gegangen?");
+        daytimeQuestion.setName("Daytime Question");
+        daytimeQuestion.setText("Um wie viel Uhr bist du gestern ungefähr ins Bett gegangen?");
+        daytimeQuestion.setHint("Das hier ist eine Frage nach der Uhrzeit. Wenn du auf das untere Feld drückst erscheint eine Uhr bei der du Stunden und Minuten auf einem Kreis auswählen kannst. Falls du dich korrigieren möchtest, drücke enifach auf die entsprechende Zahl über der Uhr.");
         // Date
         PointOfTimeQuestion dateQuestion = new PointOfTimeQuestion();
         dateQuestion.setId(5);
         dateQuestion.addPointOfTimeType(PointOfTimeType.DATE);
-        dateQuestion.setName("dateQuestion_0");
+        dateQuestion.setName("Date Question");
         dateQuestion.setText("Wann hast du Geburtstag?");
-        // Daytime and Date
-        PointOfTimeQuestion daytimeAndDateQuestion = new PointOfTimeQuestion();
-        daytimeAndDateQuestion.setId(6);
-        daytimeAndDateQuestion.addPointOfTimeType(PointOfTimeType.DAYTIME);
-        daytimeAndDateQuestion.addPointOfTimeType(PointOfTimeType.DATE);
-        daytimeAndDateQuestion.setName("daytimeDateQuestion_0");
-        daytimeAndDateQuestion.setText("Wann ist deine nächste Schulaufgabe?");
+        dateQuestion.setHint("Das hier ist eine Frage nach einem Datum. Wenn du auf das untere Feld drückst erscheint ein Kalender in dem du dein Geburtsdatum auswählen kannst. Drücke einfach auf die Jahreszahl, den Monat oder den Tag den du verändern möchtest.");
         // Time Intervall (Hours, Minutes)
         TimeIntervallQuestion hoursMinutesQuestion = new TimeIntervallQuestion();
-        hoursMinutesQuestion.setId(7);
+        hoursMinutesQuestion.setId(6);
         hoursMinutesQuestion.addTimeIntervallType(TimeIntervallType.HOURS);
         hoursMinutesQuestion.addTimeIntervallType(TimeIntervallType.MINUTES);
-        hoursMinutesQuestion.setName("hoursMinutesQuestion_0");
-        hoursMinutesQuestion.setText("Wie lange hast du für den Marathon gebraucht?");
-        // Time Intervall
+        hoursMinutesQuestion.setName("Time Intervall Hours/Minutes Question");
+        hoursMinutesQuestion.setText("Wie lange hast du Freitags Schule?");
+        hoursMinutesQuestion.setHint("Das hier ist eine Frage über eine Zeitspanne. Gebe einfach die entsprechenden Zeiten in die unteren Felder ein.");
+        // Time Intervall (Years, Months, Days)
         TimeIntervallQuestion yearsMonthsDaysQuestion = new TimeIntervallQuestion();
-        yearsMonthsDaysQuestion.setId(8);
+        yearsMonthsDaysQuestion.setId(7);
         yearsMonthsDaysQuestion.addTimeIntervallType(TimeIntervallType.YEARS);
         yearsMonthsDaysQuestion.addTimeIntervallType(TimeIntervallType.MONTHS);
         yearsMonthsDaysQuestion.addTimeIntervallType(TimeIntervallType.DAYS);
-        yearsMonthsDaysQuestion.setName("yearsMonthsDaysQuestion_0");
-        yearsMonthsDaysQuestion.setText("Wie lange geht der Corona Lockdown jetzt schon?");
-        // Time Intervall
+        yearsMonthsDaysQuestion.setName("Time Intervall Years/Months/Days Question");
+        yearsMonthsDaysQuestion.setText("Wie alt bist du?");
+        yearsMonthsDaysQuestion.setHint("Nochmal eine Frage über ein Zeitintervall. Falls du nicht genau weist wie viel Monate oder Tage du alt bist, kannst du gerne einfach eine \"0\" eintragen.");
+        // Time Intervall (Minutes, Seconds)
         TimeIntervallQuestion minutesSecondsQuestion = new TimeIntervallQuestion();
-        minutesSecondsQuestion.setId(9);
+        minutesSecondsQuestion.setId(8);
         minutesSecondsQuestion.addTimeIntervallType(TimeIntervallType.MINUTES);
         minutesSecondsQuestion.addTimeIntervallType(TimeIntervallType.SECONDS);
-        minutesSecondsQuestion.setName("minutesSecondsQuestion_0");
+        minutesSecondsQuestion.setName("Time Intervall Minutes/Seconds Question");
         minutesSecondsQuestion.setText("Wie lange kannst du die Luft anhalten?");
+        minutesSecondsQuestion.setHint("Wieder eine Frage über eine Zeitspanne. Auch hier gilt, falls du nicht genau weißt wie viele Minuten oder Sekunden du die Luft anhalten kannst, trage einfach eine Schätzung ein.");
         // Likert
         LikertQuestion likertQuestion = new LikertQuestion();
-        likertQuestion.setId(10);
-        likertQuestion.setName("likertQuestion_0");
-        likertQuestion.setText("Wie unangenehm war die Situation?");
-        likertQuestion.setScaleMinimumLabel("Sehr unangenehm");
-        likertQuestion.setScaleMaximumLabel("Gar nicht unangenehm");
+        likertQuestion.setId(9);
+        likertQuestion.setName("Likert Question");
+        likertQuestion.setText("Wie verständlich war die Bedienung der App?");
+        likertQuestion.setScaleMinimumLabel("Sehr verständlich");
+        likertQuestion.setScaleMaximumLabel("Gar nicht verständlich");
         likertQuestion.setItemCount(9);
-        likertQuestion.setInitialValue(3);
+        likertQuestion.setInitialValue(5);
         // Building answers
         // Single choice
         Answer answerS1 = new Answer();
-        answerS1.setText("Verärgert");
+        answerS1.setText("Sehr gespannt");
         answerS1.setCode("1");
-        answerS1.setNextQuestionId(likertQuestion.getId());
+        answerS1.setNextQuestionId(multipleChoiceQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS1);
         Answer answerS2 = new Answer();
-        answerS2.setText("Fröhlich");
+        answerS2.setText("Ein wenig gespannt");
         answerS2.setCode("2");
-        answerS2.setNextQuestionId(textQuestion.getId());
+        answerS2.setNextQuestionId(multipleChoiceQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS2);
         Answer answerS3 = new Answer();
-        answerS3.setText("Schlecht");
+        answerS3.setText("Ist mir egal");
         answerS3.setCode("3");
-        answerS3.setNextQuestionId(dateQuestion.getId());
+        answerS3.setNextQuestionId(multipleChoiceQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS3);
         Answer answerS4 = new Answer();
-        answerS4.setText("Gut");
+        answerS4.setText("Eher nicht gespannt");
         answerS4.setCode("4");
-        answerS4.setNextQuestionId(daytimeQuestion.getId());
+        answerS4.setNextQuestionId(multipleChoiceQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS4);
         Answer answerS5 = new Answer();
-        answerS5.setText("Hervorragend");
+        answerS5.setText("Gar nicht gespannt");
         answerS5.setCode("5");
-        answerS5.setNextQuestionId(daytimeAndDateQuestion.getId());
+        answerS5.setNextQuestionId(multipleChoiceQuestion.getId());
         singleChoiceQuestion.addAnswer(answerS5);
-        Answer answerS6 = new Answer();
-        answerS6.setText("Besser gehts nicht");
-        answerS6.setCode("6");
-        answerS6.setNextQuestionId(yearsMonthsDaysQuestion.getId());
-        singleChoiceQuestion.addAnswer(answerS6);
         // Multiple choice
         Answer answerM1 = new Answer();
-        answerM1.setText("Verärgert");
+        answerM1.setText("Videos anschauen");
         answerM1.setCode("1");
         multipleChoiceQuestion.addAnswer(answerM1);
         Answer answerM2 = new Answer();
-        answerM2.setText("Fröhlich");
+        answerM2.setText("Nachrichten schreiben");
         answerM2.setCode("2");
         multipleChoiceQuestion.addAnswer(answerM2);
         Answer answerM3 = new Answer();
-        answerM3.setText("Schlecht");
+        answerM3.setText("Telefonieren");
         answerM3.setCode("3");
         multipleChoiceQuestion.addAnswer(answerM3);
         Answer answerM4 = new Answer();
-        answerM4.setText("Gut");
+        answerM4.setText("Spiele spielen");
         answerM4.setCode("4");
         multipleChoiceQuestion.addAnswer(answerM4);
         Answer answerM5 = new Answer();
-        answerM5.setText("Hervorragend");
+        answerM5.setText("Fotos machen");
         answerM5.setCode("5");
         multipleChoiceQuestion.addAnswer(answerM5);
         Answer answerM6 = new Answer();
-        answerM6.setText("Besser gehts nicht");
+        answerM6.setText("Notizen verfassen");
         answerM6.setCode("6");
         multipleChoiceQuestion.addAnswer(answerM6);
         // Connecting questions together
-        multipleChoiceQuestion.setNextQuestionId(textQuestion.getId());
-        textQuestion.setNextQuestionId(dateQuestion.getId());
-        dateQuestion.setNextQuestionId(daytimeQuestion.getId());
-        daytimeQuestion.setNextQuestionId(daytimeAndDateQuestion.getId());
-        daytimeAndDateQuestion.setNextQuestionId(hoursMinutesQuestion.getId());
+        textQuestion.setNextQuestionId(singleChoiceQuestion.getId());
+        multipleChoiceQuestion.setNextQuestionId(daytimeQuestion.getId());
+        daytimeQuestion.setNextQuestionId(dateQuestion.getId());
+        dateQuestion.setNextQuestionId(hoursMinutesQuestion.getId());
         hoursMinutesQuestion.setNextQuestionId(yearsMonthsDaysQuestion.getId());
         yearsMonthsDaysQuestion.setNextQuestionId(minutesSecondsQuestion.getId());
         minutesSecondsQuestion.setNextQuestionId(likertQuestion.getId());
         likertQuestion.setNextQuestionId(0);
         // Adding questions to questionnaire
+        questionnaire.addQuestion(textQuestion);
         questionnaire.addQuestion(singleChoiceQuestion);
         questionnaire.addQuestion(multipleChoiceQuestion);
-        questionnaire.addQuestion(textQuestion);
-        questionnaire.addQuestion(dateQuestion);
         questionnaire.addQuestion(daytimeQuestion);
-        questionnaire.addQuestion(daytimeAndDateQuestion);
+        questionnaire.addQuestion(dateQuestion);
         questionnaire.addQuestion(hoursMinutesQuestion);
         questionnaire.addQuestion(yearsMonthsDaysQuestion);
         questionnaire.addQuestion(minutesSecondsQuestion);
         questionnaire.addQuestion(likertQuestion);
 
         // Filling surveys with steps
+        // Adding first instructions
         for (int i = 0; i < instructions.size(); i++) {
             Instruction currInstruction = instructions.get(i);
             Instruction nextInstruction;
             if (i == instructions.size() - 1) {
-                currInstruction.setNextStepId(breathingExercise.getId());
-                breathingExercise.setNextStepId(questionnaire.getId());
-                questionnaire.setNextStepId(0);
+                currInstruction.setNextStepId(breathingInstruction.getId());
             }
             else {
                 nextInstruction = instructions.get(i + 1);
                 currInstruction.setNextStepId(nextInstruction.getId());
             }
             survey1.addStep(currInstruction);
-            survey2.addStep(currInstruction);
-            // Adding Breathing exercise and questionnaire
-            if (i == instructions.size() - 1) {
-                survey1.addStep(breathingExercise);
-                survey1.addStep(questionnaire);
-                survey2.addStep(breathingExercise);
-                survey2.addStep(questionnaire);
-            }
         }
+        // Adding Breathing exercise and questionnaire
+        breathingInstruction.setNextStepId(breathingExercise.getId());
+        survey1.addStep(breathingInstruction);
+        breathingExercise.setNextStepId(breathingDischarge.getId());
+        survey1.addStep(breathingExercise);
+        breathingDischarge.setNextStepId(questionnaire.getId());
+        survey1.addStep(breathingDischarge);
+        questionnaire.setNextStepId(0);
+        survey1.addStep(questionnaire);
 
-        survey1.setNextSurveyId(survey2.getId());
-        survey2.setNextSurveyId(0);
+        survey1.setNextSurveyId(0);
 
         experimentGroup.addSurvey(survey1);
-        experimentGroup.addSurvey(survey2);
-
-        controlGroup.addSurvey(survey1);
-        controlGroup.addSurvey(survey2);
 
         experiment.addExperimentGroup(experimentGroup);
-        experiment.addExperimentGroup(controlGroup);
 
         return experiment;
-    }
+    }*/
 }
