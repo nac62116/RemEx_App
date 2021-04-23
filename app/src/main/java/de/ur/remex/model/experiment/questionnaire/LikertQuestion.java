@@ -1,54 +1,50 @@
 package de.ur.remex.model.experiment.questionnaire;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class LikertQuestion extends Question {
 
-    private int nextQuestionId;
-    private String scaleMinimumLabel;
-    private String scaleMaximumLabel;
-    private int initialValue;
-    private int itemCount;
+    private final String scaleMinimumLabel;
+    private final String scaleMaximumLabel;
+    private final int initialValue;
+    private final int itemCount;
 
-    public LikertQuestion() {
-        type = QuestionType.LIKERT;
-    }
-
-    public int getNextQuestionId() {
-        return nextQuestionId;
-    }
-
-    public void setNextQuestionId(int nextQuestionId) {
+    @JsonCreator
+    public LikertQuestion(@JsonProperty("id") int id,
+                          @JsonProperty("name") String name,
+                          @JsonProperty("text") String text,
+                          @JsonProperty("hint") String hint,
+                          @JsonProperty("nextQuestionId") int nextQuestionId,
+                          @JsonProperty("scaleMinimumLabel") String scaleMinimumLabel,
+                          @JsonProperty("scaleMaximumLabel") String scaleMaximumLabel,
+                          @JsonProperty("initialValue") int initialValue,
+                          @JsonProperty("itemCount") int itemCount) {
+        this.id = id;
+        this.type = QuestionType.LIKERT;
+        this.name = name;
+        this.text = text;
+        this.hint = hint;
         this.nextQuestionId = nextQuestionId;
+        this.scaleMinimumLabel = scaleMinimumLabel;
+        this.scaleMaximumLabel = scaleMaximumLabel;
+        this.initialValue = initialValue;
+        this.itemCount = itemCount;
     }
 
     public String getScaleMinimumLabel() {
         return scaleMinimumLabel;
     }
 
-    public void setScaleMinimumLabel(String scaleMinimumLabel) {
-        this.scaleMinimumLabel = scaleMinimumLabel;
-    }
-
     public String getScaleMaximumLabel() {
         return scaleMaximumLabel;
-    }
-
-    public void setScaleMaximumLabel(String scaleMaximumLabel) {
-        this.scaleMaximumLabel = scaleMaximumLabel;
     }
 
     public int getInitialValue() {
         return initialValue;
     }
 
-    public void setInitialValue(int initialValue) {
-        this.initialValue = initialValue;
-    }
-
     public int getItemCount() {
         return itemCount;
-    }
-
-    public void setItemCount(int itemCount) {
-        this.itemCount = itemCount;
     }
 }

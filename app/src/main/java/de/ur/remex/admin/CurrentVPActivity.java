@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import de.ur.remex.Config;
 import de.ur.remex.R;
 import de.ur.remex.model.storage.InternalStorage;
-import de.ur.remex.utilities.AlarmSender;
+import de.ur.remex.utilities.AlarmScheduler;
 
 public class CurrentVPActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -43,20 +43,9 @@ public class CurrentVPActivity extends AppCompatActivity implements View.OnClick
         createCsvButton.setOnClickListener(this);
     }
 
-    private void setCurrentVpInfo() {
-        InternalStorage storage = new InternalStorage(this);
-        currentVpId.setText(storage.getFileContent(Config.FILE_NAME_ID));
-        currentVpGroup.setText(storage.getFileContent(Config.FILE_NAME_GROUP));
-        String progress = storage.getFileContent(Config.FILE_NAME_PROGRESS) + "/" + this.getIntent().getIntExtra(Config.PROGRESS_MAXIMUM_KEY, 0);
-        currentVpProgress.setText(progress);
-        currentVpStartTime.setText(storage.getFileContent(Config.FILE_NAME_START_TIME));
-        currentVpStartDate.setText(storage.getFileContent(Config.FILE_NAME_START_DATE));
-        csvStatus.setText(storage.getFileContent(Config.FILE_NAME_CSV_STATUS));
-    }
-
     private void restartAutoExitTimer() {
-        AlarmSender alarmManager = new AlarmSender(this);
-        alarmManager.setAdminTimeoutAlarm();
+        AlarmScheduler alarmScheduler = new AlarmScheduler(this);
+        alarmScheduler.setAdminTimeoutAlarm();
     }
 
     @Override
@@ -67,6 +56,17 @@ public class CurrentVPActivity extends AppCompatActivity implements View.OnClick
             intent.putExtra(Config.CREATE_CSV_KEY, true);
             startActivity(intent);
         }
+    }
+
+    private void setCurrentVpInfo() {
+        InternalStorage storage = new InternalStorage(this);
+        currentVpId.setText(storage.getFileContent(Config.FILE_NAME_ID));
+        currentVpGroup.setText(storage.getFileContent(Config.FILE_NAME_GROUP));
+        String progress = storage.getFileContent(Config.FILE_NAME_PROGRESS) + "/" + this.getIntent().getIntExtra(Config.PROGRESS_MAXIMUM_KEY, 0);
+        currentVpProgress.setText(progress);
+        currentVpStartTime.setText(storage.getFileContent(Config.FILE_NAME_START_TIME));
+        currentVpStartDate.setText(storage.getFileContent(Config.FILE_NAME_START_DATE));
+        csvStatus.setText(storage.getFileContent(Config.FILE_NAME_CSV_STATUS));
     }
 
     @Override

@@ -4,6 +4,6 @@ public enum QuestionType {
     LIKERT,
     CHOICE,
     TEXT,
-    TIME_INTERVALL,
+    TIME_INTERVAL,
     POINT_OF_TIME
 }

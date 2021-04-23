@@ -2,7 +2,6 @@ package de.ur.remex.view;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -102,17 +101,17 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    public void addObserver(Observer observer) {
-        OBSERVABLE.deleteObservers();
-        OBSERVABLE.addObserver(observer);
-    }
-
     @Override
     public void onClick(View v) {
         if (v.equals(nextButton)) {
             Event event = new Event(this, Config.EVENT_NEXT_STEP, null);
             OBSERVABLE.notifyExperimentController(event);
         }
+    }
+
+    public void addObserver(Observer observer) {
+        OBSERVABLE.deleteObservers();
+        OBSERVABLE.addObserver(observer);
     }
 
     // Disabling the OS-Back Button

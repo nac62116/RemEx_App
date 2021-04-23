@@ -15,11 +15,12 @@ public class CsvCreator {
     private HashMap<String, String> questionMap;
     private ArrayList<String> questionKeys;
 
-    // All commas (,) and stars (*) get eliminated as they are relevant for the csv structure
-    // The comma seperates the values and the star is a placeholder for "\n" because the saving process
+    // All commas (,) and stars (*) inside csv entries get eliminated as they are relevant for the csv structure
+    // The comma separates the values and the star is a placeholder for "\n" because the saving process
     // in the internal storage cuts out all "\n"'s
     // Hash Structure: Key = surveyName + questionName; Value = csvLine
     // Csv Structure: VP_ID, VP_GROUP, SURVEY_NAME, QUESTION_NAME, ANSWER_CODE, TIME_STAMP
+
     public void initCsvMap(ArrayList<Survey> surveys, String vpId, String vpGroup) {
         questionMap = new HashMap<>();
         questionKeys = new ArrayList<>();

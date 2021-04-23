@@ -1,34 +1,34 @@
 package de.ur.remex.model.experiment.questionnaire;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Answer {
 
-    private String text;
+    private final String text;
     // Add RemEx Interface functionality to create a list of the answer codes
     // Has to be unique inside one question
-    private String code;
-    private int nextQuestionId;
+    private final String code;
+    private final int nextQuestionId;
+
+    @JsonCreator
+    public Answer(@JsonProperty("text") String text,
+                  @JsonProperty("code") String code,
+                  @JsonProperty("nextQuestionId") int nextQuestionId) {
+        this.text = text;
+        this.code = code;
+        this.nextQuestionId = nextQuestionId;
+    }
 
     public String getText() {
         return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
     }
 
     public String getCode() {
         return code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public int getNextQuestionId() {
         return nextQuestionId;
-    }
-
-    public void setNextQuestionId(int nextQuestionId) {
-        this.nextQuestionId = nextQuestionId;
     }
 }

@@ -4,12 +4,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-import de.ur.remex.R;
+import de.ur.remex.Config;
 
 public class InternalStorage {
 
@@ -24,11 +25,10 @@ public class InternalStorage {
             fos.write(content.getBytes());
         }
         catch (Exception e){
-            // AlertDialog: Systemfehler
             new AlertDialog.Builder(context)
-                    .setTitle(context.getResources().getString(R.string.fos_alert_title))
-                    .setMessage(context.getResources().getString(R.string.fos_alert_text))
-                    .setPositiveButton(android.R.string.ok, null)
+                    .setTitle(Config.INTERNAL_STORAGE_SAVING_ERROR_TITLE)
+                    .setMessage(Config.INTERNAL_STORAGE_SAVING_ERROR_MESSAGE)
+                    .setPositiveButton(Config.OK, null)
                     .show();
         }
     }
@@ -43,11 +43,10 @@ public class InternalStorage {
             inputStreamReader = new InputStreamReader(fis, StandardCharsets.UTF_8);
         }
         catch (Exception e) {
-            // AlertDialog: Systemfehler
             new AlertDialog.Builder(context)
-                    .setTitle(context.getResources().getString(R.string.fis_alert_title))
-                    .setMessage(context.getResources().getString(R.string.fis_alert_text))
-                    .setPositiveButton(android.R.string.ok, null)
+                    .setTitle(Config.INTERNAL_STORAGE_LOADING_ERROR_TITLE)
+                    .setMessage(Config.INTERNAL_STORAGE_LOADING_ERROR_MESSAGE)
+                    .setPositiveButton(Config.OK, null)
                     .show();
             return null;
         }
@@ -59,16 +58,20 @@ public class InternalStorage {
                 line = reader.readLine();
             }
         } catch (Exception e) {
-            // AlertDialog: Systemfehler
             new AlertDialog.Builder(context)
-                    .setTitle(context.getResources().getString(R.string.buffered_reader_alert_title))
-                    .setMessage(context.getResources().getString(R.string.buffered_reader_alert_text))
-                    .setPositiveButton(android.R.string.ok, null)
+                    .setTitle(Config.INTERNAL_STORAGE_READING_ERROR_TITLE)
+                    .setMessage(Config.INTERNAL_STORAGE_READING_ERROR_MESSAGE)
+                    .setPositiveButton(Config.OK, null)
                     .show();
             return null;
         } finally {
             content = stringBuilder.toString();
         }
         return content;
+    }
+
+    public boolean fileExists(String fileName){
+        File file = context.getFileStreamPath(fileName);
+        return file.exists();
     }
 }

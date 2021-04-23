@@ -1,21 +1,37 @@
 package de.ur.remex.model.experiment.questionnaire;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 
 public class ChoiceQuestion extends Question {
 
-    private int nextQuestionId;
-    private ArrayList<Answer> answers;
+    private final ArrayList<Answer> answers;
     // Has to contain either ChoiceType.SINGLE or ChoiceType.MULTIPLE
-    private ChoiceType choiceType;
+    private final ChoiceType choiceType;
 
-    public ChoiceQuestion() {
-        type = QuestionType.CHOICE;
-        answers = new ArrayList<>();
-    }
-
-    public ArrayList<Answer> getAnswers() {
-        return answers;
+    @JsonCreator
+    public ChoiceQuestion(@JsonProperty("id") int id,
+                          @JsonProperty("name") String name,
+                          @JsonProperty("text") String text,
+                          @JsonProperty("hint") String hint,
+                          @JsonProperty("nextQuestionId") int nextQuestionId,
+                          @JsonProperty("answers") ArrayList<Answer> answers,
+                          @JsonProperty("choiceType") String choiceType) {
+        this.id = id;
+        this.type = QuestionType.CHOICE;
+        this.name = name;
+        this.text = text;
+        this.hint = hint;
+        this.nextQuestionId = nextQuestionId;
+        this.answers = answers;
+        if (choiceType.equals(ChoiceType.SINGLE_CHOICE.name())) {
+            this.choiceType = ChoiceType.SINGLE_CHOICE;
+        }
+        else {
+            this.choiceType = ChoiceType.MULTIPLE_CHOICE;
+        }
     }
 
     public String[] getAnswerTexts() {
@@ -35,10 +51,6 @@ public class ChoiceQuestion extends Question {
         return null;
     }
 
-    public void addAnswer(Answer answer) {
-        this.answers.add(answer);
-    }
-
     public int getNextQuestionIdByAnswerText(String answerText) {
         for (Answer answer: answers) {
             if (answer.getText().equals(answerText)) {
@@ -48,19 +60,7 @@ public class ChoiceQuestion extends Question {
         return 0;
     }
 
-    public int getNextQuestionId() {
-        return nextQuestionId;
-    }
-
-    public void setNextQuestionId(int nextQuestionId) {
-        this.nextQuestionId = nextQuestionId;
-    }
-
     public ChoiceType getChoiceType() {
         return choiceType;
-    }
-
-    public void setChoiceType(ChoiceType choiceType) {
-        this.choiceType = choiceType;
     }
 }

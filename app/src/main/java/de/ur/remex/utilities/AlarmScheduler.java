@@ -4,7 +4,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,10 +12,9 @@ import de.ur.remex.Config;
 
 import static android.content.Context.ALARM_SERVICE;
 
-public class AlarmSender {
+public class AlarmScheduler {
 
     private final Context context;
-
 
     private static final String SURVEY_ALARM_SUFFIX = "0";
     private static final String SURVEY_TIMEOUT_SUFFIX = "1";
@@ -25,12 +23,11 @@ public class AlarmSender {
     private static final ArrayList<PendingIntent> pendingIntents = new ArrayList<>();
 
 
-    public AlarmSender(Context context) {
+    public AlarmScheduler(Context context) {
         this.context = context;
     }
 
     public void setRelativeSurveyAlarm(int surveyId, long referenceTime, long surveyRelativeStartTimeInMillis) {
-        Log.e("AlarmManager", "EVENT_SURVEY_ALARM_SET");
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra(Config.ALARM_PURPOSE_KEY, Config.PURPOSE_SURVEY_ALARM);
@@ -43,7 +40,6 @@ public class AlarmSender {
 
     public void setAbsoluteSurveyAlarm(int surveyId, long experimentStartTimeInMillis,
                                        int hour, int minute, int daysOffset) {
-        Log.e("AlarmManager", "EVENT_SURVEY_ALARM_SET");
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(experimentStartTimeInMillis);
@@ -61,7 +57,6 @@ public class AlarmSender {
     }
 
     public void setSurveyTimeoutAlarm(int surveyId, int maxDurationInMin) {
-        Log.e("AlarmManager", "EVENT_SURVEY_TIMEOUT_ALARM_SET");
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         Calendar c = Calendar.getInstance();
         Intent intent = new Intent(context, AlarmReceiver.class);
@@ -74,7 +69,6 @@ public class AlarmSender {
     }
 
     public void setNotificationTimeoutAlarm(int notificationDurationInMin) {
-        Log.e("AlarmManager", "EVENT_NOTIFICATION_TIMEOUT_ALARM_SET");
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         Calendar c = Calendar.getInstance();
         Intent intent = new Intent(context, AlarmReceiver.class);
@@ -93,7 +87,6 @@ public class AlarmSender {
     }
 
     public void setStepTimer(int stepId, int stepDurationInMin) {
-        Log.e("AlarmManager", "EVENT_STEP_TIMER_SET");
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         Calendar c = Calendar.getInstance();
         Intent intent = new Intent(context, AlarmReceiver.class);
@@ -125,7 +118,6 @@ public class AlarmSender {
     }
 
     public void cancelAllAlarms() {
-        Log.e("AlarmManager", "EVENT_ALARMS_CANCELLED");
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         for (PendingIntent pendingIntent: pendingIntents) {
             alarmManager.cancel(pendingIntent);

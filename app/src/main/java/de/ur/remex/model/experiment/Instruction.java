@@ -1,30 +1,44 @@
 package de.ur.remex.model.experiment;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Instruction extends Step {
 
     // Max characters: 50
-    private String header;
+    private final String header;
     // Max characters: 350 (with image), 500 (without image)
-    private String text;
+    private final String text;
     // Either image or video in one Instruction
-    private String imageFileName;
-    private String videoFileName;
-    private int durationInMin;
+    private final String imageFileName;
+    private final String videoFileName;
+    private final int durationInMin;
     // Max characters: 500
-    private String waitingText;
+    private final String waitingText;
     private boolean isFinished;
 
-    public Instruction() {
-        type = StepType.INSTRUCTION;
-        isFinished = false;
-    }
-
-    public void setHeader(String header) {
+    @JsonCreator
+    public Instruction(@JsonProperty("id") int id,
+                       @JsonProperty("waitForStep") int waitForStep,
+                       @JsonProperty("nextStepId") int nextStepId,
+                       @JsonProperty("header") String header,
+                       @JsonProperty("text") String text,
+                       @JsonProperty("imageFileName") String imageFileName,
+                       @JsonProperty("videoFileName") String videoFileName,
+                       @JsonProperty("durationInMin") int durationInMin,
+                       @JsonProperty("waitingText") String waitingText,
+                       @JsonProperty("isFinished") boolean isFinished) {
+        this.id = id;
+        this.type = StepType.INSTRUCTION;
+        this.waitForStep = waitForStep;
+        this.nextStepId = nextStepId;
         this.header = header;
-    }
-
-    public void setText(String text) {
         this.text = text;
+        this.imageFileName = imageFileName;
+        this.videoFileName = videoFileName;
+        this.durationInMin = durationInMin;
+        this.waitingText = waitingText;
+        this.isFinished = isFinished;
     }
 
     public String getHeader() {
@@ -39,39 +53,23 @@ public class Instruction extends Step {
         return imageFileName;
     }
 
-    public void setImageFileName(String imageFileName) {
-        this.imageFileName = imageFileName;
-    }
-
-    public void setFinished(boolean finished) {
-        isFinished = finished;
-    }
-
     public int getDurationInMin() {
         return durationInMin;
-    }
-
-    public void setDurationInMin(int durationInMin) {
-        this.durationInMin = durationInMin;
     }
 
     public boolean isFinished() {
         return isFinished;
     }
 
+    public void setFinished(boolean isFinished) {
+        this.isFinished = isFinished;
+    }
+
     public String getWaitingText() {
         return waitingText;
     }
 
-    public void setWaitingText(String waitingText) {
-        this.waitingText = waitingText;
-    }
-
     public String getVideoFileName() {
         return videoFileName;
-    }
-
-    public void setVideoFileName(String videoFileName) {
-        this.videoFileName = videoFileName;
     }
 }

@@ -1,5 +1,8 @@
 package de.ur.remex.model.experiment.breathingExercise;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import de.ur.remex.model.experiment.Step;
 import de.ur.remex.model.experiment.StepType;
 
@@ -12,37 +15,41 @@ public class BreathingExercise extends Step {
     // dischargeHeader
 
     // int value! max duration = 60
-    private int durationInMin;
+    private final int durationInMin;
     // min 2, max 10
-    private int breathingFrequencyInSec;
-    private BreathingMode mode;
+    private final int breathingFrequencyInSec;
+    private final BreathingMode mode;
 
-
-    public BreathingExercise() {
-        type = StepType.BREATHING_EXERCISE;
+    @JsonCreator
+    public BreathingExercise(@JsonProperty("id") int id,
+                             @JsonProperty("waitForStep") int waitForStep,
+                             @JsonProperty("nextStepId") int nextStepId,
+                             @JsonProperty("durationInMin") int durationInMin,
+                             @JsonProperty("breathingFrequencyInSec") int breathingFrequencyInSec,
+                             @JsonProperty("mode") String mode) {
+        this.id = id;
+        this.type = StepType.BREATHING_EXERCISE;
+        this.waitForStep = waitForStep;
+        this.nextStepId = nextStepId;
+        this.durationInMin = durationInMin;
+        this.breathingFrequencyInSec = breathingFrequencyInSec;
+        if (mode.equals(BreathingMode.MOVING_CIRCLE.name())) {
+            this.mode = BreathingMode.MOVING_CIRCLE;
+        }
+        else {
+            this.mode = BreathingMode.STATIC_CIRCLE;
+        }
     }
 
     public int getDurationInMin() {
         return durationInMin;
     }
 
-    public void setDurationInMin(int durationInMin) {
-        this.durationInMin = durationInMin;
-    }
-
     public int getBreathingFrequencyInSec() {
         return breathingFrequencyInSec;
     }
 
-    public void setBreathingFrequencyInSec(int breathingFrequencyInSec) {
-        this.breathingFrequencyInSec = breathingFrequencyInSec;
-    }
-
     public BreathingMode getMode() {
         return mode;
-    }
-
-    public void setMode(BreathingMode mode) {
-        this.mode = mode;
     }
 }

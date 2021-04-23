@@ -30,7 +30,7 @@
         <activity android:name=".view.ChoiceQuestionActivity" android:screenOrientation="portrait"/>
         <activity android:name=".view.TextQuestionActivity" android:screenOrientation="portrait"/>
         <activity android:name=".view.PointOfTimeQuestionActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".view.TimeIntervallQuestionActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".view.TimeIntervalQuestionActivity" android:screenOrientation="portrait"/>
         <activity android:name=".view.LikertQuestionActivity" android:screenOrientation="portrait"/>
 
         <service

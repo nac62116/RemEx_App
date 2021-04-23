@@ -18,18 +18,18 @@ import java.util.Observer;
 
 import de.ur.remex.Config;
 import de.ur.remex.R;
-import de.ur.remex.model.experiment.questionnaire.TimeIntervallType;
+import de.ur.remex.model.experiment.questionnaire.TimeIntervalType;
 import de.ur.remex.utilities.Event;
 import de.ur.remex.utilities.Observable;
 
-public class TimeIntervallQuestionActivity extends AppCompatActivity implements View.OnClickListener, TextWatcher {
+public class TimeIntervalQuestionActivity extends AppCompatActivity implements View.OnClickListener, TextWatcher {
 
     private static final Observable OBSERVABLE = new Observable();
 
     private String questionText;
     private String questionHint;
     private Button nextButton;
-    private ArrayList<String> timeIntervallTypeNames;
+    private ArrayList<String> timeIntervalTypeNames;
     private ArrayList<EditText> activeAnswerFields;
     private HashMap<EditText, TextView> suffixMap;
 
@@ -37,14 +37,14 @@ public class TimeIntervallQuestionActivity extends AppCompatActivity implements 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_time_intervall_question);
+        setContentView(R.layout.activity_time_interval_question);
         getIntentExtras();
         initViews();
     }
 
     private void getIntentExtras() {
         if (getIntent().getStringArrayListExtra(Config.TIME_INTERVALL_TYPES_KEY) != null) {
-            timeIntervallTypeNames = getIntent().getStringArrayListExtra(Config.TIME_INTERVALL_TYPES_KEY);
+            timeIntervalTypeNames = getIntent().getStringArrayListExtra(Config.TIME_INTERVALL_TYPES_KEY);
         }
         if (getIntent().getStringExtra(Config.QUESTION_TEXT_KEY) != null) {
             questionText = getIntent().getStringExtra(Config.QUESTION_TEXT_KEY);
@@ -58,20 +58,20 @@ public class TimeIntervallQuestionActivity extends AppCompatActivity implements 
     }
 
     private void initViews() {
-        TextView questionTextView = findViewById(R.id.timeIntervallQuestionText);
+        TextView questionTextView = findViewById(R.id.timeIntervalQuestionText);
         questionTextView.setText(questionText);
-        TextView questionHintView = findViewById(R.id.timeIntervallQuestionHint);
+        TextView questionHintView = findViewById(R.id.timeIntervalQuestionHint);
         questionHintView.setText(questionHint);
-        nextButton = findViewById(R.id.timeIntervallQuestionNextButton);
+        nextButton = findViewById(R.id.timeIntervalQuestionNextButton);
         nextButton.setOnClickListener(this);
         nextButton.setEnabled(false);
         nextButton.setBackground(ContextCompat.getDrawable(this, R.drawable.next_button_deactivated));
         nextButton.setTextColor(Color.LTGRAY);
         activeAnswerFields = new ArrayList<>();
         suffixMap = new HashMap<>();
-        EditText yearsAnswerField = findViewById(R.id.timeIntervallQuestionYearAnswerField);
-        TextView yearsSuffix = findViewById(R.id.timeIntervallQuestionYearSuffix);
-        if (timeIntervallTypeNames.contains(TimeIntervallType.YEARS.name())) {
+        EditText yearsAnswerField = findViewById(R.id.timeIntervalQuestionYearAnswerField);
+        TextView yearsSuffix = findViewById(R.id.timeIntervalQuestionYearSuffix);
+        if (timeIntervalTypeNames.contains(TimeIntervalType.YEARS.name())) {
             yearsAnswerField.addTextChangedListener(this);
             activeAnswerFields.add(yearsAnswerField);
             suffixMap.put(yearsAnswerField, yearsSuffix);
@@ -80,9 +80,9 @@ public class TimeIntervallQuestionActivity extends AppCompatActivity implements 
             yearsAnswerField.setVisibility(View.GONE);
             yearsSuffix.setVisibility(View.GONE);
         }
-        EditText monthsAnswerField = findViewById(R.id.timeIntervallQuestionMonthAnswerField);
-        TextView monthsSuffix = findViewById(R.id.timeIntervallQuestionMonthSuffix);
-        if (timeIntervallTypeNames.contains(TimeIntervallType.MONTHS.name())) {
+        EditText monthsAnswerField = findViewById(R.id.timeIntervalQuestionMonthAnswerField);
+        TextView monthsSuffix = findViewById(R.id.timeIntervalQuestionMonthSuffix);
+        if (timeIntervalTypeNames.contains(TimeIntervalType.MONTHS.name())) {
             monthsAnswerField.addTextChangedListener(this);
             activeAnswerFields.add(monthsAnswerField);
             suffixMap.put(monthsAnswerField, monthsSuffix);
@@ -91,9 +91,9 @@ public class TimeIntervallQuestionActivity extends AppCompatActivity implements 
             monthsAnswerField.setVisibility(View.GONE);
             monthsSuffix.setVisibility(View.GONE);
         }
-        EditText daysAnswerField = findViewById(R.id.timeIntervallQuestionDayAnswerField);
-        TextView daysSuffix = findViewById(R.id.timeIntervallQuestionDaySuffix);
-        if (timeIntervallTypeNames.contains(TimeIntervallType.DAYS.name())) {
+        EditText daysAnswerField = findViewById(R.id.timeIntervalQuestionDayAnswerField);
+        TextView daysSuffix = findViewById(R.id.timeIntervalQuestionDaySuffix);
+        if (timeIntervalTypeNames.contains(TimeIntervalType.DAYS.name())) {
             daysAnswerField.addTextChangedListener(this);
             activeAnswerFields.add(daysAnswerField);
             suffixMap.put(daysAnswerField, daysSuffix);
@@ -102,9 +102,9 @@ public class TimeIntervallQuestionActivity extends AppCompatActivity implements 
             daysAnswerField.setVisibility(View.GONE);
             daysSuffix.setVisibility(View.GONE);
         }
-        EditText hoursAnswerField = findViewById(R.id.timeIntervallQuestionHourAnswerField);
-        TextView hoursSuffix = findViewById(R.id.timeIntervallQuestionHourSuffix);
-        if (timeIntervallTypeNames.contains(TimeIntervallType.HOURS.name())) {
+        EditText hoursAnswerField = findViewById(R.id.timeIntervalQuestionHourAnswerField);
+        TextView hoursSuffix = findViewById(R.id.timeIntervalQuestionHourSuffix);
+        if (timeIntervalTypeNames.contains(TimeIntervalType.HOURS.name())) {
             hoursAnswerField.addTextChangedListener(this);
             activeAnswerFields.add(hoursAnswerField);
             suffixMap.put(hoursAnswerField, hoursSuffix);
@@ -113,9 +113,9 @@ public class TimeIntervallQuestionActivity extends AppCompatActivity implements 
             hoursAnswerField.setVisibility(View.GONE);
             hoursSuffix.setVisibility(View.GONE);
         }
-        EditText minutesAnswerField = findViewById(R.id.timeIntervallQuestionMinuteAnswerField);
-        TextView minutesSuffix = findViewById(R.id.timeIntervallQuestionMinuteSuffix);
-        if (timeIntervallTypeNames.contains(TimeIntervallType.MINUTES.name())) {
+        EditText minutesAnswerField = findViewById(R.id.timeIntervalQuestionMinuteAnswerField);
+        TextView minutesSuffix = findViewById(R.id.timeIntervalQuestionMinuteSuffix);
+        if (timeIntervalTypeNames.contains(TimeIntervalType.MINUTES.name())) {
             minutesAnswerField.addTextChangedListener(this);
             activeAnswerFields.add(minutesAnswerField);
             suffixMap.put(minutesAnswerField, minutesSuffix);
@@ -124,9 +124,9 @@ public class TimeIntervallQuestionActivity extends AppCompatActivity implements 
             minutesAnswerField.setVisibility(View.GONE);
             minutesSuffix.setVisibility(View.GONE);
         }
-        EditText secondsAnswerField = findViewById(R.id.timeIntervallQuestionSecondAnswerField);
-        TextView secondsSuffix = findViewById(R.id.timeIntervallQuestionSecondSuffix);
-        if (timeIntervallTypeNames.contains(TimeIntervallType.SECONDS.name())) {
+        EditText secondsAnswerField = findViewById(R.id.timeIntervalQuestionSecondAnswerField);
+        TextView secondsSuffix = findViewById(R.id.timeIntervalQuestionSecondSuffix);
+        if (timeIntervalTypeNames.contains(TimeIntervalType.SECONDS.name())) {
             secondsAnswerField.addTextChangedListener(this);
             activeAnswerFields.add(secondsAnswerField);
             suffixMap.put(secondsAnswerField, secondsSuffix);
@@ -137,19 +137,16 @@ public class TimeIntervallQuestionActivity extends AppCompatActivity implements 
         }
     }
 
-    public void addObserver(Observer observer) {
-        OBSERVABLE.deleteObservers();
-        OBSERVABLE.addObserver(observer);
-    }
-
     @Override
     public void onClick(View v) {
         if (v.equals(nextButton)) {
             StringBuilder answer = new StringBuilder();
             for (EditText activeAnswerField: activeAnswerFields) {
+                TextView suffix = suffixMap.get(activeAnswerField);
+                assert suffix != null;
                 answer.append(activeAnswerField.getText().toString())
                         .append(" ")
-                        .append(suffixMap.get(activeAnswerField).getText().toString())
+                        .append(suffix.getText().toString())
                         .append(" ");
             }
             Event event = new Event(this, Config.EVENT_NEXT_QUESTION, answer.toString().trim());
@@ -170,6 +167,7 @@ public class TimeIntervallQuestionActivity extends AppCompatActivity implements 
                 allAnswersProvided = false;
             }
             TextView suffix = suffixMap.get(activeAnswerField);
+            assert suffix != null;
             String newSuffix = null;
             if (activeAnswerField.getText().toString().equals("1")) {
                 if (!(suffix.getText().toString().equals("Jahr") ||
@@ -212,6 +210,11 @@ public class TimeIntervallQuestionActivity extends AppCompatActivity implements 
     @Override
     public void afterTextChanged(Editable s) {
 
+    }
+
+    public void addObserver(Observer observer) {
+        OBSERVABLE.deleteObservers();
+        OBSERVABLE.addObserver(observer);
     }
 
     // Disabling the OS-Back Button

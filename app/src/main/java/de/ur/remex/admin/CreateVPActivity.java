@@ -19,7 +19,7 @@ import java.util.Calendar;
 import de.ur.remex.Config;
 import de.ur.remex.R;
 import de.ur.remex.model.storage.InternalStorage;
-import de.ur.remex.utilities.AlarmSender;
+import de.ur.remex.utilities.AlarmScheduler;
 
 public class CreateVPActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
@@ -60,6 +60,21 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         createVPButton.setOnClickListener(this);
     }
 
+    private void restartAutoExitTimer() {
+        AlarmScheduler alarmScheduler = new AlarmScheduler(this);
+        alarmScheduler.setAdminTimeoutAlarm();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        selectedGroup = (String) parent.getItemAtPosition(position);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
     @Override
     public void onClick(View v) {
         restartAutoExitTimer();
@@ -73,67 +88,18 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         }
         if (createVPButton.equals(v)) {
             if (inputIsValid()) {
-                // Get experiment start time in ms
                 long startTimeInMs = getStartTimeInMs();
                 // Send start request to AdminActivity
                 sendStartRequest(startTimeInMs);
             }
             else {
-                // AlertDialog: Nicht alle Felder wurden angegeben
+                // AlertDialog: Input invalid
                 new AlertDialog.Builder(this)
                         .setTitle(Config.INPUT_INVALID_ALERT_TITLE)
                         .setMessage(Config.INPUT_INVALID_ALERT_MESSAGE)
                         .setPositiveButton(Config.OK, null)
                         .show();
             }
-        }
-    }
-
-    private long getStartTimeInMs() {
-        Calendar calendar = Calendar.getInstance();
-        // TODO: Move line "long startTimeInMs..." under "calender.set(..."
-        long startTimeInMs = calendar.getTimeInMillis();
-        // Format: dd.mm.yyyy
-        String startDate = startDateEditText.getText().toString();
-        // Format: hh:mm Uhr
-        String startTime = startTimeEditText.getText().toString();
-        int year = Integer.parseInt(startDate.substring(6));
-        int month = Integer.parseInt(startDate.substring(3,5));
-        int date = Integer.parseInt(startDate.substring(0,2));
-        int hour = Integer.parseInt(startTime.substring(0,2));
-        int minute = Integer.parseInt(startTime.substring(3,5));
-        calendar.set(year, month - 1, date, hour, minute);
-        return startTimeInMs;
-    }
-
-    private void sendStartRequest(long startTimeInMs) {
-        InternalStorage storage = new InternalStorage(this);
-        String experimentStatus = storage.getFileContent(Config.FILE_NAME_EXPERIMENT_STATUS);
-        if (experimentStatus == null) {
-            experimentStatus = Config.EXPERIMENT_FINISHED;
-            storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, experimentStatus);
-        }
-        if (experimentStatus.equals(Config.EXPERIMENT_FINISHED)) {
-            saveVpInternalStorage();
-            Intent intent = new Intent(this, AdminActivity.class);
-            intent.putExtra(Config.START_EXPERIMENT_KEY, true);
-            intent.putExtra(Config.START_TIME_MS_KEY, startTimeInMs);
-            startActivity(intent);
-        }
-        else {
-            // AlertDialog: Experiment wurde noch nicht beendet
-            new AlertDialog.Builder(this)
-                    .setTitle(Config.EXPERIMENT_NOT_FINISHED_ALERT_TITLE)
-                    .setMessage(Config.EXPERIMENT_NOT_FINISHED_ALERT_MESSAGE)
-                    .setPositiveButton(Config.JA, (dialog, which) -> {
-                        saveVpInternalStorage();
-                        Intent intent = new Intent(CreateVPActivity.this, AdminActivity.class);
-                        intent.putExtra(Config.START_EXPERIMENT_KEY, true);
-                        intent.putExtra(Config.START_TIME_MS_KEY, startTimeInMs);
-                        startActivity(intent);
-                    })
-                    .setNegativeButton(Config.NEIN, null)
-                    .show();
         }
     }
 
@@ -150,7 +116,7 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
             c.set(year, month, dayOfMonth);
             long userSettedTimeInMillis = c.getTimeInMillis();
             if (currentTimeInMillis >= userSettedTimeInMillis) {
-                // AlertDialog: Ausgwähltes Datum liegt in der Vergangenheit
+                // AlertDialog: Picked date lays in the past
                 new AlertDialog.Builder(CreateVPActivity.this)
                         .setTitle(Config.DATE_INVALID_ALERT_TITLE)
                         .setMessage(Config.DATE_INVALID_ALERT_MESSAGE)
@@ -216,14 +182,57 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         return isValid;
     }
 
-    private void saveVpInternalStorage() {
+    private long getStartTimeInMs() {
+        Calendar calendar = Calendar.getInstance();
+        // TODO: Move line "long startTimeInMs..." under "calender.set(..."
+        long startTimeInMs = calendar.getTimeInMillis();
+        // Format: dd.mm.yyyy
+        String startDate = startDateEditText.getText().toString();
+        // Format: hh:mm Uhr
+        String startTime = startTimeEditText.getText().toString();
+        int year = Integer.parseInt(startDate.substring(6));
+        int month = Integer.parseInt(startDate.substring(3,5));
+        int date = Integer.parseInt(startDate.substring(0,2));
+        int hour = Integer.parseInt(startTime.substring(0,2));
+        int minute = Integer.parseInt(startTime.substring(3,5));
+        calendar.set(year, month - 1, date, hour, minute);
+        return startTimeInMs;
+    }
+
+    private void sendStartRequest(long startTimeInMs) {
+        InternalStorage storage = new InternalStorage(this);
+        String experimentStatus = storage.getFileContent(Config.FILE_NAME_EXPERIMENT_STATUS);
+        if (experimentStatus.equals(Config.EXPERIMENT_FINISHED)) {
+            saveVpInInternalStorage(storage);
+            Intent intent = new Intent(this, AdminActivity.class);
+            intent.putExtra(Config.START_EXPERIMENT_KEY, true);
+            intent.putExtra(Config.START_TIME_MS_KEY, startTimeInMs);
+            startActivity(intent);
+        }
+        else {
+            // AlertDialog: Experiment not finished
+            new AlertDialog.Builder(this)
+                    .setTitle(Config.EXPERIMENT_NOT_FINISHED_ALERT_TITLE)
+                    .setMessage(Config.EXPERIMENT_NOT_FINISHED_ALERT_MESSAGE)
+                    .setPositiveButton(Config.JA, (dialog, which) -> {
+                        saveVpInInternalStorage(storage);
+                        Intent intent = new Intent(CreateVPActivity.this, AdminActivity.class);
+                        intent.putExtra(Config.START_EXPERIMENT_KEY, true);
+                        intent.putExtra(Config.START_TIME_MS_KEY, startTimeInMs);
+                        startActivity(intent);
+                    })
+                    .setNegativeButton(Config.NEIN, null)
+                    .show();
+        }
+    }
+
+    private void saveVpInInternalStorage(InternalStorage storage) {
         String vpId = vpIdEditText.getText().toString();
         String group = selectedGroup;
         String progress = "0";
         String startDate = startDateEditText.getText().toString();
         String startTime = startTimeEditText.getText().toString();
 
-        InternalStorage storage = new InternalStorage(this);
         storage.saveFileContent(Config.FILE_NAME_ID, vpId);
         storage.saveFileContent(Config.FILE_NAME_GROUP, group);
         storage.saveFileContent(Config.FILE_NAME_START_DATE, startDate);
@@ -231,25 +240,10 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         storage.saveFileContent(Config.FILE_NAME_PROGRESS, progress);
     }
 
-    private void restartAutoExitTimer() {
-        AlarmSender alarmManager = new AlarmSender(this);
-        alarmManager.setAdminTimeoutAlarm();
-    }
-
     @Override
     public void onBackPressed() {
         restartAutoExitTimer();
         Intent intent = new Intent(this, AdminActivity.class);
         startActivity(intent);
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        selectedGroup = (String) parent.getItemAtPosition(position);
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
     }
 }

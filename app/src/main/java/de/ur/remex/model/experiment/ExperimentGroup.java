@@ -1,17 +1,24 @@
 package de.ur.remex.model.experiment;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 
 public class ExperimentGroup {
 
-    private String name;
+    private final String name;
     // Relevant to calculate absolute alarm times
     private long startTimeInMillis;
-    private ArrayList<Survey> surveys;
+    private final ArrayList<Survey> surveys;
 
-    public ExperimentGroup(String name) {
+    @JsonCreator
+    public ExperimentGroup(@JsonProperty("name") String name,
+                           @JsonProperty("startTimeInMillis") long startTimeInMillis,
+                           @JsonProperty("surveys") ArrayList<Survey> surveys) {
         this.name = name;
-        surveys = new ArrayList<>();
+        this.startTimeInMillis = startTimeInMillis;
+        this.surveys = surveys;
     }
 
     public void setStartTimeInMillis(long startTimeInMillis) {
@@ -20,10 +27,6 @@ public class ExperimentGroup {
 
     public long getStartTimeInMillis() {
         return startTimeInMillis;
-    }
-
-    public void addSurvey(Survey survey) {
-        surveys.add(survey);
     }
 
     public Survey getFirstSurvey() {

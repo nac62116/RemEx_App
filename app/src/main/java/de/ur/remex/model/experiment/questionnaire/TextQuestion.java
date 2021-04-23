@@ -1,18 +1,21 @@
 package de.ur.remex.model.experiment.questionnaire;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class TextQuestion extends Question {
 
-    private int nextQuestionId;
-
-    public TextQuestion() {
-        type = QuestionType.TEXT;
-    }
-
-    public int getNextQuestionId() {
-        return nextQuestionId;
-    }
-
-    public void setNextQuestionId(int nextQuestionId) {
+    @JsonCreator
+    public TextQuestion(@JsonProperty("id") int id,
+                        @JsonProperty("name") String name,
+                        @JsonProperty("text") String text,
+                        @JsonProperty("hint") String hint,
+                        @JsonProperty("nextQuestionId") int nextQuestionId) {
+        this.id = id;
+        this.type = QuestionType.TEXT;
+        this.name = name;
+        this.text = text;
+        this.hint = hint;
         this.nextQuestionId = nextQuestionId;
     }
 }

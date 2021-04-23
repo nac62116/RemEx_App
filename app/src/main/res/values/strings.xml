@@ -1,25 +1,16 @@
-<!-- TODO: Clean up-->
 <resources>
 
     <!-- Layout Strings -->
-
     <string name="app_name">RemEx</string>
     <string name="weiter_button_text">Weiter</string>
     <string name="medbo_logo_content_description">Medbo Logo</string>
-    <string name="start_experiment">Start Experiment</string>
     <string name="header">Header</string>
     <string name="text">Text</string>
-    <string name="weiter">Weiter</string>
-    <string name="admin_login_header">Login</string>
     <string name="admin_login_input_hint">Passwort</string>
-    <string name="admin_login_buttontext">Weiter</string>
     <string name="admin_logout_buttontext">Ausloggen</string>
     <string name="admin_current_vp_buttontext">Aktuelle VP einsehen</string>
     <string name="admin_create_vp_buttontext">Neue VP erstellen</string>
     <string name="admin_test_run_buttontext">Anwendung vorführen</string>
-    <string name="admin_relax_run_buttontext">Entspannungsübung</string>
-    <string name="vp_group_buttontext_kg">KG</string>
-    <string name="vp_group_buttontext_eg">EG</string>
     <string name="current_vp_header"><u>Aktuelle Versuchsperson:</u></string>
     <string name="current_vp_id_prefix">VP-ID:</string>
     <string name="current_vp_id_hint">VP-Nummer</string>
@@ -36,52 +27,12 @@
     <string name="create_vp_start_time_prefix">Weckzeit:</string>
     <string name="create_vp_start_time_hint">Weckzeit</string>
     <string name="create_vp_buttontext">Experiment starten</string>
-
-    <string name="fos_alert_title">Fehler beim Speichern</string>
-    <string name="fos_alert_text">Die Speicherung im Internal Storage konnte nur teilweise oder gar nicht durchgeführt werden. Bitte den Support kontaktieren.</string>
-    <string name="fis_alert_title">Fehler beim Laden</string>
-    <string name="fis_alert_text">Das Laden aus dem Internal Storage konnte nur teilweise oder gar nicht durchgeführt werden. Bitte den Support kontaktieren.</string>
-    <string name="buffered_reader_alert_title">Fehler beim Lesen</string>
-    <string name="buffered_reader_alert_text">Das Lesen der Datei aus dem Internal Storage konnte nur teilweise oder gar nicht durchgeführt werden. Bitte den Support kontaktieren.</string>
-    <string name="current_vp_save_alert_header">Speichern fehlgeschlagen</string>
-    <string name="current_vp_save_alert">Es gab ein Problem mit der Speicherung der Versuchsperson. Bitte erneut versuchen oder den Support kontaktieren.</string>
-    <string name="exception_alert_title">Fehler im System</string>
-    <string name="exception_alert_text">Die Aktion konnte nur teilweise oder gar nicht durchgeführt werden, da ein Fehler im System aufgetreten ist. Bitte den Support kontaktieren.</string>
-    <string name="current_vp_file_name_id">id</string>
-    <string name="current_vp_file_name_group">group</string>
-    <string name="current_vp_file_name_alarms">alarmTimesInMillisLongArrayAsJSON</string>
-    <string name="current_vp_file_name_progress">progress</string>
-    <string name="current_vp_file_name_start_date">date</string>
-    <string name="current_vp_file_name_start_time">time</string>
-    <string name="current_vp_file_name_csv">csv</string>
-    <string name="experiment_active_file_name">experimentActive</string>
-    <string name="experiment_finished_file_name">experimentFinished</string>
-    <string name="current_notification_id_file_name">currentExperiment</string>
-    <string name="file_name_salivetteReady">salivetteReady</string>
-    <string name="file_name_password">pw</string>
-    <string name="file_name_logged_in">loggedIn</string>
-    <string name="csv_header">VP_ID,Gruppe,Befragung_ID,Frage_ID,Antwort,Zeitstempel*</string>
-    <string name="initial_password">Medbo_TSST</string>
-    <string name="password_alert_title">Login fehlgeschlagen</string>
-    <string name="password_alert_text">Das eingegebene Passwort ist falsch.</string>
-
-
-    <string name="date_invalid_alert_title">Falsches Datum</string>
-    <string name="date_invalid_alert_text">Das gewählte Datum ist heute oder liegt in der Vergangenheit.</string>
-    <string name="input_invalid_alert_title">Angaben unvollständig</string>
-    <string name="input_invalid_alert_text">Es wurden nicht alle Felder ausgefüllt.</string>
-    <string name="salivette_not_ready_alert_title">Bitte warte noch einen Moment.</string>
-    <string name="salivette_not_ready_alert_text">Die Watterolle ist noch nicht lange genug in deinem Mund. Bitte behalte sie noch 1 bis 2 Minuten im Mund und drücke dann erneut auf \"Weiter\".</string>
-    <string name="csv_not_saved_alert_title">Achtung!</string>
-    <string name="csv_not_saved_alert_text">Die CSV-Datei der aktuellen Versuchsperson wurde noch nicht gespeichert. Trotzdem Fortfahren?</string>
-    <string name="ja">Ja</string>
-    <string name="nein">Nein</string>
     <string name="instruction_image_content_description">Bild zur Instruktion</string>
     <string name="bitte_warten">Bitte warten</string>
     <string name="du_wirst_automatisch_weitergeleitet">Du wirst automatisch weitergeleitet.</string>
     <string name="atem_bung">Atemübung</string>
     <string name="breathing_circle_content_description">Kreis für die Atemübung</string>
-    <string name="experiment_laden">Experiment laden</string>
+    <string name="experiment_laden">Neues Experiment laden</string>
     <string name="csv_status">Csv status</string>
     <string name="question_text">Question_Text</string>
     <string name="question_hint">Question_Hint</string>
@@ -91,10 +42,6 @@
     <string name="deine_antwort">Deine Antwort…</string>
     <string name="datum_eingeben">Datum eingeben…</string>
     <string name="uhrzeit_eingeben">Uhrzeit eingeben…</string>
-    <string name="_00d_00h_00m">00d 00h 00m</string>
-    <string name="intervall">intervall</string>
-    <string name="tage_stunden_minuten">(Tage, Stunden, Minuten)</string>
-    <string name="_0">0</string>
     <string name="wie_viele">Wie viele…</string>
     <string name="jahre">Jahre</string>
     <string name="monate">Monate</string>
@@ -104,5 +51,7 @@
     <string name="sekunden">Sekunden</string>
     <string name="label">Label</string>
     <string name="value">Value</string>
+    <string name="aktuelles_experiment">Aktuelles Experiment</string>
+    <string name="vp_gruppe">VP-Gruppe</string>
 
 </resources>

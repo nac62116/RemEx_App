@@ -77,6 +77,7 @@ public class ChoiceQuestionActivity extends AppCompatActivity implements View.On
         adapter = new CustomArrayAdapter(this, android.R.layout.simple_list_item_1, answerTexts);
         answerListView.setAdapter(adapter);
         answerListView.setOnItemClickListener(this);
+        // Checking if the answerListView is scrollable
         Runnable fitsOnScreen = () -> {
             int last = answerListView.getLastVisiblePosition();
             if (last == answerListView.getCount() - 1 && answerListView.getChildAt(last).getBottom() <= answerListView.getHeight()) {
@@ -89,11 +90,6 @@ public class ChoiceQuestionActivity extends AppCompatActivity implements View.On
             TextView multipleChoiceHint = findViewById(R.id.multipleChoiceHint);
             multipleChoiceHint.setVisibility(View.INVISIBLE);
         }
-    }
-
-    public void addObserver(Observer observer) {
-        OBSERVABLE.deleteObservers();
-        OBSERVABLE.addObserver(observer);
     }
 
     @Override
@@ -110,6 +106,7 @@ public class ChoiceQuestionActivity extends AppCompatActivity implements View.On
         }
     }
 
+    // Here the answer pick logic is implemented (for highlighting see adapter class at the bottom)
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (choiceType.equals(ChoiceType.SINGLE_CHOICE)) {
@@ -141,12 +138,18 @@ public class ChoiceQuestionActivity extends AppCompatActivity implements View.On
         }
     }
 
+    public void addObserver(Observer observer) {
+        OBSERVABLE.deleteObservers();
+        OBSERVABLE.addObserver(observer);
+    }
+
     // Disabling the OS-Back Button
     @Override
     public void onBackPressed() {
         //
     }
 
+    // Adapter to manage the highlighting of the chosen answers
     public class CustomArrayAdapter extends ArrayAdapter<String> {
 
         private final Context context;

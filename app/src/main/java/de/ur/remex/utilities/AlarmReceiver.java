@@ -3,7 +3,6 @@ package de.ur.remex.utilities;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import java.util.Observer;
 
@@ -18,7 +17,6 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String purpose = intent.getStringExtra(Config.ALARM_PURPOSE_KEY);
         if (purpose != null) {
-            // Creating notification for a survey
             Event event = null;
             switch (purpose) {
                 case Config.PURPOSE_SURVEY_ALARM:
@@ -35,7 +33,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                     event = new Event(null, Config.EVENT_STEP_TIMER, stepId);
                     break;
                 case Config.PURPOSE_ADMIN_TIMEOUT:
-                    Log.e("AlarmReceiver", "EVENT_ADMIN_TIMEOUT");
                     Intent destinationIntent = new Intent(context, LoginActivity.class);
                     destinationIntent.putExtra(Config.EXIT_APP_KEY, true);
                     destinationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

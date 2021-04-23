@@ -19,7 +19,6 @@ import java.util.Observer;
 import de.ur.remex.Config;
 import de.ur.remex.R;
 import de.ur.remex.model.experiment.questionnaire.PointOfTimeType;
-import de.ur.remex.model.experiment.questionnaire.QuestionType;
 import de.ur.remex.utilities.Event;
 import de.ur.remex.utilities.Observable;
 
@@ -79,11 +78,6 @@ public class PointOfTimeQuestionActivity extends AppCompatActivity implements Vi
         }
     }
 
-    public void addObserver(Observer observer) {
-        OBSERVABLE.deleteObservers();
-        OBSERVABLE.addObserver(observer);
-    }
-
     @Override
     public void onClick(View v) {
         if (v.equals(nextButton)) {
@@ -99,34 +93,6 @@ public class PointOfTimeQuestionActivity extends AppCompatActivity implements Vi
             TimePickerDialog timePickerDialog = createTimePickerDialog();
             timePickerDialog.show();
         }
-    }
-
-    private TimePickerDialog createTimePickerDialog() {
-        // Get Current Time
-        final Calendar c = Calendar.getInstance();
-        final int currentHour = c.get(Calendar.HOUR_OF_DAY);
-        final int currentMinute = c.get(Calendar.MINUTE);
-        TimePickerDialog timePickerDialog;
-
-        timePickerDialog = new TimePickerDialog(this, (view, hourOfDay, minute) -> {
-            String hour, min;
-            if (hourOfDay < 10) {
-                hour = "0" + hourOfDay;
-            }
-            else {
-                hour = "" + hourOfDay;
-            }
-            if (minute < 10) {
-                min = "0" + minute;
-            }
-            else {
-                min = "" + minute;
-            }
-            String timeString = hour + ":" + min + " Uhr";
-            daytimeAnswerTextField.setText(timeString);
-            updateNextButton();
-        }, currentHour, currentMinute, true);
-        return timePickerDialog;
     }
 
     private DatePickerDialog createDatePickerDialog() {
@@ -159,6 +125,34 @@ public class PointOfTimeQuestionActivity extends AppCompatActivity implements Vi
         return datePickerDialog;
     }
 
+    private TimePickerDialog createTimePickerDialog() {
+        // Get Current Time
+        final Calendar c = Calendar.getInstance();
+        final int currentHour = c.get(Calendar.HOUR_OF_DAY);
+        final int currentMinute = c.get(Calendar.MINUTE);
+        TimePickerDialog timePickerDialog;
+
+        timePickerDialog = new TimePickerDialog(this, (view, hourOfDay, minute) -> {
+            String hour, min;
+            if (hourOfDay < 10) {
+                hour = "0" + hourOfDay;
+            }
+            else {
+                hour = "" + hourOfDay;
+            }
+            if (minute < 10) {
+                min = "0" + minute;
+            }
+            else {
+                min = "" + minute;
+            }
+            String timeString = hour + ":" + min + " Uhr";
+            daytimeAnswerTextField.setText(timeString);
+            updateNextButton();
+        }, currentHour, currentMinute, true);
+        return timePickerDialog;
+    }
+
     private void updateNextButton() {
         if (pointOfTimeTypeNames.contains(PointOfTimeType.DATE.name()) &&
                 pointOfTimeTypeNames.contains(PointOfTimeType.DAYTIME.name())) {
@@ -183,6 +177,11 @@ public class PointOfTimeQuestionActivity extends AppCompatActivity implements Vi
                 nextButton.setTextColor(this.getResources().getColor(R.color.themeColor));
             }
         }
+    }
+
+    public void addObserver(Observer observer) {
+        OBSERVABLE.deleteObservers();
+        OBSERVABLE.addObserver(observer);
     }
 
     // Disabling the OS-Back Button

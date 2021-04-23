@@ -93,17 +93,17 @@ public class LikertQuestionActivity extends AppCompatActivity implements View.On
         nextButton.setOnClickListener(this);
     }
 
-    public void addObserver(Observer observer) {
-        OBSERVABLE.deleteObservers();
-        OBSERVABLE.addObserver(observer);
-    }
-
     @Override
     public void onClick(View v) {
         if (v.equals(nextButton)) {
             Event event = new Event(this, Config.EVENT_NEXT_QUESTION, scaleValueView.getText().toString());
             OBSERVABLE.notifyExperimentController(event);
         }
+    }
+
+    public void addObserver(Observer observer) {
+        OBSERVABLE.deleteObservers();
+        OBSERVABLE.addObserver(observer);
     }
 
     // Disabling the OS-Back Button

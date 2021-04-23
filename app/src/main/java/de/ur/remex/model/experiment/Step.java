@@ -1,19 +1,27 @@
 package de.ur.remex.model.experiment;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import de.ur.remex.model.experiment.breathingExercise.BreathingExercise;
+import de.ur.remex.model.experiment.questionnaire.Questionnaire;
+
+import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY;
+import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
+
+@JsonTypeInfo(use = NAME, include = PROPERTY)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Instruction.class, name = "INSTRUCTION"),
+        @JsonSubTypes.Type(value = BreathingExercise.class, name = "BREATHING_EXERCISE"),
+        @JsonSubTypes.Type(value = Questionnaire.class, name = "QUESTIONNAIRE")
+})
 public abstract class Step {
 
     // Id must have an unique value excluding 0 -> RemEx Interface
     protected int id;
-    private String name;
     protected StepType type;
     protected int waitForStep;
-    // Only needed if back button gets implemented.
-    protected int previousStepId;
     protected int nextStepId;
-
-    public void setNextStepId(int nextStepId) {
-        this.nextStepId = nextStepId;
-    }
 
     public int getNextStepId() {
         return nextStepId;
@@ -23,16 +31,8 @@ public abstract class Step {
         return type;
     }
 
-    public void setWaitForStep(int stepId) {
-        this.waitForStep = stepId;
-    }
-
     public int getWaitForStep() {
         return waitForStep;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getId() {

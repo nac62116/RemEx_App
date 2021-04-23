@@ -82,17 +82,17 @@ public class TextQuestionActivity extends AppCompatActivity implements View.OnCl
         });
     }
 
-    public void addObserver(Observer observer) {
-        OBSERVABLE.deleteObservers();
-        OBSERVABLE.addObserver(observer);
-    }
-
     @Override
     public void onClick(View v) {
         if (v.equals(nextButton)) {
             Event event = new Event(this, Config.EVENT_NEXT_QUESTION, answerTextField.getText().toString());
             OBSERVABLE.notifyExperimentController(event);
         }
+    }
+
+    public void addObserver(Observer observer) {
+        OBSERVABLE.deleteObservers();
+        OBSERVABLE.addObserver(observer);
     }
 
     // Disabling the OS-Back Button

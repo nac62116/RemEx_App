@@ -1,5 +1,8 @@
 package de.ur.remex.model.experiment.questionnaire;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 
 import de.ur.remex.model.experiment.Step;
@@ -12,11 +15,19 @@ public class Questionnaire extends Step {
     // instructionHeader
     // dischargeText
     // dischargeHeader
-    private ArrayList<Question> questions;
 
-    public Questionnaire() {
-        type = StepType.QUESTIONNAIRE;
-        questions = new ArrayList<>();
+    private final ArrayList<Question> questions;
+
+    @JsonCreator
+    public Questionnaire(@JsonProperty("id") int id,
+                         @JsonProperty("waitForStep") int waitForStep,
+                         @JsonProperty("nextStepId") int nextStepId,
+                         @JsonProperty("questions") ArrayList<Question> questions) {
+        this.id = id;
+        this.type = StepType.QUESTIONNAIRE;
+        this.waitForStep = waitForStep;
+        this.nextStepId = nextStepId;
+        this.questions = questions;
     }
 
     public Question getFirstQuestion() {
@@ -37,9 +48,5 @@ public class Questionnaire extends Step {
 
     public ArrayList<Question> getQuestions() {
         return questions;
-    }
-
-    public void addQuestion(Question question) {
-        questions.add(question);
     }
 }

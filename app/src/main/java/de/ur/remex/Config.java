@@ -12,10 +12,22 @@ public final class Config {
     // General app settings
     public static final int ADMIN_TIMEOUT_MIN = 10;
     public static final String INITIAL_PASSWORD = ""; // TODO
+    public static final String EXPERIMENT_NAME_FIELD_SUFFIX = "Aktuelles Experiment:\n";
+    public static final String EXPERIMENT_NAME_FIELD_NO_EXPERIMENT_LOADED = "Kein Experiment geladen";
+
+    // User feedback
+    public static final String INTERNAL_STORAGE_SAVING_ERROR_TITLE = "Fehler beim Speichern";
+    public static final String INTERNAL_STORAGE_SAVING_ERROR_MESSAGE = "Die Datei konnte nicht im internen Appspeicher abgelegt werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
+    public static final String INTERNAL_STORAGE_LOADING_ERROR_TITLE = "Fehler beim Laden";
+    public static final String INTERNAL_STORAGE_LOADING_ERROR_MESSAGE = "Die angeforderte Datei konnte nicht aus dem internen Appspeicher geladen werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
+    public static final String INTERNAL_STORAGE_READING_ERROR_TITLE = "Fehler beim Lesen";
+    public static final String INTERNAL_STORAGE_READING_ERROR_MESSAGE = "Die angeforderte Datei aus dem internen Appspeicher konnte nicht gelesen werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
     public static final String PASSWORD_ALERT_TITLE = "Login fehlgeschlagen";
     public static final String PASSWORD_ALERT_MESSAGE = "Das eingegebene Passwort ist falsch.";
     public static final String EXPERIMENT_NOT_FINISHED_ALERT_TITLE = "Experiment läuft noch";
     public static final String EXPERIMENT_NOT_FINISHED_ALERT_MESSAGE = "Das Experiment der aktuellen Versuchsperson läuft noch. Möchten Sie trotzdem das Experiment mit einer neuen Versuchsperson starten? Dadurch wird das aktuelle Experiment gestoppt und die dazugehörige CSV-Datei geht verloren.";
+    public static final String CSV_NOT_SAVED_ALERT_TITLE = "CSV-Datei noch nicht gespeichert";
+    public static final String CSV_NOT_SAVED_ALERT_MESSAGE = "Die CSV-Datei der letzten Versuchsperson wurde noch nicht gespeichert und geht verloren wenn ein neues Experiment gestartet wird. Möchten Sie trotzdem das Experiment starten?";
     public static final String EXTERNAL_WRITE_ALERT_TITLE = "Speichern fehlgeschlagen";
     public static final String EXTERNAL_WRITE_ALERT_MESSAGE = "Die CSV-Datei konnte nicht gespeichert werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
     public static final String EXTERNAL_READ_ALERT_TITLE = "Laden fehlgeschlagen";
@@ -26,13 +38,15 @@ public final class Config {
     public static final String INPUT_INVALID_ALERT_MESSAGE = "Es wurden nicht alle Felder ausgefüllt.";
     public static final String DATE_INVALID_ALERT_TITLE = "Falsches Datum";
     public static final String DATE_INVALID_ALERT_MESSAGE = "Das gewählte Datum ist heute oder liegt in der Vergangenheit.";
+    public static final String EXPERIMENT_NOT_LOADED_ALERT_TITLE = "Kein Experiment geladen";
+    public static final String EXPERIMENT_NOT_LOADED_ALERT_MESSAGE = "Es kann keine Versuchsperson erstellt werden, da noch kein Experiment geladen wurde. Bitte zuerst ein Experiment hochladen. (Ein Experiment kann über den RemEx Editor im Browser erstellt, dann via USB auf das Smartphone übertragen und anschließend über den Button \"Neues Experiment laden\" in die App geladen werden)";
     public static final String CSV_SAVED_TOAST = "CSV-Datei gespeichert";
     public static final String EXPERIMENT_LOADED_TOAST = "Experiment erfolgreich geladen";
     public static final String EXPERIMENT_STARTED_TOAST = "Experiment gestartet";
+    public static final String SURVEY_TIMEOUT_TOAST = "Zeit abgelaufen.\nBefragung beendet.";
     public static final String OK = "Ok";
     public static final String JA = "Ja";
     public static final String NEIN = "Nein";
-    public static final String MESSAGE_SURVEY_TIMEOUT = "Zeit abgelaufen.\nBefragung beendet.";
 
     // Event types
     public static final String EVENT_NEXT_STEP = "nextStepEvent";
@@ -95,6 +109,7 @@ public final class Config {
     public static final int BREATHING_TIMER_FREQUENCY_MS = 50; // Value to set the fps for the moving circle (f.e. 50ms = 20fps)
 
     // File Names
+    public static final String FILE_NAME_FIRST_START = "firstApplicationStart";
     public static final String FILE_NAME_ID = "vpId";
     public static final String FILE_NAME_GROUP = "vpGroup";
     public static final String FILE_NAME_START_DATE = "startDate";
@@ -106,7 +121,6 @@ public final class Config {
     public static final String FILE_NAME_PASSWORD = "password";
     public static final String FILE_NAME_EXPERIMENT_STATUS = "experimentStatus";
     public static final String FILE_NAME_EXPERIMENT_JSON = "experimentJSON";
-    public static final String FILE_NAME_TEST_EXPERIMENT_JSON = "testExperimentJSON";
 
     // File Values
     public static final String SURVEY_ENTRANCE_OPENED = "surveyEntranceOpened";

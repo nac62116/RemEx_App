@@ -6,7 +6,7 @@
     android:background="@color/backgroundColor">
 
     <TextView
-        android:id="@+id/timeIntervallQuestionText"
+        android:id="@+id/timeIntervalQuestionText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -21,7 +21,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/timeIntervallQuestionHint"
+        android:id="@+id/timeIntervalQuestionHint"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -33,10 +33,10 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionText" />
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervalQuestionText" />
 
     <EditText
-        android:id="@+id/timeIntervallQuestionYearAnswerField"
+        android:id="@+id/timeIntervalQuestionYearAnswerField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
@@ -48,10 +48,10 @@
         android:textColor="@color/textColor"
         android:textSize="30sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionHint" />
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervalQuestionHint" />
 
     <EditText
-        android:id="@+id/timeIntervallQuestionSecondAnswerField"
+        android:id="@+id/timeIntervalQuestionSecondAnswerField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -62,10 +62,10 @@
         android:textColor="@color/textColor"
         android:textSize="30sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionMinuteAnswerField" />
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervalQuestionMinuteAnswerField" />
 
     <EditText
-        android:id="@+id/timeIntervallQuestionMonthAnswerField"
+        android:id="@+id/timeIntervalQuestionMonthAnswerField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -76,10 +76,10 @@
         android:textColor="@color/textColor"
         android:textSize="30sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionYearAnswerField" />
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervalQuestionYearAnswerField" />
 
     <EditText
-        android:id="@+id/timeIntervallQuestionDayAnswerField"
+        android:id="@+id/timeIntervalQuestionDayAnswerField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -90,10 +90,10 @@
         android:textColor="@color/textColor"
         android:textSize="30sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionMonthAnswerField" />
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervalQuestionMonthAnswerField" />
 
     <EditText
-        android:id="@+id/timeIntervallQuestionHourAnswerField"
+        android:id="@+id/timeIntervalQuestionHourAnswerField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -104,10 +104,10 @@
         android:textColor="@color/textColor"
         android:textSize="30sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionDayAnswerField" />
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervalQuestionDayAnswerField" />
 
     <EditText
-        android:id="@+id/timeIntervallQuestionMinuteAnswerField"
+        android:id="@+id/timeIntervalQuestionMinuteAnswerField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -118,10 +118,10 @@
         android:textColor="@color/textColor"
         android:textSize="30sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionHourAnswerField" />
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervalQuestionHourAnswerField" />
 
     <Button
-        android:id="@+id/timeIntervallQuestionNextButton"
+        android:id="@+id/timeIntervalQuestionNextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
@@ -144,75 +144,75 @@
         app:layout_constraintGuide_percent="0.5" />
 
     <TextView
-        android:id="@+id/timeIntervallQuestionYearSuffix"
+        android:id="@+id/timeIntervalQuestionYearSuffix"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/jahre"
         android:textColor="@color/textColor"
         android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="@+id/timeIntervallQuestionYearAnswerField"
+        app:layout_constraintBottom_toBottomOf="@+id/timeIntervalQuestionYearAnswerField"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="@+id/timeIntervallQuestionYearAnswerField" />
+        app:layout_constraintTop_toTopOf="@+id/timeIntervalQuestionYearAnswerField" />
 
     <TextView
-        android:id="@+id/timeIntervallQuestionMonthSuffix"
+        android:id="@+id/timeIntervalQuestionMonthSuffix"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/monate"
         android:textColor="@color/textColor"
         android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="@+id/timeIntervallQuestionMonthAnswerField"
+        app:layout_constraintBottom_toBottomOf="@+id/timeIntervalQuestionMonthAnswerField"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionYearAnswerField" />
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervalQuestionYearAnswerField" />
 
     <TextView
-        android:id="@+id/timeIntervallQuestionDaySuffix"
+        android:id="@+id/timeIntervalQuestionDaySuffix"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/tage"
         android:textColor="@color/textColor"
         android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="@+id/timeIntervallQuestionDayAnswerField"
+        app:layout_constraintBottom_toBottomOf="@+id/timeIntervalQuestionDayAnswerField"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionMonthAnswerField" />
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervalQuestionMonthAnswerField" />
 
     <TextView
-        android:id="@+id/timeIntervallQuestionHourSuffix"
+        android:id="@+id/timeIntervalQuestionHourSuffix"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/stunden"
         android:textColor="@color/textColor"
         android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="@+id/timeIntervallQuestionHourAnswerField"
+        app:layout_constraintBottom_toBottomOf="@+id/timeIntervalQuestionHourAnswerField"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/timeIntervallQuestionDayAnswerField" />
+        app:layout_constraintTop_toBottomOf="@+id/timeIntervalQuestionDayAnswerField" />
 
     <TextView
-        android:id="@+id/timeIntervallQuestionMinuteSuffix"
+        android:id="@+id/timeIntervalQuestionMinuteSuffix"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/minuten"
         android:textColor="@color/textColor"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/timeIntervallQuestionSecondAnswerField"
+        app:layout_constraintBottom_toTopOf="@+id/timeIntervalQuestionSecondAnswerField"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="@+id/timeIntervallQuestionMinuteAnswerField" />
+        app:layout_constraintTop_toTopOf="@+id/timeIntervalQuestionMinuteAnswerField" />
 
     <TextView
-        android:id="@+id/timeIntervallQuestionSecondSuffix"
+        android:id="@+id/timeIntervalQuestionSecondSuffix"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/sekunden"
         android:textColor="@color/textColor"
         android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="@+id/timeIntervallQuestionSecondAnswerField"
+        app:layout_constraintBottom_toBottomOf="@+id/timeIntervalQuestionSecondAnswerField"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="@+id/timeIntervallQuestionSecondAnswerField" />
+        app:layout_constraintTop_toTopOf="@+id/timeIntervalQuestionSecondAnswerField" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
