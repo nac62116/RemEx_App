@@ -31,7 +31,6 @@ public class AppKillCallbackService extends Service {
         super.onTaskRemoved(rootIntent);
         Event event = new Event(null, Config.EVENT_APP_KILLED, null);
         OBSERVABLE.notifyExperimentController(event);
-        stopSelf();
     }
 
     public void addObserver(Observer observer) {

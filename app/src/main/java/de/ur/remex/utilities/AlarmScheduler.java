@@ -15,6 +15,7 @@ import static android.content.Context.ALARM_SERVICE;
 public class AlarmScheduler {
 
     private final Context context;
+    private long nextSurveyAlarmTimeInMillis;
 
     private static final String SURVEY_ALARM_SUFFIX = "0";
     private static final String SURVEY_TIMEOUT_SUFFIX = "1";
@@ -22,9 +23,48 @@ public class AlarmScheduler {
     private static final int ADMIN_TIMEOUT_ID = -2;
     private static final ArrayList<PendingIntent> pendingIntents = new ArrayList<>();
 
-
     public AlarmScheduler(Context context) {
         this.context = context;
+        this.nextSurveyAlarmTimeInMillis = 0;
+    }
+
+    public long getNextSurveyAlarmTimeInMillis() {
+        return nextSurveyAlarmTimeInMillis;
+    }
+
+    public long getExactSurveyAlarmTimeRelative(long referenceTime, long surveyRelativeStartTimeInMillis) {
+        return referenceTime + surveyRelativeStartTimeInMillis;
+    }
+
+    public long getExactSurveyAlarmTimeAbsolute(long experimentStartTimeInMillis,
+                                                int hour, int minute, int daysOffset) {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(experimentStartTimeInMillis);
+        c.set(Calendar.HOUR_OF_DAY, hour);
+        c.set(Calendar.MINUTE, minute);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH) + daysOffset);
+        return c.getTimeInMillis();
+    }
+
+    public boolean setExactSurveyAlarm(int surveyId, long exactAlarmTimeInMillis) {
+        Calendar c = Calendar.getInstance();
+        // Alarm time lays in the future
+        if (exactAlarmTimeInMillis >= c.getTimeInMillis()) {
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+            Intent intent = new Intent(context, AlarmReceiver.class);
+            intent.putExtra(Config.ALARM_PURPOSE_KEY, Config.PURPOSE_SURVEY_ALARM);
+            String pendingIntentId = surveyId + SURVEY_ALARM_SUFFIX;
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Integer.parseInt(pendingIntentId), intent, PendingIntent.FLAG_ONE_SHOT);
+            pendingIntents.add(pendingIntent);
+            nextSurveyAlarmTimeInMillis = exactAlarmTimeInMillis;
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, exactAlarmTimeInMillis, pendingIntent);
+            return true;
+        }
+        // Alarm time lays in the past
+        else {
+            return false;
+        }
     }
 
     public void setRelativeSurveyAlarm(int surveyId, long referenceTime, long surveyRelativeStartTimeInMillis) {
@@ -34,8 +74,8 @@ public class AlarmScheduler {
         String pendingIntentId = surveyId + SURVEY_ALARM_SUFFIX;
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Integer.parseInt(pendingIntentId), intent, PendingIntent.FLAG_ONE_SHOT);
         pendingIntents.add(pendingIntent);
-        long alarmTimeInMillis = referenceTime + surveyRelativeStartTimeInMillis;
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
+        nextSurveyAlarmTimeInMillis = referenceTime + surveyRelativeStartTimeInMillis;
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextSurveyAlarmTimeInMillis, pendingIntent);
     }
 
     public void setAbsoluteSurveyAlarm(int surveyId, long experimentStartTimeInMillis,
@@ -52,8 +92,8 @@ public class AlarmScheduler {
         String pendingIntentId = surveyId + SURVEY_ALARM_SUFFIX;
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Integer.parseInt(pendingIntentId), intent, PendingIntent.FLAG_ONE_SHOT);
         pendingIntents.add(pendingIntent);
-        long alarmTimeInMillis = c.getTimeInMillis();
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
+        nextSurveyAlarmTimeInMillis = c.getTimeInMillis();
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextSurveyAlarmTimeInMillis, pendingIntent);
     }
 
     public void setSurveyTimeoutAlarm(int surveyId, int maxDurationInMin) {
@@ -123,5 +163,6 @@ public class AlarmScheduler {
             alarmManager.cancel(pendingIntent);
         }
         pendingIntents.clear();
+        nextSurveyAlarmTimeInMillis = 0;
     }
 }

@@ -121,6 +121,7 @@ public final class Config {
     public static final String FILE_NAME_PASSWORD = "password";
     public static final String FILE_NAME_EXPERIMENT_STATUS = "experimentStatus";
     public static final String FILE_NAME_EXPERIMENT_JSON = "experimentJSON";
+    public static final String FILE_NAME_NEXT_SURVEY_ALARM = "nextSurveyAlarmInMillis";
 
     // File Values
     public static final String SURVEY_ENTRANCE_OPENED = "surveyEntranceOpened";

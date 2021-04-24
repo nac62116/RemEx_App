@@ -2,6 +2,8 @@ package de.ur.remex.controller;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -90,31 +92,34 @@ public class ExperimentController implements Observer {
     }
 
     public void startExperiment(ExperimentGroup experimentGroup, long startTimeInMs) {
-        InternalStorage internalStorage = new InternalStorage(currentContext);
+        InternalStorage storage = new InternalStorage(currentContext);
+        // Start service to receive a callback, when the user kills the app by swiping it in the recent apps list.
+        currentContext.startService(new Intent(currentContext, AppKillCallbackService.class));
         // Cancel possible ongoing alarms
         AlarmScheduler alarmScheduler = new AlarmScheduler(currentContext);
         alarmScheduler.cancelAllAlarms();
         // Set internal storage values
-        internalStorage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, Config.EXPERIMENT_RUNNING);
-        internalStorage.saveFileContent(Config.FILE_NAME_CSV_STATUS, Config.CSV_NOT_SAVED);
+        storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, Config.EXPERIMENT_RUNNING);
+        storage.saveFileContent(Config.FILE_NAME_CSV_STATUS, Config.CSV_NOT_SAVED);
         // Init CSV
-        String vpId = internalStorage.getFileContent(Config.FILE_NAME_ID);
-        String vpGroup = internalStorage.getFileContent(Config.FILE_NAME_GROUP);
+        String vpId = storage.getFileContent(Config.FILE_NAME_ID);
+        String vpGroup = storage.getFileContent(Config.FILE_NAME_GROUP);
         csvCreator = new CsvCreator();
         csvCreator.initCsvMap(experimentGroup.getSurveys(), vpId, vpGroup);
-        internalStorage.saveFileContent(Config.FILE_NAME_CSV, Config.INITIAL_CSV_VALUE);
+        storage.saveFileContent(Config.FILE_NAME_CSV, Config.INITIAL_CSV_VALUE);
         // Init current state
         currentExperimentGroup = experimentGroup;
         currentExperimentGroup.setStartTimeInMillis(startTimeInMs);
         Survey currentSurvey = currentExperimentGroup.getFirstSurvey();
         currentSurveyId = currentSurvey.getId();
-        setSurveyAlarm(currentSurvey, alarmScheduler, startTimeInMs);
+        setSurveyAlarm(currentSurvey, alarmScheduler, startTimeInMs, storage);
         // Inform user
         Toast toast = Toast.makeText(currentContext, Config.EXPERIMENT_STARTED_TOAST, Toast.LENGTH_LONG);
         toast.show();
     }
 
-    private void setSurveyAlarm(Survey survey, AlarmScheduler alarmScheduler, long referenceTime) {
+    private void setSurveyAlarm(Survey survey, AlarmScheduler alarmScheduler,
+                                long referenceTime, InternalStorage storage) {
         if (survey.isRelative()) {
             long relativeStartTimeInMillis = survey.getRelativeStartTimeInMin() * 60 * 1000;
             alarmScheduler.setRelativeSurveyAlarm(survey.getId(),
@@ -128,6 +133,8 @@ public class ExperimentController implements Observer {
                     survey.getAbsoluteStartAtMinute(),
                     survey.getAbsoluteStartDaysOffset());
         }
+        long nextSurveyAlarmTime = alarmScheduler.getNextSurveyAlarmTimeInMillis();
+        storage.saveFileContent(Config.FILE_NAME_NEXT_SURVEY_ALARM, Long.toString(nextSurveyAlarmTime));
     }
 
     @Override
@@ -167,8 +174,6 @@ public class ExperimentController implements Observer {
                 break;
 
             case Config.EVENT_SURVEY_STARTED:
-                // Start service to receive a callback, when the user kills the app by swiping it in the recent apps list.
-                currentContext.startService(new Intent(currentContext, AppKillCallbackService.class));
                 // As the survey got started the notification timeout is not relevant anymore
                 alarmScheduler.cancelNotificationTimeoutAlarm();
                 // Each survey has a maximum duration. The timeout alarm is set here
@@ -214,20 +219,27 @@ public class ExperimentController implements Observer {
             case Config.EVENT_SURVEY_TIMEOUT:
                 Toast toast = Toast.makeText(currentContext, Config.SURVEY_TIMEOUT_TOAST, Toast.LENGTH_LONG);
                 toast.show();
-                exitApp(currentSurvey, storage, alarmScheduler, calendar);
+                finishSurvey(currentSurvey, storage, alarmScheduler, calendar);
                 break;
 
             case Config.EVENT_CSV_REQUEST:
                 // When the csv is requested the CsvCreator class converts its whole Hashmap into a csvString
                 // which is then saved in the internal storage.
                 saveCsvInInternalStorage(storage);
+                break;
 
             case Config.EVENT_APP_KILLED:
                 // This event is triggered when the user swipes the app away in the recent apps list.
                 // As a result the currentSurvey gets cancelled, the next survey is scheduled and the app exits.
-                if (currentSurvey != null) {
-                    exitApp(currentSurvey, storage, alarmScheduler, calendar);
+                if (currentStepId != 0) {
+                    finishSurvey(currentSurvey, storage, alarmScheduler, calendar);
                 }
+                else {
+                    Intent intent = new Intent(currentContext, LoginActivity.class);
+                    intent.putExtra(Config.EXIT_APP_KEY, true);
+                    currentContext.startActivity(intent);
+                }
+                break;
 
             default:
                 break;
@@ -243,13 +255,17 @@ public class ExperimentController implements Observer {
         Survey nextSurvey = currentExperimentGroup.getSurveyById(currentSurvey.getNextSurveyId());
         if (nextSurvey != null) {
             currentSurveyId = nextSurvey.getId();
-            setSurveyAlarm(nextSurvey, alarmScheduler, referenceTime);
+            setSurveyAlarm(nextSurvey, alarmScheduler, referenceTime, storage);
         }
         else {
-            // Finish experiment
-            currentSurveyId = 0;
-            storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, Config.EXPERIMENT_FINISHED);
+            finishExperiment(storage);
         }
+    }
+
+    private void finishExperiment(InternalStorage storage) {
+        currentContext.stopService(new Intent(currentContext, AppKillCallbackService.class));
+        currentSurveyId = 0;
+        storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, Config.EXPERIMENT_FINISHED);
     }
 
     private void navigateToStep(Step step) {
@@ -330,10 +346,7 @@ public class ExperimentController implements Observer {
         }
         // There is no next step and the survey gets finished
         else {
-            currentStepId = 0;
-            alarmScheduler.cancelAllAlarms();
-            updateProgress(storage);
-            exitApp(currentSurvey, storage, alarmScheduler, calendar);
+            finishSurvey(currentSurvey, storage, alarmScheduler, calendar);
         }
     }
 
@@ -386,11 +399,13 @@ public class ExperimentController implements Observer {
         storage.saveFileContent(Config.FILE_NAME_PROGRESS, Integer.toString(progress));
     }
 
-    private void exitApp(Survey currentSurvey, InternalStorage storage,
-                         AlarmScheduler alarmScheduler, Calendar calendar) {
+    private void finishSurvey(Survey currentSurvey, InternalStorage storage,
+                              AlarmScheduler alarmScheduler, Calendar calendar) {
+        currentStepId = 0;
+        alarmScheduler.cancelAllAlarms();
+        updateProgress(storage);
         prepareNextSurvey(currentSurvey, storage, alarmScheduler, calendar.getTimeInMillis());
         storage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, Config.SURVEY_ENTRANCE_CLOSED);
-        currentContext.stopService(new Intent(currentContext, AppKillCallbackService.class));
         Intent intent = new Intent(currentContext, LoginActivity.class);
         intent.putExtra(Config.EXIT_APP_KEY, true);
         currentContext.startActivity(intent);

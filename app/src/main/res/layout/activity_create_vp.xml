@@ -26,7 +26,7 @@
         android:layout_marginTop="32dp"
         android:text="@string/create_vp_id_prefix"
         android:textColor="@color/textColor"
-        android:textSize="30sp"
+        android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/createVPHeader" />
 
@@ -39,7 +39,7 @@
         android:hint="@string/create_vp_id_hint"
         android:inputType="text"
         android:textAlignment="center"
-        android:textSize="30sp"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.425"
         app:layout_constraintStart_toEndOf="@+id/startTimePrefix"
@@ -53,7 +53,7 @@
         android:layout_marginTop="32dp"
         android:text="@string/create_vp_group_prefix"
         android:textColor="@color/textColor"
-        android:textSize="30sp"
+        android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/newVPidPrefix" />
 
@@ -63,23 +63,23 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
         android:background="@drawable/next_button"
         android:text="@string/create_vp_buttontext"
         android:textColor="@color/themeColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/startTime" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Spinner
         android:id="@+id/inputVPGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:textAlignment="center"
         android:textColor="@color/textColor"
-        android:textSize="30sp"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/startTimePrefix"
         app:layout_constraintTop_toBottomOf="@+id/inputVPid" />
@@ -92,7 +92,7 @@
         android:layout_marginTop="32dp"
         android:text="@string/create_vp_start_date_prefix"
         android:textColor="@color/textColor"
-        android:textSize="30sp"
+        android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/newGroupPrefix" />
 
@@ -106,7 +106,7 @@
         android:hint="@string/create_vp_start_date_hint"
         android:inputType="date"
         android:textAlignment="center"
-        android:textSize="30sp"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/startTimePrefix"
         app:layout_constraintTop_toBottomOf="@+id/inputVPGroup" />
@@ -119,7 +119,7 @@
         android:layout_marginTop="32dp"
         android:text="@string/create_vp_start_time_prefix"
         android:textColor="@color/textColor"
-        android:textSize="30sp"
+        android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/currentStartDatePrefix2" />
 
@@ -133,7 +133,7 @@
         android:hint="@string/create_vp_start_time_hint"
         android:inputType="date"
         android:textAlignment="center"
-        android:textSize="30sp"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/startTimePrefix"
         app:layout_constraintTop_toBottomOf="@+id/startDate" />

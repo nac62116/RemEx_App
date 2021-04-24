@@ -64,6 +64,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String surveyEntrance = Config.SURVEY_ENTRANCE_CLOSED;
         String password = Config.INITIAL_PASSWORD;
         String experimentStatus = Config.EXPERIMENT_FINISHED;
+        String nextSurveyAlarmTime = "0";
 
         storage.saveFileContent(Config.FILE_NAME_FIRST_START, firstStart);
         storage.saveFileContent(Config.FILE_NAME_ID, vpId);
@@ -76,6 +77,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         storage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, surveyEntrance);
         storage.saveFileContent(Config.FILE_NAME_PASSWORD, password);
         storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, experimentStatus);
+        storage.saveFileContent(Config.FILE_NAME_NEXT_SURVEY_ALARM, nextSurveyAlarmTime);
     }
 
     private void exitApp() {
