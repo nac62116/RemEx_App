@@ -184,8 +184,6 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
 
     private long getStartTimeInMs() {
         Calendar calendar = Calendar.getInstance();
-        // TODO: Move line "long startTimeInMs..." under "calender.set(..."
-        long startTimeInMs = calendar.getTimeInMillis();
         // Format: dd.mm.yyyy
         String startDate = startDateEditText.getText().toString();
         // Format: hh:mm Uhr
@@ -196,7 +194,7 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         int hour = Integer.parseInt(startTime.substring(0,2));
         int minute = Integer.parseInt(startTime.substring(3,5));
         calendar.set(year, month - 1, date, hour, minute);
-        return startTimeInMs;
+        return calendar.getTimeInMillis();
     }
 
     private void sendStartRequest(long startTimeInMs) {

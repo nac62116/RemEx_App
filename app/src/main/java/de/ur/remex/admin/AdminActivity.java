@@ -34,8 +34,6 @@ import de.ur.remex.utilities.AlarmScheduler;
 import de.ur.remex.utilities.JSONParser;
 import de.ur.remex.utilities.Observable;
 
-// TODO: Text alignment -> (center, justify, left?)
-
 public class AdminActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button currentVPButton;
