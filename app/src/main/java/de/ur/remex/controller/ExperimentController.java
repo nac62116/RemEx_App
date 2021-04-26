@@ -2,8 +2,6 @@ package de.ur.remex.controller;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -30,7 +28,6 @@ import de.ur.remex.model.experiment.questionnaire.TextQuestion;
 import de.ur.remex.model.experiment.questionnaire.TimeIntervalQuestion;
 import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.utilities.AlarmReceiver;
-import de.ur.remex.utilities.AppKillCallbackService;
 import de.ur.remex.utilities.CsvCreator;
 import de.ur.remex.utilities.Event;
 import de.ur.remex.Config;
@@ -76,7 +73,6 @@ public class ExperimentController implements Observer {
         PointOfTimeQuestionActivity pointOfTimeQuestionActivity = new PointOfTimeQuestionActivity();
         TimeIntervalQuestionActivity timeIntervalQuestionActivity = new TimeIntervalQuestionActivity();
         LikertQuestionActivity likertQuestionActivity = new LikertQuestionActivity();
-        AppKillCallbackService service = new AppKillCallbackService();
         instructionActivity.addObserver(this);
         breathingExerciseActivity.addObserver(this);
         surveyEntranceActivity.addObserver(this);
@@ -88,13 +84,11 @@ public class ExperimentController implements Observer {
         pointOfTimeQuestionActivity.addObserver(this);
         timeIntervalQuestionActivity.addObserver(this);
         likertQuestionActivity.addObserver(this);
-        service.addObserver(this);
     }
 
+    // Entry point from AdminActivity
     public void startExperiment(ExperimentGroup experimentGroup, long startTimeInMs) {
         InternalStorage storage = new InternalStorage(currentContext);
-        // Start service to receive a callback, when the user kills the app by swiping it in the recent apps list.
-        currentContext.startService(new Intent(currentContext, AppKillCallbackService.class));
         // Cancel possible ongoing alarms
         AlarmScheduler alarmScheduler = new AlarmScheduler(currentContext);
         alarmScheduler.cancelAllAlarms();
@@ -112,14 +106,13 @@ public class ExperimentController implements Observer {
         currentExperimentGroup.setStartTimeInMillis(startTimeInMs);
         Survey currentSurvey = currentExperimentGroup.getFirstSurvey();
         currentSurveyId = currentSurvey.getId();
-        setSurveyAlarm(currentSurvey, alarmScheduler, startTimeInMs, storage);
+        setSurveyAlarm(currentSurvey, alarmScheduler, startTimeInMs);
         // Inform user
         Toast toast = Toast.makeText(currentContext, Config.EXPERIMENT_STARTED_TOAST, Toast.LENGTH_LONG);
         toast.show();
     }
 
-    private void setSurveyAlarm(Survey survey, AlarmScheduler alarmScheduler,
-                                long referenceTime, InternalStorage storage) {
+    private void setSurveyAlarm(Survey survey, AlarmScheduler alarmScheduler, long referenceTime) {
         if (survey.isRelative()) {
             long relativeStartTimeInMillis = survey.getRelativeStartTimeInMin() * 60 * 1000;
             alarmScheduler.setRelativeSurveyAlarm(survey.getId(),
@@ -133,8 +126,6 @@ public class ExperimentController implements Observer {
                     survey.getAbsoluteStartAtMinute(),
                     survey.getAbsoluteStartDaysOffset());
         }
-        long nextSurveyAlarmTime = alarmScheduler.getNextSurveyAlarmTimeInMillis();
-        storage.saveFileContent(Config.FILE_NAME_NEXT_SURVEY_ALARM, Long.toString(nextSurveyAlarmTime));
     }
 
     @Override
@@ -228,19 +219,6 @@ public class ExperimentController implements Observer {
                 saveCsvInInternalStorage(storage);
                 break;
 
-            case Config.EVENT_APP_KILLED:
-                // This event is triggered when the user swipes the app away in the recent apps list.
-                // As a result the currentSurvey gets cancelled, the next survey is scheduled and the app exits.
-                if (currentStepId != 0) {
-                    finishSurvey(currentSurvey, storage, alarmScheduler, calendar);
-                }
-                else {
-                    Intent intent = new Intent(currentContext, LoginActivity.class);
-                    intent.putExtra(Config.EXIT_APP_KEY, true);
-                    currentContext.startActivity(intent);
-                }
-                break;
-
             default:
                 break;
         }
@@ -255,7 +233,7 @@ public class ExperimentController implements Observer {
         Survey nextSurvey = currentExperimentGroup.getSurveyById(currentSurvey.getNextSurveyId());
         if (nextSurvey != null) {
             currentSurveyId = nextSurvey.getId();
-            setSurveyAlarm(nextSurvey, alarmScheduler, referenceTime, storage);
+            setSurveyAlarm(nextSurvey, alarmScheduler, referenceTime);
         }
         else {
             finishExperiment(storage);
@@ -263,7 +241,6 @@ public class ExperimentController implements Observer {
     }
 
     private void finishExperiment(InternalStorage storage) {
-        currentContext.stopService(new Intent(currentContext, AppKillCallbackService.class));
         currentSurveyId = 0;
         storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, Config.EXPERIMENT_FINISHED);
     }

@@ -11,7 +11,7 @@ public final class Config {
 
     // General app settings
     public static final int ADMIN_TIMEOUT_MIN = 10;
-    public static final String INITIAL_PASSWORD = ""; // TODO
+    public static final String INITIAL_PASSWORD = "Medbo_TSST";
     public static final String EXPERIMENT_NAME_FIELD_SUFFIX = "Aktuelles Experiment:\n";
     public static final String EXPERIMENT_NAME_FIELD_NO_EXPERIMENT_LOADED = "Kein Experiment geladen";
 
@@ -58,7 +58,6 @@ public final class Config {
     public static final String EVENT_WAITING_ROOM_ENTERED = "waitingRoomEnteredEvent";
     public static final String EVENT_NEXT_QUESTION = "nextQuestionEvent";
     public static final String EVENT_CSV_REQUEST = "csvRequestEvent";
-    public static final String EVENT_APP_KILLED = "appKilledEvent";
 
     // Intent Extra Keys
     public static final String EXIT_APP_KEY = "exitApp";

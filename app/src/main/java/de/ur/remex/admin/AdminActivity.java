@@ -13,9 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -34,6 +31,7 @@ import de.ur.remex.model.experiment.ExperimentGroup;
 import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.utilities.Event;
 import de.ur.remex.utilities.AlarmScheduler;
+import de.ur.remex.utilities.JSONParser;
 import de.ur.remex.utilities.Observable;
 
 // TODO: Text alignment -> (center, justify, left?)
@@ -92,21 +90,8 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
 
     private Experiment parseExperimentJSON(String experimentJSON) {
         // JSON-String to Experiment object
-        Experiment parsedExperiment = null;
-        if (experimentJSON != null) {
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                parsedExperiment = mapper.readValue(experimentJSON, Experiment.class);
-            }
-            catch (JsonProcessingException e) {
-                new AlertDialog.Builder(this)
-                        .setTitle(Config.JSON_PARSE_ALERT_TITLE)
-                        .setMessage(Config.JSON_PARSE_ALERT_MESSAGE)
-                        .setPositiveButton(Config.OK, null)
-                        .show();
-            }
-        }
-        return parsedExperiment;
+        JSONParser parser = new JSONParser(this);
+        return (Experiment) parser.parse(experimentJSON, Experiment.class);
     }
 
     private void createCsv(InternalStorage storage) {
