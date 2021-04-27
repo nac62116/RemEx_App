@@ -31,6 +31,10 @@
         <activity android:name=".view.TimeIntervalQuestionActivity" android:screenOrientation="portrait"/>
         <activity android:name=".view.LikertQuestionActivity" android:screenOrientation="portrait"/>
 
+        <service
+            android:name=".utilities.AppKillCallbackService"
+            android:stopWithTask="false" />
+
         <receiver android:name=".utilities.AlarmReceiver">
         </receiver>
 

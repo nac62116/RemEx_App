@@ -26,8 +26,8 @@ public class InternalStorage {
         }
         catch (Exception e){
             new AlertDialog.Builder(context)
-                    .setTitle(Config.INTERNAL_STORAGE_SAVING_ERROR_TITLE)
-                    .setMessage(Config.INTERNAL_STORAGE_SAVING_ERROR_MESSAGE)
+                    .setTitle(Config.INTERNAL_STORAGE_SAVING_ALERT_TITLE)
+                    .setMessage(Config.INTERNAL_STORAGE_SAVING_ALERT_MESSAGE)
                     .setPositiveButton(Config.OK, null)
                     .show();
         }
@@ -44,8 +44,8 @@ public class InternalStorage {
         }
         catch (Exception e) {
             new AlertDialog.Builder(context)
-                    .setTitle(Config.INTERNAL_STORAGE_LOADING_ERROR_TITLE)
-                    .setMessage(Config.INTERNAL_STORAGE_LOADING_ERROR_MESSAGE)
+                    .setTitle(Config.INTERNAL_STORAGE_LOADING_ALERT_TITLE)
+                    .setMessage(Config.INTERNAL_STORAGE_LOADING_ALERT_MESSAGE)
                     .setPositiveButton(Config.OK, null)
                     .show();
             return null;
@@ -59,8 +59,8 @@ public class InternalStorage {
             }
         } catch (Exception e) {
             new AlertDialog.Builder(context)
-                    .setTitle(Config.INTERNAL_STORAGE_READING_ERROR_TITLE)
-                    .setMessage(Config.INTERNAL_STORAGE_READING_ERROR_MESSAGE)
+                    .setTitle(Config.INTERNAL_STORAGE_READING_ALERT_TITLE)
+                    .setMessage(Config.INTERNAL_STORAGE_READING_ALERT_MESSAGE)
                     .setPositiveButton(Config.OK, null)
                     .show();
             return null;
@@ -70,8 +70,13 @@ public class InternalStorage {
         return content;
     }
 
+    public boolean deleteFile(String fileName) {
+        return context.deleteFile(fileName);
+    }
+
     public boolean fileExists(String fileName){
         File file = context.getFileStreamPath(fileName);
         return file.exists();
     }
+
 }

@@ -120,6 +120,7 @@ public class PointOfTimeQuestionActivity extends AppCompatActivity implements Vi
             }
             String dateString = dayString + "." + monthString + "." + year;
             dateAnswerTextField.setText(dateString);
+            dateAnswerTextField.setHint("");
             updateNextButton();
         }, currentYear, currentMonth, currentDay);
         return datePickerDialog;
@@ -148,6 +149,7 @@ public class PointOfTimeQuestionActivity extends AppCompatActivity implements Vi
             }
             String timeString = hour + ":" + min + " Uhr";
             daytimeAnswerTextField.setText(timeString);
+            daytimeAnswerTextField.setHint("");
             updateNextButton();
         }, currentHour, currentMinute, true);
         return timePickerDialog;

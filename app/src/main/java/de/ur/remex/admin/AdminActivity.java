@@ -28,6 +28,7 @@ import de.ur.remex.R;
 import de.ur.remex.controller.ExperimentController;
 import de.ur.remex.model.experiment.Experiment;
 import de.ur.remex.model.experiment.ExperimentGroup;
+import de.ur.remex.model.experiment.EncodedResource;
 import de.ur.remex.model.storage.InternalStorage;
 import de.ur.remex.utilities.Event;
 import de.ur.remex.utilities.AlarmScheduler;
@@ -71,7 +72,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
                 String vpGroup = storage.getFileContent(Config.FILE_NAME_GROUP);
                 ExperimentGroup group = currentExperiment.getExperimentGroupByName(vpGroup);
                 long startTimeInMs = this.getIntent().getLongExtra(Config.START_TIME_MS_KEY, 0);
-                startExperiment(group, startTimeInMs, storage);
+                startExperiment(group, startTimeInMs, currentExperiment.getEncodedResources(), storage);
             }
         }
         initAdminScreen();
@@ -151,16 +152,19 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
                 if (experimentJSON != null) {
                     Experiment experiment = parseExperimentJSON(experimentJSON);
                     if (experiment != null) {
+                        if (currentExperiment != null) {
+                            cleanUpLastExperiment(currentExperiment.getEncodedResources(), storage);
+                        }
+                        currentExperiment = experiment;
                         if (requestCode == GET_EXPERIMENT_JSON_FILE) {
                             storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_JSON, experimentJSON);
-                            currentExperiment = experiment;
                             String experimentName = Config.EXPERIMENT_NAME_FIELD_SUFFIX + currentExperiment.getName();
                             currentExperimentNameView.setText(experimentName);
                             Toast toast = Toast.makeText(this, Config.EXPERIMENT_LOADED_TOAST, Toast.LENGTH_LONG);
                             toast.show();
                         }
                         else {
-                            startExperiment(experiment.getExperimentGroups().get(0), 0, storage);
+                            startExperiment(experiment.getExperimentGroups().get(0), 0, experiment.getEncodedResources(), storage);
                         }
                     }
                 }
@@ -172,6 +176,21 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
                         .setMessage(Config.EXTERNAL_READ_ALERT_MESSAGE)
                         .setPositiveButton(Config.OK, null)
                         .show();
+            }
+        }
+    }
+
+    private void cleanUpLastExperiment(ArrayList<EncodedResource> encodedResources, InternalStorage storage) {
+        for (EncodedResource resource: encodedResources) {
+            if (storage.fileExists(resource.getFileName())) {
+                boolean success = storage.deleteFile(resource.getFileName());
+                if (!success) {
+                    new AlertDialog.Builder(this)
+                            .setTitle(Config.CLEAN_UP_ALERT_TITLE)
+                            .setMessage(Config.CLEAN_UP_ALERT_MESSAGE)
+                            .setPositiveButton(Config.OK, null)
+                            .show();
+                }
             }
         }
     }
@@ -220,8 +239,10 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         return result.toString();
     }
 
-    private void startExperiment(ExperimentGroup group, long startTimeInMs, InternalStorage storage) {
+    private void startExperiment(ExperimentGroup group, long startTimeInMs,
+                                 ArrayList<EncodedResource> experimentResources, InternalStorage storage) {
         if (storage.getFileContent(Config.FILE_NAME_CSV_STATUS).equals(Config.CSV_SAVED)) {
+            saveExperimentResources(experimentResources, storage);
             ExperimentController experimentController = new ExperimentController(this);
             experimentController.startExperiment(group, startTimeInMs);
         }
@@ -230,11 +251,18 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
                     .setTitle(Config.CSV_NOT_SAVED_ALERT_TITLE)
                     .setMessage(Config.CSV_NOT_SAVED_ALERT_MESSAGE)
                     .setPositiveButton(Config.JA, (dialog, which) -> {
+                        saveExperimentResources(experimentResources, storage);
                         ExperimentController experimentController = new ExperimentController(this);
                         experimentController.startExperiment(group, startTimeInMs);
                     })
                     .setNegativeButton(Config.NEIN, null)
                     .show();
+        }
+    }
+
+    private void saveExperimentResources(ArrayList<EncodedResource> experimentResources, InternalStorage storage) {
+        for (EncodedResource resource: experimentResources) {
+            storage.saveFileContent(resource.getFileName(), resource.getBase64String());
         }
     }
 

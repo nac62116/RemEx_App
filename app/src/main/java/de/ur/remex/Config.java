@@ -16,12 +16,14 @@ public final class Config {
     public static final String EXPERIMENT_NAME_FIELD_NO_EXPERIMENT_LOADED = "Kein Experiment geladen";
 
     // User feedback
-    public static final String INTERNAL_STORAGE_SAVING_ERROR_TITLE = "Fehler beim Speichern";
-    public static final String INTERNAL_STORAGE_SAVING_ERROR_MESSAGE = "Die Datei konnte nicht im internen Appspeicher abgelegt werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
-    public static final String INTERNAL_STORAGE_LOADING_ERROR_TITLE = "Fehler beim Laden";
-    public static final String INTERNAL_STORAGE_LOADING_ERROR_MESSAGE = "Die angeforderte Datei konnte nicht aus dem internen Appspeicher geladen werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
-    public static final String INTERNAL_STORAGE_READING_ERROR_TITLE = "Fehler beim Lesen";
-    public static final String INTERNAL_STORAGE_READING_ERROR_MESSAGE = "Die angeforderte Datei aus dem internen Appspeicher konnte nicht gelesen werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
+    public static final String INTERNAL_STORAGE_SAVING_ALERT_TITLE = "Fehler beim Speichern";
+    public static final String INTERNAL_STORAGE_SAVING_ALERT_MESSAGE = "Die Datei konnte nicht im internen Appspeicher abgelegt werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
+    public static final String INTERNAL_STORAGE_LOADING_ALERT_TITLE = "Fehler beim Laden";
+    public static final String INTERNAL_STORAGE_LOADING_ALERT_MESSAGE = "Die angeforderte Datei konnte nicht aus dem internen Appspeicher geladen werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
+    public static final String INTERNAL_STORAGE_READING_ALERT_TITLE = "Fehler beim Lesen";
+    public static final String INTERNAL_STORAGE_READING_ALERT_MESSAGE = "Die angeforderte Datei aus dem internen Appspeicher konnte nicht gelesen werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
+    public static final String CLEAN_UP_ALERT_TITLE = "Fehler beim aufräumen";
+    public static final String CLEAN_UP_ALERT_MESSAGE = "Die Bilder und Videos des letzten Experiments konnten nicht vollständig entfernt werden. Das ist nicht weiter schlimm für die Funktionalität der App. Sollte diese Nachricht öfter auftauchen, kontaktieren Sie bitte den Support.";
     public static final String PASSWORD_ALERT_TITLE = "Login fehlgeschlagen";
     public static final String PASSWORD_ALERT_MESSAGE = "Das eingegebene Passwort ist falsch.";
     public static final String EXPERIMENT_NOT_FINISHED_ALERT_TITLE = "Experiment läuft noch";
@@ -58,6 +60,7 @@ public final class Config {
     public static final String EVENT_WAITING_ROOM_ENTERED = "waitingRoomEnteredEvent";
     public static final String EVENT_NEXT_QUESTION = "nextQuestionEvent";
     public static final String EVENT_CSV_REQUEST = "csvRequestEvent";
+    public static final String EVENT_APP_KILLED = "appKilledEvent";
 
     // Intent Extra Keys
     public static final String EXIT_APP_KEY = "exitApp";
@@ -121,6 +124,7 @@ public final class Config {
     public static final String FILE_NAME_EXPERIMENT_STATUS = "experimentStatus";
     public static final String FILE_NAME_EXPERIMENT_JSON = "experimentJSON";
     public static final String FILE_NAME_NEXT_SURVEY_ALARM = "nextSurveyAlarmInMillis";
+    public static final String FILE_NAME_DECODED_VIDEO = "current_video.mp4";
 
     // File Values
     public static final String SURVEY_ENTRANCE_OPENED = "surveyEntranceOpened";

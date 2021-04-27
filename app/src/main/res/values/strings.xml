@@ -29,7 +29,7 @@
     <string name="create_vp_buttontext">Experiment starten</string>
     <string name="instruction_image_content_description">Bild zur Instruktion</string>
     <string name="bitte_warten">Bitte warten</string>
-    <string name="du_wirst_automatisch_weitergeleitet">Du wirst automatisch weitergeleitet.</string>
+    <string name="du_wirst_automatisch_weitergeleitet">Du wirst automatisch weitergeleitet</string>
     <string name="atem_bung">Atemübung</string>
     <string name="breathing_circle_content_description">Kreis für die Atemübung</string>
     <string name="experiment_laden">Neues Experiment laden</string>
@@ -42,7 +42,6 @@
     <string name="deine_antwort">Deine Antwort…</string>
     <string name="datum_eingeben">Datum eingeben…</string>
     <string name="uhrzeit_eingeben">Uhrzeit eingeben…</string>
-    <string name="wie_viele">Wie viele…</string>
     <string name="jahre">Jahre</string>
     <string name="monate">Monate</string>
     <string name="tage">Tage</string>
@@ -53,5 +52,7 @@
     <string name="value">Value</string>
     <string name="aktuelles_experiment">Aktuelles Experiment</string>
     <string name="vp_gruppe">VP-Gruppe</string>
+    <string name="time_intervall_hint">…</string>
+    <string name="einatmen">Einatmen…</string>
 
 </resources>
