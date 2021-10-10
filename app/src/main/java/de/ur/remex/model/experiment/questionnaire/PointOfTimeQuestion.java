@@ -16,6 +16,7 @@ public class PointOfTimeQuestion extends Question {
                                @JsonProperty("text") String text,
                                @JsonProperty("hint") String hint,
                                @JsonProperty("nextQuestionId") int nextQuestionId,
+                               @JsonProperty("previousQuestionId") int previousQuestionId,
                                @JsonProperty("pointOfTimeTypeNames") ArrayList<String> pointOfTimeTypeNames) {
         this.id = id;
         this.type = QuestionType.POINT_OF_TIME;
@@ -23,6 +24,7 @@ public class PointOfTimeQuestion extends Question {
         this.text = text;
         this.hint = hint;
         this.nextQuestionId = nextQuestionId;
+        this.previousQuestionId = previousQuestionId;
         pointOfTimeTypes = new ArrayList<>();
         if (pointOfTimeTypeNames.contains(PointOfTimeType.DATE.name())) {
             pointOfTimeTypes.add(PointOfTimeType.DATE);
