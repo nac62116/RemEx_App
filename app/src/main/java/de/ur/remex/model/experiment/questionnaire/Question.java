@@ -26,6 +26,7 @@ public abstract class Question {
     // Max characters 90
     protected String hint;
     protected int nextQuestionId;
+    protected int previousQuestionId;
 
     public int getId() {
         return id;
@@ -49,5 +50,9 @@ public abstract class Question {
 
     public int getNextQuestionId() {
         return nextQuestionId;
+    }
+        
+    public int getPreviousQuestionId() {
+        return previousQuestionId;
     }
 }
