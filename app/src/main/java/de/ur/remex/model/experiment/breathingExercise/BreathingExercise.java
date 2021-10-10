@@ -24,6 +24,7 @@ public class BreathingExercise extends Step {
     public BreathingExercise(@JsonProperty("id") int id,
                              @JsonProperty("waitForStep") int waitForStep,
                              @JsonProperty("nextStepId") int nextStepId,
+                             @JsonProperty("previousStepId") int previousStepId,
                              @JsonProperty("durationInMin") int durationInMin,
                              @JsonProperty("breathingFrequencyInSec") int breathingFrequencyInSec,
                              @JsonProperty("mode") String mode) {
@@ -31,6 +32,7 @@ public class BreathingExercise extends Step {
         this.type = StepType.BREATHING_EXERCISE;
         this.waitForStep = waitForStep;
         this.nextStepId = nextStepId;
+        this.previousStepId = previousStepId;
         this.durationInMin = durationInMin;
         this.breathingFrequencyInSec = breathingFrequencyInSec;
         if (mode.equals(BreathingMode.MOVING_CIRCLE.name())) {
