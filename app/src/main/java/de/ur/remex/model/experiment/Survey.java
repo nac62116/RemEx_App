@@ -57,7 +57,7 @@ public class Survey {
     }
     
     public int getPreviousSurveyId() {
-        return nextSurveyId;
+        return previousSurveyId;
     }
 
     public boolean isRelative() {
