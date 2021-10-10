@@ -22,6 +22,7 @@ public class Survey {
     private final int maxDurationInMin;
     private final int notificationDurationInMin;
     private final int nextSurveyId;
+    private final int previousSurveyId;
     private final ArrayList<Step> steps;
 
     @JsonCreator
