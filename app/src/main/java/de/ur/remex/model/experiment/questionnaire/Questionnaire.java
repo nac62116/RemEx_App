@@ -22,17 +22,21 @@ public class Questionnaire extends Step {
     public Questionnaire(@JsonProperty("id") int id,
                          @JsonProperty("waitForStep") int waitForStep,
                          @JsonProperty("nextStepId") int nextStepId,
+                         @JsonProperty("previousStepId") int previousStepId,
                          @JsonProperty("questions") ArrayList<Question> questions) {
         this.id = id;
         this.type = StepType.QUESTIONNAIRE;
         this.waitForStep = waitForStep;
         this.nextStepId = nextStepId;
+        this.previousStepId = previousStepId;
         this.questions = questions;
     }
 
     public Question getFirstQuestion() {
-        if (!questions.isEmpty()) {
-            return questions.get(0);
+        for (Question question: questions) {
+            if (question.getPreviousQuestionId() == null) {
+                return question;
+            }
         }
         return null;
     }
