@@ -16,6 +16,7 @@ public class LikertQuestion extends Question {
                           @JsonProperty("text") String text,
                           @JsonProperty("hint") String hint,
                           @JsonProperty("nextQuestionId") int nextQuestionId,
+                          @JsonProperty("previousQuestionId") int previousQuestionId,
                           @JsonProperty("scaleMinimumLabel") String scaleMinimumLabel,
                           @JsonProperty("scaleMaximumLabel") String scaleMaximumLabel,
                           @JsonProperty("initialValue") int initialValue,
@@ -26,6 +27,7 @@ public class LikertQuestion extends Question {
         this.text = text;
         this.hint = hint;
         this.nextQuestionId = nextQuestionId;
+        this.previousQuestionId = previousQuestionId;
         this.scaleMinimumLabel = scaleMinimumLabel;
         this.scaleMaximumLabel = scaleMaximumLabel;
         this.initialValue = initialValue;
