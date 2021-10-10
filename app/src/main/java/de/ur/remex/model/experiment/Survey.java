@@ -35,6 +35,7 @@ public class Survey {
                   @JsonProperty("notificationDurationInMin") int notificationDurationInMin,
                   @JsonProperty("isRelative") boolean isRelative,
                   @JsonProperty("nextSurveyId") int nextSurveyId,
+                  @JsonProperty("previousSurveyId") int previousSurveyId,
                   @JsonProperty("steps") ArrayList<Step> steps) {
         this.id = id;
         this.name = name;
@@ -46,10 +47,15 @@ public class Survey {
         this.notificationDurationInMin = notificationDurationInMin;
         this.isRelative = isRelative;
         this.nextSurveyId = nextSurveyId;
+        this.previousSurveyId = previousSurveyId;
         this.steps = steps;
     }
 
     public int getNextSurveyId() {
+        return nextSurveyId;
+    }
+    
+    public int getPreviousSurveyId() {
         return nextSurveyId;
     }
 
@@ -78,8 +84,10 @@ public class Survey {
     }
 
     public Step getFirstStep() {
-        if (!steps.isEmpty()) {
-            return steps.get(0);
+        for (Step step: steps) {
+            if (step.getPreviousStepId() == null) {
+                return step;
+            }
         }
         return null;
     }
