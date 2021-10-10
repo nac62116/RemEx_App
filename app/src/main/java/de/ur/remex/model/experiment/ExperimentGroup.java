@@ -31,7 +31,7 @@ public class ExperimentGroup {
 
     public Survey getFirstSurvey() {
         for (Survey survey: surveys) {
-            if (survey.getPreviousSurveyId == null) {
+            if (survey.getPreviousSurveyId() == null) {
                 return survey;
             }
         }
