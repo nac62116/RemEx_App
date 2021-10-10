@@ -22,9 +22,14 @@ public abstract class Step {
     protected StepType type;
     protected int waitForStep;
     protected int nextStepId;
+    protected int previousStepId;
 
     public int getNextStepId() {
         return nextStepId;
+    }
+        
+    public int getPreviousStepId() {
+        return previousStepId;
     }
 
     public StepType getType() {
