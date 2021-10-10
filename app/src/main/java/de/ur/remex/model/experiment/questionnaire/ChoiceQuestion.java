@@ -17,6 +17,7 @@ public class ChoiceQuestion extends Question {
                           @JsonProperty("text") String text,
                           @JsonProperty("hint") String hint,
                           @JsonProperty("nextQuestionId") int nextQuestionId,
+                          @JsonProperty("previousQuestionId") int previousQuestionId,
                           @JsonProperty("answers") ArrayList<Answer> answers,
                           @JsonProperty("choiceType") String choiceType) {
         this.id = id;
@@ -25,6 +26,7 @@ public class ChoiceQuestion extends Question {
         this.text = text;
         this.hint = hint;
         this.nextQuestionId = nextQuestionId;
+        this.previousQuestionId = previousQuestionId;
         this.answers = answers;
         if (choiceType.equals(ChoiceType.SINGLE_CHOICE.name())) {
             this.choiceType = ChoiceType.SINGLE_CHOICE;
