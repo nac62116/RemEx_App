@@ -10,12 +10,14 @@ public class TextQuestion extends Question {
                         @JsonProperty("name") String name,
                         @JsonProperty("text") String text,
                         @JsonProperty("hint") String hint,
-                        @JsonProperty("nextQuestionId") int nextQuestionId) {
+                        @JsonProperty("nextQuestionId") int nextQuestionId,
+                        @JsonProperty("previousQuestionId") int previousQuestionId) {
         this.id = id;
         this.type = QuestionType.TEXT;
         this.name = name;
         this.text = text;
         this.hint = hint;
         this.nextQuestionId = nextQuestionId;
+        this.previousQuestionId = previousQuestionId;
     }
 }
