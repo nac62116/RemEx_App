@@ -21,6 +21,7 @@ public class Instruction extends Step {
     public Instruction(@JsonProperty("id") int id,
                        @JsonProperty("waitForStep") int waitForStep,
                        @JsonProperty("nextStepId") int nextStepId,
+                       @JsonProperty("previousStepId") int previousStepId,
                        @JsonProperty("header") String header,
                        @JsonProperty("text") String text,
                        @JsonProperty("imageFileName") String imageFileName,
@@ -32,6 +33,7 @@ public class Instruction extends Step {
         this.type = StepType.INSTRUCTION;
         this.waitForStep = waitForStep;
         this.nextStepId = nextStepId;
+        this.previousStepId = previousStepId;
         this.header = header;
         this.text = text;
         this.imageFileName = imageFileName;
