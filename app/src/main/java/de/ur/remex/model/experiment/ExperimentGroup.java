@@ -30,8 +30,10 @@ public class ExperimentGroup {
     }
 
     public Survey getFirstSurvey() {
-        if (!surveys.isEmpty()) {
-            return surveys.get(0);
+        for (Survey survey: surveys) {
+            if (survey.getPreviousSurveyId == null) {
+                return survey;
+            }
         }
         return null;
     }
