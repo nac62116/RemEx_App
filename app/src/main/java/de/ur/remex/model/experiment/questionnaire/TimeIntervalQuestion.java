@@ -16,6 +16,7 @@ public class TimeIntervalQuestion extends Question {
                                 @JsonProperty("text") String text,
                                 @JsonProperty("hint") String hint,
                                 @JsonProperty("nextQuestionId") int nextQuestionId,
+                                @JsonProperty("previousQuestionId") int previousQuestionId,
                                 @JsonProperty("timeIntervalTypeNames") ArrayList<String> timeIntervalTypeNames) {
         this.id = id;
         this.type = QuestionType.TIME_INTERVAL;
@@ -23,6 +24,7 @@ public class TimeIntervalQuestion extends Question {
         this.text = text;
         this.hint = hint;
         this.nextQuestionId = nextQuestionId;
+        this.previousQuestionId = previousQuestionId;
         timeIntervalTypes = new ArrayList<>();
         if (timeIntervalTypeNames.contains(TimeIntervalType.YEARS.name())) {
             timeIntervalTypes.add(TimeIntervalType.YEARS);
