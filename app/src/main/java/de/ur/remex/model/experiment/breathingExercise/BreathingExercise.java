@@ -1,23 +1,20 @@
 package de.ur.remex.model.experiment.breathingExercise;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.ur.remex.model.experiment.Step;
 import de.ur.remex.model.experiment.StepType;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BreathingExercise extends Step {
 
-    // RemEx Interface: For below attributes create two hidden instructions, one before and one after the breathingExercise step.
-    // instructionText
-    // instructionHeader
-    // dischargeText
-    // dischargeHeader
-
-    // int value! max duration = 60
+    @JsonProperty("durationInMin")
     private final int durationInMin;
-    // min 2, max 10
+    @JsonProperty("breathingFrequencyInSec")
     private final int breathingFrequencyInSec;
+    @JsonProperty("mode")
     private final BreathingMode mode;
 
     @JsonCreator

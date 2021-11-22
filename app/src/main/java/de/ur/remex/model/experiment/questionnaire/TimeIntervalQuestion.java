@@ -1,13 +1,16 @@
 package de.ur.remex.model.experiment.questionnaire;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeIntervalQuestion extends Question {
 
     // Has to contain at least one of TimeIntervalType.YEARS/MONTHS/DAYS/HOURS/MINUTES/SECONDS
+    @JsonProperty("timeIntervalTypes")
     private final ArrayList<TimeIntervalType> timeIntervalTypes;
 
     @JsonCreator
@@ -17,7 +20,7 @@ public class TimeIntervalQuestion extends Question {
                                 @JsonProperty("hint") String hint,
                                 @JsonProperty("nextQuestionId") int nextQuestionId,
                                 @JsonProperty("previousQuestionId") int previousQuestionId,
-                                @JsonProperty("timeIntervalTypeNames") ArrayList<String> timeIntervalTypeNames) {
+                                @JsonProperty("timeIntervalTypes") ArrayList<String> timeIntervalTypes) {
         this.id = id;
         this.type = QuestionType.TIME_INTERVAL;
         this.name = name;
@@ -25,24 +28,24 @@ public class TimeIntervalQuestion extends Question {
         this.hint = hint;
         this.nextQuestionId = nextQuestionId;
         this.previousQuestionId = previousQuestionId;
-        timeIntervalTypes = new ArrayList<>();
-        if (timeIntervalTypeNames.contains(TimeIntervalType.YEARS.name())) {
-            timeIntervalTypes.add(TimeIntervalType.YEARS);
+        this.timeIntervalTypes = new ArrayList<>();
+        if (timeIntervalTypes.contains(TimeIntervalType.YEARS.name())) {
+            this.timeIntervalTypes.add(TimeIntervalType.YEARS);
         }
-        if (timeIntervalTypeNames.contains(TimeIntervalType.MONTHS.name())) {
-            timeIntervalTypes.add(TimeIntervalType.MONTHS);
+        if (timeIntervalTypes.contains(TimeIntervalType.MONTHS.name())) {
+            this.timeIntervalTypes.add(TimeIntervalType.MONTHS);
         }
-        if (timeIntervalTypeNames.contains(TimeIntervalType.DAYS.name())) {
-            timeIntervalTypes.add(TimeIntervalType.DAYS);
+        if (timeIntervalTypes.contains(TimeIntervalType.DAYS.name())) {
+            this.timeIntervalTypes.add(TimeIntervalType.DAYS);
         }
-        if (timeIntervalTypeNames.contains(TimeIntervalType.HOURS.name())) {
-            timeIntervalTypes.add(TimeIntervalType.HOURS);
+        if (timeIntervalTypes.contains(TimeIntervalType.HOURS.name())) {
+            this.timeIntervalTypes.add(TimeIntervalType.HOURS);
         }
-        if (timeIntervalTypeNames.contains(TimeIntervalType.MINUTES.name())) {
-            timeIntervalTypes.add(TimeIntervalType.MINUTES);
+        if (timeIntervalTypes.contains(TimeIntervalType.MINUTES.name())) {
+            this.timeIntervalTypes.add(TimeIntervalType.MINUTES);
         }
-        if (timeIntervalTypeNames.contains(TimeIntervalType.SECONDS.name())) {
-            timeIntervalTypes.add(TimeIntervalType.SECONDS);
+        if (timeIntervalTypes.contains(TimeIntervalType.SECONDS.name())) {
+            this.timeIntervalTypes.add(TimeIntervalType.SECONDS);
         }
     }
 

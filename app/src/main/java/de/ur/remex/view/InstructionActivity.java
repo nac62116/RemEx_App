@@ -3,7 +3,6 @@ package de.ur.remex.view;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -14,7 +13,6 @@ import android.widget.VideoView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Observer;
 
 import de.ur.remex.R;
@@ -66,11 +64,6 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    private String getRawResource(String fileName) {
-        InternalStorage storage = new InternalStorage(this);
-        return storage.getFileContent(fileName);
-    }
-
     private void initViews() {
         TextView headerTextView = findViewById(R.id.instructionHeader);
         ImageView imageView = findViewById(R.id.instructionImageView);
@@ -91,9 +84,9 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
             bodyTextView.setVisibility(View.GONE);
         }
         if (imageFileName != null) {
-            String base64Image = getRawResource(imageFileName);
-            byte[] imageBytes = Base64.decode(base64Image, Base64.DEFAULT);
-            Bitmap imageBitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+            InternalStorage storage = new InternalStorage(this);
+            File imageFile = storage.getFile(imageFileName);
+            Bitmap imageBitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
             imageView.setImageBitmap(imageBitmap);
         }
         else {
@@ -104,35 +97,14 @@ public class InstructionActivity extends AppCompatActivity implements View.OnCli
             mediaController = new MediaController(this);
             mediaController.setAnchorView(videoView);
             videoView.setMediaController(mediaController);
-            String base64Video = getRawResource(videoFileName);
-            byte[] videoBytes = Base64.decode(base64Video, Base64.DEFAULT);
-            // Save decoded video as a file to feed the reulting path to videoView
-            File videoFile = new File(this.getFilesDir() + Config.FILE_NAME_DECODED_VIDEO);
-            boolean success;
-            try {
-                if (!videoFile.exists()) {
-                    success = videoFile.createNewFile();
-                }
-                else {
-                    success = videoFile.delete();
-                    if (success) {
-                        success = videoFile.createNewFile();
-                    }
-                }
-                if (success) {
-                    FileOutputStream fos = new FileOutputStream(videoFile);
-                    fos.write(videoBytes);
-                    fos.close();
-                    success = true;
-                }
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-                success = false;
-            }
-            if (success) {
+            InternalStorage storage = new InternalStorage(this);
+            File videoFile = storage.getFile(videoFileName);
+            if (videoFile.length() > 0) {
                 videoView.setVideoPath(videoFile.getAbsolutePath());
                 videoView.start();
+            }
+            else {
+                videoView.setVisibility(View.GONE);
             }
         }
         else {

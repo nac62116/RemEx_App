@@ -37,14 +37,12 @@
         android:id="@+id/currentVPid"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="16dp"
+        android:gravity="center"
         android:text="@string/current_vp_id_hint"
         android:textSize="24sp"
-        android:gravity="center"
         app:layout_constraintBottom_toTopOf="@+id/currentGroupPrefix"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/currentProgressPrefix"
+        app:layout_constraintStart_toEndOf="@+id/currentVPidPrefix"
         app:layout_constraintTop_toBottomOf="@+id/currentVPHeader" />
 
     <TextView
@@ -63,14 +61,12 @@
         android:id="@+id/currentGroup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="@string/vp_gruppe"
+        android:layout_marginStart="16dp"
         android:gravity="center"
+        android:text="@string/vp_gruppe"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/currentProgressPrefix"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/currentProgressPrefix"
+        app:layout_constraintStart_toEndOf="@+id/currentGroupPrefix"
         app:layout_constraintTop_toBottomOf="@+id/currentVPid" />
 
     <TextView
@@ -98,25 +94,13 @@
         app:layout_constraintTop_toBottomOf="@+id/currentProgressPrefix" />
 
     <TextView
-        android:id="@+id/currentStartTimePrefix"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/create_vp_start_time_prefix"
-        android:textColor="@color/textColor"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/currentStartDatePrefix" />
-
-    <TextView
         android:id="@+id/currentProgress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:text="@string/current_vp_progress_suffix"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/currentProgressPrefix"
         app:layout_constraintTop_toBottomOf="@+id/currentGroup" />
 
@@ -124,12 +108,11 @@
         android:id="@+id/currentStartDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:text="@string/create_vp_start_date_hint"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.435"
-        app:layout_constraintStart_toEndOf="@+id/currentProgressPrefix"
+        app:layout_constraintStart_toEndOf="@+id/currentStartDatePrefix"
         app:layout_constraintTop_toBottomOf="@+id/currentProgress" />
 
     <TextView
@@ -145,18 +128,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/currentStartTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/create_vp_start_time_hint"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.44"
-        app:layout_constraintStart_toEndOf="@+id/currentProgressPrefix"
-        app:layout_constraintTop_toBottomOf="@+id/currentStartDate" />
 
     <Button
         android:id="@+id/createCsvButton"

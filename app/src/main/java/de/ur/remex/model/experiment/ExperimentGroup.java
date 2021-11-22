@@ -1,15 +1,19 @@
 package de.ur.remex.model.experiment;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ExperimentGroup {
 
+    @JsonProperty("name")
     private final String name;
-    // Relevant to calculate absolute alarm times
+    @JsonProperty("startTimeInMillis")
     private long startTimeInMillis;
+    @JsonProperty("surveys")
     private final ArrayList<Survey> surveys;
 
     @JsonCreator
@@ -31,7 +35,7 @@ public class ExperimentGroup {
 
     public Survey getFirstSurvey() {
         for (Survey survey: surveys) {
-            if (survey.getPreviousSurveyId() == null) {
+            if (survey.getPreviousSurveyId() == 0) {
                 return survey;
             }
         }

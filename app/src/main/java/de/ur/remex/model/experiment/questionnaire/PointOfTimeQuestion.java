@@ -1,13 +1,16 @@
 package de.ur.remex.model.experiment.questionnaire;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PointOfTimeQuestion extends Question {
 
     // Has to contain at least one of PointOfTimeType.DATE or PointOfTimeType.DAYTIME
+    @JsonProperty("pointOfTimeTypes")
     private final ArrayList<PointOfTimeType> pointOfTimeTypes;
 
     @JsonCreator
@@ -17,7 +20,7 @@ public class PointOfTimeQuestion extends Question {
                                @JsonProperty("hint") String hint,
                                @JsonProperty("nextQuestionId") int nextQuestionId,
                                @JsonProperty("previousQuestionId") int previousQuestionId,
-                               @JsonProperty("pointOfTimeTypeNames") ArrayList<String> pointOfTimeTypeNames) {
+                               @JsonProperty("pointOfTimeTypes") ArrayList<String> pointOfTimeTypes) {
         this.id = id;
         this.type = QuestionType.POINT_OF_TIME;
         this.name = name;
@@ -25,12 +28,12 @@ public class PointOfTimeQuestion extends Question {
         this.hint = hint;
         this.nextQuestionId = nextQuestionId;
         this.previousQuestionId = previousQuestionId;
-        pointOfTimeTypes = new ArrayList<>();
-        if (pointOfTimeTypeNames.contains(PointOfTimeType.DATE.name())) {
-            pointOfTimeTypes.add(PointOfTimeType.DATE);
+        this.pointOfTimeTypes = new ArrayList<>();
+        if (pointOfTimeTypes.contains(PointOfTimeType.DATE.name())) {
+            this.pointOfTimeTypes.add(PointOfTimeType.DATE);
         }
-        if (pointOfTimeTypeNames.contains(PointOfTimeType.DAYTIME.name())) {
-            pointOfTimeTypes.add(PointOfTimeType.DAYTIME);
+        if (pointOfTimeTypes.contains(PointOfTimeType.DAYTIME.name())) {
+            this.pointOfTimeTypes.add(PointOfTimeType.DAYTIME);
         }
     }
 

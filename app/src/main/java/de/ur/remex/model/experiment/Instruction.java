@@ -1,20 +1,25 @@
 package de.ur.remex.model.experiment;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Instruction extends Step {
 
-    // Max characters: 50
+    @JsonProperty("header")
     private final String header;
-    // Max characters: 350 (with image), 500 (without image)
+    @JsonProperty("text")
     private final String text;
-    // Either image or video in one Instruction
+    @JsonProperty("imageFileName")
     private final String imageFileName;
+    @JsonProperty("videoFileName")
     private final String videoFileName;
+    @JsonProperty("durationInMin")
     private final int durationInMin;
-    // Max characters: 500
+    @JsonProperty("waitingText")
     private final String waitingText;
+    @JsonProperty("isFinished")
     private boolean isFinished;
 
     @JsonCreator

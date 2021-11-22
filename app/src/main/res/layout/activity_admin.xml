@@ -28,7 +28,7 @@
         android:textColor="@color/themeColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/testRunButton" />
+        app:layout_constraintTop_toBottomOf="@+id/adminCreateVPButton" />
 
     <Button
         android:id="@+id/currentVPButton"
@@ -56,20 +56,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/currentVPButton" />
-
-    <Button
-        android:id="@+id/testRunButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
-        android:background="@drawable/next_button"
-        android:text="@string/admin_test_run_buttontext"
-        android:textColor="@color/themeColor"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/adminCreateVPButton" />
 
     <Button
         android:id="@+id/logoutButton"

@@ -2,7 +2,6 @@ package de.ur.remex.admin;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -25,7 +24,6 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
 
     private EditText vpIdEditText;
     private EditText startDateEditText;
-    private EditText startTimeEditText;
     private Button createVPButton;
     private String selectedGroup;
 
@@ -40,7 +38,6 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         restartAutoExitTimer();
         vpIdEditText = findViewById(R.id.inputVPid);
         startDateEditText = findViewById(R.id.startDate);
-        startTimeEditText = findViewById(R.id.startTime);
         createVPButton = findViewById(R.id.createVP);
         Spinner vpGroupSpinner = findViewById(R.id.inputVPGroup);
         String[] groups = this.getIntent().getStringArrayExtra(Config.GROUP_NAMES_KEY);
@@ -56,7 +53,6 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         vpGroupSpinner.setAdapter(adapter);
         vpGroupSpinner.setOnItemSelectedListener(this);
         startDateEditText.setOnClickListener(this);
-        startTimeEditText.setOnClickListener(this);
         createVPButton.setOnClickListener(this);
     }
 
@@ -81,10 +77,6 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         if (startDateEditText.equals(v)) {
             DatePickerDialog datePickerDialog = createDatePickerDialog();
             datePickerDialog.show();
-        }
-        if (startTimeEditText.equals(v)) {
-            TimePickerDialog timePickerDialog = createTimePickerDialog();
-            timePickerDialog.show();
         }
         if (createVPButton.equals(v)) {
             if (inputIsValid()) {
@@ -115,7 +107,7 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         datePickerDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             c.set(year, month, dayOfMonth);
             long userSettedTimeInMillis = c.getTimeInMillis();
-            if (currentTimeInMillis >= userSettedTimeInMillis) {
+            if (currentTimeInMillis > userSettedTimeInMillis) {
                 // AlertDialog: Picked date lays in the past
                 new AlertDialog.Builder(CreateVPActivity.this)
                         .setTitle(Config.DATE_INVALID_ALERT_TITLE)
@@ -145,38 +137,10 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         return datePickerDialog;
     }
 
-    private TimePickerDialog createTimePickerDialog() {
-        // Get Current Time
-        final Calendar c = Calendar.getInstance();
-        final int currentHour = c.get(Calendar.HOUR_OF_DAY);
-        final int currentMinute = c.get(Calendar.MINUTE);
-        TimePickerDialog timePickerDialog;
-
-        timePickerDialog = new TimePickerDialog(this, (view, hourOfDay, minute) -> {
-            String hour, min;
-            if (hourOfDay < 10) {
-                hour = "0" + hourOfDay;
-            }
-            else {
-                hour = "" + hourOfDay;
-            }
-            if (minute < 10) {
-                min = "0" + minute;
-            }
-            else {
-                min = "" + minute;
-            }
-            String timeString = hour + ":" + min + " Uhr";
-            startTimeEditText.setText(timeString);
-        }, currentHour, currentMinute, true);
-        return timePickerDialog;
-    }
-
     private boolean inputIsValid() {
         boolean isValid = false;
         if (vpIdEditText.getText().length() != 0 &&
-                startDateEditText.getText().length() != 0 &&
-                startTimeEditText.getText().length() != 0) {
+                startDateEditText.getText().length() != 0) {
             isValid = true;
         }
         return isValid;
@@ -186,20 +150,16 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         Calendar calendar = Calendar.getInstance();
         // Format: dd.mm.yyyy
         String startDate = startDateEditText.getText().toString();
-        // Format: hh:mm Uhr
-        String startTime = startTimeEditText.getText().toString();
         int year = Integer.parseInt(startDate.substring(6));
         int month = Integer.parseInt(startDate.substring(3,5));
         int date = Integer.parseInt(startDate.substring(0,2));
-        int hour = Integer.parseInt(startTime.substring(0,2));
-        int minute = Integer.parseInt(startTime.substring(3,5));
-        calendar.set(year, month - 1, date, hour, minute);
+        calendar.set(year, month - 1, date, 0, 0);
         return calendar.getTimeInMillis();
     }
 
     private void sendStartRequest(long startTimeInMs) {
         InternalStorage storage = new InternalStorage(this);
-        String experimentStatus = storage.getFileContent(Config.FILE_NAME_EXPERIMENT_STATUS);
+        String experimentStatus = storage.getFileContentString(Config.FILE_NAME_EXPERIMENT_STATUS);
         if (experimentStatus.equals(Config.EXPERIMENT_FINISHED)) {
             saveVpInInternalStorage(storage);
             Intent intent = new Intent(this, AdminActivity.class);
@@ -229,13 +189,11 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         String group = selectedGroup;
         String progress = "0";
         String startDate = startDateEditText.getText().toString();
-        String startTime = startTimeEditText.getText().toString();
 
-        storage.saveFileContent(Config.FILE_NAME_ID, vpId);
-        storage.saveFileContent(Config.FILE_NAME_GROUP, group);
-        storage.saveFileContent(Config.FILE_NAME_START_DATE, startDate);
-        storage.saveFileContent(Config.FILE_NAME_START_TIME, startTime);
-        storage.saveFileContent(Config.FILE_NAME_PROGRESS, progress);
+        storage.saveFileContentString(Config.FILE_NAME_ID, vpId);
+        storage.saveFileContentString(Config.FILE_NAME_GROUP, group);
+        storage.saveFileContentString(Config.FILE_NAME_START_DATE, startDate);
+        storage.saveFileContentString(Config.FILE_NAME_PROGRESS, progress);
     }
 
     @Override

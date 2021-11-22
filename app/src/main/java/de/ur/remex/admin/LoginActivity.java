@@ -11,9 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import de.ur.remex.Config;
 import de.ur.remex.R;
-import de.ur.remex.model.storage.InternalStorage;
-import de.ur.remex.utilities.NotificationHandler;
-import de.ur.remex.view.SurveyEntranceActivity;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -24,11 +21,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // Initial storage files
-        InternalStorage storage = new InternalStorage(this);
-        if (!storage.fileExists(Config.FILE_NAME_FIRST_START)) {
-            createInitialStorageFiles(storage);
-        }
         // Checking for exit app attribute
         boolean exitApp = this.getIntent().getBooleanExtra(Config.EXIT_APP_KEY, false);
         if (exitApp) {
@@ -40,7 +32,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onStart () {
         super.onStart();
-        // Checking for active experiment
+        // TODO: Include this
+        /* Checking for active experiment
         InternalStorage storage = new InternalStorage(this);
         String experimentActive = storage.getFileContent(Config.FILE_NAME_SURVEY_ENTRANCE);
         if (experimentActive.equals(Config.SURVEY_ENTRANCE_OPENED)) {
@@ -49,35 +42,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             Intent intent = new Intent(this, SurveyEntranceActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK & Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }
-    }
-
-    private void createInitialStorageFiles(InternalStorage storage) {
-        String firstStart = "1";
-        String vpId = "Initial-VP";
-        String group = "VP-GROUP";
-        String progress = "0";
-        String startDate = "dd.mm.jjjj";
-        String startTime = "hh:mm";
-        String csv = Config.INITIAL_CSV_VALUE;
-        String csvStatus = Config.CSV_SAVED;
-        String surveyEntrance = Config.SURVEY_ENTRANCE_CLOSED;
-        String password = Config.INITIAL_PASSWORD;
-        String experimentStatus = Config.EXPERIMENT_FINISHED;
-        String nextSurveyAlarmTime = "0";
-
-        storage.saveFileContent(Config.FILE_NAME_FIRST_START, firstStart);
-        storage.saveFileContent(Config.FILE_NAME_ID, vpId);
-        storage.saveFileContent(Config.FILE_NAME_GROUP, group);
-        storage.saveFileContent(Config.FILE_NAME_START_DATE, startDate);
-        storage.saveFileContent(Config.FILE_NAME_START_TIME, startTime);
-        storage.saveFileContent(Config.FILE_NAME_PROGRESS, progress);
-        storage.saveFileContent(Config.FILE_NAME_CSV, csv);
-        storage.saveFileContent(Config.FILE_NAME_CSV_STATUS, csvStatus);
-        storage.saveFileContent(Config.FILE_NAME_SURVEY_ENTRANCE, surveyEntrance);
-        storage.saveFileContent(Config.FILE_NAME_PASSWORD, password);
-        storage.saveFileContent(Config.FILE_NAME_EXPERIMENT_STATUS, experimentStatus);
-        storage.saveFileContent(Config.FILE_NAME_NEXT_SURVEY_ALARM, nextSurveyAlarmTime);
+        }*/
     }
 
     private void exitApp() {
@@ -96,9 +61,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         if (loginButton.equals(v)) {
-            InternalStorage storage = new InternalStorage(this);
-            String password = storage.getFileContent(Config.FILE_NAME_PASSWORD);
-            if (loginInput.getText().toString().equals(password)) {
+            // TODO: Make password changeable
+            if (loginInput.getText().toString().equals(Config.INITIAL_PASSWORD)) {
                 Intent intent = new Intent(this, AdminActivity.class);
                 startActivity(intent);
             }

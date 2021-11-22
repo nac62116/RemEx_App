@@ -19,7 +19,6 @@ public class CurrentVPActivity extends AppCompatActivity implements View.OnClick
     private TextView currentVpGroup;
     private TextView currentVpProgress;
     private TextView currentVpStartDate;
-    private TextView currentVpStartTime;
     private TextView csvStatus;
     private Button createCsvButton;
 
@@ -37,7 +36,6 @@ public class CurrentVPActivity extends AppCompatActivity implements View.OnClick
         currentVpGroup = findViewById(R.id.currentGroup);
         currentVpProgress = findViewById(R.id.currentProgress);
         currentVpStartDate = findViewById(R.id.currentStartDate);
-        currentVpStartTime = findViewById(R.id.currentStartTime);
         csvStatus = findViewById(R.id.csvStatus);
         createCsvButton = findViewById(R.id.createCsvButton);
         createCsvButton.setOnClickListener(this);
@@ -60,13 +58,12 @@ public class CurrentVPActivity extends AppCompatActivity implements View.OnClick
 
     private void setCurrentVpInfo() {
         InternalStorage storage = new InternalStorage(this);
-        currentVpId.setText(storage.getFileContent(Config.FILE_NAME_ID));
-        currentVpGroup.setText(storage.getFileContent(Config.FILE_NAME_GROUP));
-        String progress = storage.getFileContent(Config.FILE_NAME_PROGRESS) + "/" + this.getIntent().getIntExtra(Config.PROGRESS_MAXIMUM_KEY, 0);
+        currentVpId.setText(storage.getFileContentString(Config.FILE_NAME_ID));
+        currentVpGroup.setText(storage.getFileContentString(Config.FILE_NAME_GROUP));
+        String progress = storage.getFileContentString(Config.FILE_NAME_PROGRESS) + "/" + this.getIntent().getIntExtra(Config.PROGRESS_MAXIMUM_KEY, 0);
         currentVpProgress.setText(progress);
-        currentVpStartTime.setText(storage.getFileContent(Config.FILE_NAME_START_TIME));
-        currentVpStartDate.setText(storage.getFileContent(Config.FILE_NAME_START_DATE));
-        csvStatus.setText(storage.getFileContent(Config.FILE_NAME_CSV_STATUS));
+        currentVpStartDate.setText(storage.getFileContentString(Config.FILE_NAME_START_DATE));
+        csvStatus.setText(storage.getFileContentString(Config.FILE_NAME_CSV_STATUS));
     }
 
     @Override

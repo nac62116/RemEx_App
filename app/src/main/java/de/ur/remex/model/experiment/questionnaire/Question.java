@@ -1,11 +1,13 @@
 package de.ur.remex.model.experiment.questionnaire;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = NAME, include = PROPERTY)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ChoiceQuestion.class, name = "CHOICE"),
@@ -16,14 +18,10 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 })
 public abstract class Question {
 
-    // Has to be unique inside one questionnaire
     protected int id;
     protected QuestionType type;
-    // Has to be unique inside one survey
     protected String name;
-    // Max characters 130
     protected String text;
-    // Max characters 90
     protected String hint;
     protected int nextQuestionId;
     protected int previousQuestionId;

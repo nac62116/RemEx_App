@@ -1,6 +1,7 @@
 package de.ur.remex.model.experiment.questionnaire;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
@@ -8,14 +9,10 @@ import java.util.ArrayList;
 import de.ur.remex.model.experiment.Step;
 import de.ur.remex.model.experiment.StepType;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Questionnaire extends Step {
 
-    // RemEx Interface: For below attributes create two hidden instructions, one before and one after the questionnaire step.
-    // instructionText
-    // instructionHeader
-    // dischargeText
-    // dischargeHeader
-
+    @JsonProperty("questions")
     private final ArrayList<Question> questions;
 
     @JsonCreator
@@ -34,7 +31,7 @@ public class Questionnaire extends Step {
 
     public Question getFirstQuestion() {
         for (Question question: questions) {
-            if (question.getPreviousQuestionId() == null) {
+            if (question.getPreviousQuestionId() == 0) {
                 return question;
             }
         }

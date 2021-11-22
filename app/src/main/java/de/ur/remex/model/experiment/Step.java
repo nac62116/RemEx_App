@@ -1,5 +1,6 @@
 package de.ur.remex.model.experiment;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -9,6 +10,7 @@ import de.ur.remex.model.experiment.questionnaire.Questionnaire;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = NAME, include = PROPERTY)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = Instruction.class, name = "INSTRUCTION"),
@@ -17,7 +19,6 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 })
 public abstract class Step {
 
-    // Id must have an unique value excluding 0 -> RemEx Interface
     protected int id;
     protected StepType type;
     protected int waitForStep;

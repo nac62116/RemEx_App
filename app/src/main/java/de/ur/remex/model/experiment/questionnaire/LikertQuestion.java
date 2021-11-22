@@ -1,13 +1,19 @@
 package de.ur.remex.model.experiment.questionnaire;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LikertQuestion extends Question {
 
+    @JsonProperty("scaleMinimumLabel")
     private final String scaleMinimumLabel;
+    @JsonProperty("scaleMaximumLabel")
     private final String scaleMaximumLabel;
+    @JsonProperty("initialValue")
     private final int initialValue;
+    @JsonProperty("itemCount")
     private final int itemCount;
 
     @JsonCreator

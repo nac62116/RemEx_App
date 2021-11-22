@@ -37,15 +37,14 @@
         android:id="@+id/inputVPid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="20dp"
         android:autofillHints=""
         android:hint="@string/create_vp_id_hint"
         android:inputType="text"
         android:textAlignment="center"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.425"
-        app:layout_constraintStart_toEndOf="@+id/startTimePrefix"
+        app:layout_constraintStart_toEndOf="@+id/newVPidPrefix"
         app:layout_constraintTop_toBottomOf="@+id/createVPHeader" />
 
     <TextView
@@ -79,12 +78,12 @@
         android:id="@+id/inputVPGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:textAlignment="center"
         android:textColor="@color/textColor"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/startTimePrefix"
+        app:layout_constraintStart_toEndOf="@+id/newGroupPrefix"
         app:layout_constraintTop_toBottomOf="@+id/inputVPid" />
 
     <TextView
@@ -103,6 +102,7 @@
         android:id="@+id/startDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="28dp"
         android:autofillHints=""
         android:focusable="false"
@@ -110,34 +110,7 @@
         android:inputType="date"
         android:textAlignment="center"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/startTimePrefix"
+        app:layout_constraintStart_toEndOf="@+id/currentStartDatePrefix2"
         app:layout_constraintTop_toBottomOf="@+id/inputVPGroup" />
 
-    <TextView
-        android:id="@+id/startTimePrefix"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/create_vp_start_time_prefix"
-        android:textColor="@color/textColor"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/currentStartDatePrefix2" />
-
-    <EditText
-        android:id="@+id/startTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:autofillHints=""
-        android:focusable="false"
-        android:hint="@string/create_vp_start_time_hint"
-        android:inputType="date"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/startTimePrefix"
-        app:layout_constraintTop_toBottomOf="@+id/startDate" />
 </androidx.constraintlayout.widget.ConstraintLayout>

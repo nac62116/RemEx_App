@@ -1,14 +1,18 @@
 package de.ur.remex.model.experiment.questionnaire;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChoiceQuestion extends Question {
 
+    @JsonProperty("answers")
     private final ArrayList<Answer> answers;
     // Has to contain either ChoiceType.SINGLE or ChoiceType.MULTIPLE
+    @JsonProperty("choiceType")
     private final ChoiceType choiceType;
 
     @JsonCreator

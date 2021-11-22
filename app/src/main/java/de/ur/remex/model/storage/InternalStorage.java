@@ -2,6 +2,7 @@ package de.ur.remex.model.storage;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.zip.ZipInputStream;
 
 import de.ur.remex.Config;
 
@@ -20,7 +22,7 @@ public class InternalStorage {
         this.context = context;
     }
 
-    public void saveFileContent(String fileName, String content) {
+    public void saveFileContentString(String fileName, String content) {
         try (FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE)) {
             fos.write(content.getBytes());
         }
@@ -33,7 +35,7 @@ public class InternalStorage {
         }
     }
 
-    public String getFileContent(String fileName) {
+    public String getFileContentString(String fileName) {
         FileInputStream fis;
         InputStreamReader inputStreamReader;
         String content;
@@ -48,6 +50,8 @@ public class InternalStorage {
                     .setMessage(Config.INTERNAL_STORAGE_LOADING_ALERT_MESSAGE)
                     .setPositiveButton(Config.OK, null)
                     .show();
+            Log.e("Loading exception", e.getMessage());
+            Log.e("Loading exception", e.toString());
             return null;
         }
         StringBuilder stringBuilder = new StringBuilder();
@@ -70,8 +74,32 @@ public class InternalStorage {
         return content;
     }
 
-    public boolean deleteFile(String fileName) {
-        return context.deleteFile(fileName);
+    public void saveZipEntry(String fileName, ZipInputStream zis) {
+        try (FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE)) {
+            byte[] buffer = new byte[2048];
+            int length = zis.read(buffer);
+            while (length > 0) {
+                fos.write(buffer, 0, length);
+                length = zis.read(buffer);
+            }
+        }
+        catch (Exception e){
+            new AlertDialog.Builder(context)
+                    .setTitle(Config.INTERNAL_STORAGE_SAVING_ALERT_TITLE)
+                    .setMessage(Config.INTERNAL_STORAGE_SAVING_ALERT_MESSAGE)
+                    .setPositiveButton(Config.OK, null)
+                    .show();
+        }
+    }
+
+    public File getFile(String fileName) {
+        return new File(context.getFilesDir() + "/" + fileName);
+    }
+
+    public void clear() {
+        for (String fileName: context.getFilesDir().list()) {
+            context.deleteFile(fileName);
+        }
     }
 
     public boolean fileExists(String fileName){

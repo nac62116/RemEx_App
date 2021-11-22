@@ -11,7 +11,9 @@ public final class Config {
 
     // General app settings
     public static final int ADMIN_TIMEOUT_MIN = 10;
-    public static final String INITIAL_PASSWORD = "Medbo_TSST";
+    // TODO: Change initial password
+    //public static final String INITIAL_PASSWORD = "Medbo_TSST";
+    public static final String INITIAL_PASSWORD = "";
     public static final String EXPERIMENT_NAME_FIELD_SUFFIX = "Aktuelles Experiment:\n";
     public static final String EXPERIMENT_NAME_FIELD_NO_EXPERIMENT_LOADED = "Kein Experiment geladen";
 
@@ -22,20 +24,21 @@ public final class Config {
     public static final String INTERNAL_STORAGE_LOADING_ALERT_MESSAGE = "Die angeforderte Datei konnte nicht aus dem internen Appspeicher geladen werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
     public static final String INTERNAL_STORAGE_READING_ALERT_TITLE = "Fehler beim Lesen";
     public static final String INTERNAL_STORAGE_READING_ALERT_MESSAGE = "Die angeforderte Datei aus dem internen Appspeicher konnte nicht gelesen werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
-    public static final String CLEAN_UP_ALERT_TITLE = "Fehler beim aufräumen";
-    public static final String CLEAN_UP_ALERT_MESSAGE = "Die Bilder und Videos des letzten Experiments konnten nicht vollständig entfernt werden. Das ist nicht weiter schlimm für die Funktionalität der App. Sollte diese Nachricht öfter auftauchen, kontaktieren Sie bitte den Support.";
     public static final String PASSWORD_ALERT_TITLE = "Login fehlgeschlagen";
     public static final String PASSWORD_ALERT_MESSAGE = "Das eingegebene Passwort ist falsch.";
     public static final String EXPERIMENT_NOT_FINISHED_ALERT_TITLE = "Experiment läuft noch";
     public static final String EXPERIMENT_NOT_FINISHED_ALERT_MESSAGE = "Das Experiment der aktuellen Versuchsperson läuft noch. Möchten Sie trotzdem das Experiment mit einer neuen Versuchsperson starten? Dadurch wird das aktuelle Experiment gestoppt und die dazugehörige CSV-Datei geht verloren.";
     public static final String CSV_NOT_SAVED_ALERT_TITLE = "CSV-Datei noch nicht gespeichert";
-    public static final String CSV_NOT_SAVED_ALERT_MESSAGE = "Die CSV-Datei der letzten Versuchsperson wurde noch nicht gespeichert und geht verloren wenn ein neues Experiment gestartet wird. Möchten Sie trotzdem das Experiment starten?";
+    public static final String CSV_NOT_SAVED_SAVE_EXPERIMENT_ALERT_MESSAGE = "Die CSV-Datei der letzten Versuchsperson wurde noch nicht gespeichert und geht verloren wenn ein Experiment gestartet wird. Möchten Sie trotzdem das Experiment starten?";
+    public static final String CSV_NOT_SAVED_LOAD_EXPERIMENT_ALERT_MESSAGE = "Die CSV-Datei der letzten Versuchsperson wurde noch nicht gespeichert und geht verloren wenn ein neues Experiment geladen wird. Möchten Sie trotzdem ein neues Experiment laden?";
     public static final String EXTERNAL_WRITE_ALERT_TITLE = "Speichern fehlgeschlagen";
     public static final String EXTERNAL_WRITE_ALERT_MESSAGE = "Die CSV-Datei konnte nicht gespeichert werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
     public static final String EXTERNAL_READ_ALERT_TITLE = "Laden fehlgeschlagen";
     public static final String EXTERNAL_READ_ALERT_MESSAGE = "Die JSON-Datei konnte nicht geladen werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
     public static final String JSON_PARSE_ALERT_TITLE = "Parse fehlgeschlagen.";
     public static final String JSON_PARSE_ALERT_MESSAGE = "Die JSON-Datei konnte nicht richtig geparsed werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
+    public static final String JSON_STRINGIFY_ALERT_TITLE = "Parse fehlgeschlagen.";
+    public static final String JSON_STRINGIFY_ALERT_MESSAGE = "Das Experiment konnte nicht richtig zur JSON-Datei umgewandelt werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
     public static final String INPUT_INVALID_ALERT_TITLE = "Angaben unvollständig";
     public static final String INPUT_INVALID_ALERT_MESSAGE = "Es wurden nicht alle Felder ausgefüllt.";
     public static final String DATE_INVALID_ALERT_TITLE = "Falsches Datum";
@@ -67,6 +70,7 @@ public final class Config {
     public static final String ALARM_PURPOSE_KEY = "purpose";
     public static final String CREATE_CSV_KEY = "createCSV";
     public static final String START_EXPERIMENT_KEY = "startExperiment";
+    public static final String LOAD_EXPERIMENT_KEY = "loadExperiment";
     public static final String START_TIME_MS_KEY = "startTimeMs";
     public static final String PROGRESS_MAXIMUM_KEY = "progressMaximum";
     public static final String GROUP_NAMES_KEY = "groupNames";
@@ -115,16 +119,13 @@ public final class Config {
     public static final String FILE_NAME_ID = "vpId";
     public static final String FILE_NAME_GROUP = "vpGroup";
     public static final String FILE_NAME_START_DATE = "startDate";
-    public static final String FILE_NAME_START_TIME = "startTime";
     public static final String FILE_NAME_CSV = "csv";
     public static final String FILE_NAME_CSV_STATUS = "csvStatus";
     public static final String FILE_NAME_PROGRESS = "progress";
     public static final String FILE_NAME_SURVEY_ENTRANCE = "surveyEntrance";
-    public static final String FILE_NAME_PASSWORD = "password";
     public static final String FILE_NAME_EXPERIMENT_STATUS = "experimentStatus";
     public static final String FILE_NAME_EXPERIMENT_JSON = "experimentJSON";
     public static final String FILE_NAME_NEXT_SURVEY_ALARM = "nextSurveyAlarmInMillis";
-    public static final String FILE_NAME_DECODED_VIDEO = "current_video.mp4";
 
     // File Values
     public static final String SURVEY_ENTRANCE_OPENED = "surveyEntranceOpened";

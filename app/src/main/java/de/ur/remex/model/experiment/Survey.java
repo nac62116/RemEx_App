@@ -1,52 +1,54 @@
 package de.ur.remex.model.experiment;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Survey {
 
-    // Id must have an unique value excluding 0 -> RemEx Interface
+    @JsonProperty("id")
     private final int id;
-    // Has to be unique
+    @JsonProperty("name")
     private final String name;
-    // Calculated relative to a given time (f.e. last survey finish, experimentStart, etc..)
-    private final int relativeStartTimeInMin;
-    private final boolean isRelative;
+    @JsonProperty("absoluteStartAtHour")
     private final int absoluteStartAtHour;
+    @JsonProperty("absoluteStartAtMinute")
     private final int absoluteStartAtMinute;
     // Offset relative to experiment start day
+    @JsonProperty("absoluteStartDaysOffset")
     private final int absoluteStartDaysOffset;
-    // Calculate min maxDuration
+    @JsonProperty("maxDurationInMin")
     private final int maxDurationInMin;
+    @JsonProperty("notificationDurationInMin")
     private final int notificationDurationInMin;
+    @JsonProperty("nextSurveyId")
     private final int nextSurveyId;
+    @JsonProperty("previousSurveyId")
     private final int previousSurveyId;
+    @JsonProperty("steps")
     private final ArrayList<Step> steps;
 
     @JsonCreator
     public Survey(@JsonProperty("id") int id,
                   @JsonProperty("name") String name,
-                  @JsonProperty("relativeStartTimeInMin") int relativeStartTimeInMin,
                   @JsonProperty("absoluteStartAtHour") int absoluteStartAtHour,
                   @JsonProperty("absoluteStartAtMinute") int absoluteStartAtMinute,
                   @JsonProperty("absoluteStartDaysOffset") int absoluteStartDaysOffset,
                   @JsonProperty("maxDurationInMin") int maxDurationInMin,
                   @JsonProperty("notificationDurationInMin") int notificationDurationInMin,
-                  @JsonProperty("isRelative") boolean isRelative,
                   @JsonProperty("nextSurveyId") int nextSurveyId,
                   @JsonProperty("previousSurveyId") int previousSurveyId,
                   @JsonProperty("steps") ArrayList<Step> steps) {
         this.id = id;
         this.name = name;
-        this.relativeStartTimeInMin = relativeStartTimeInMin;
         this.absoluteStartAtHour = absoluteStartAtHour;
         this.absoluteStartAtMinute = absoluteStartAtMinute;
         this.absoluteStartDaysOffset = absoluteStartDaysOffset;
         this.maxDurationInMin = maxDurationInMin;
         this.notificationDurationInMin = notificationDurationInMin;
-        this.isRelative = isRelative;
         this.nextSurveyId = nextSurveyId;
         this.previousSurveyId = previousSurveyId;
         this.steps = steps;
@@ -58,14 +60,6 @@ public class Survey {
     
     public int getPreviousSurveyId() {
         return previousSurveyId;
-    }
-
-    public boolean isRelative() {
-        return isRelative;
-    }
-
-    public int getRelativeStartTimeInMin() {
-        return relativeStartTimeInMin;
     }
 
     public int getAbsoluteStartAtHour() {
@@ -86,7 +80,7 @@ public class Survey {
 
     public Step getFirstStep() {
         for (Step step: steps) {
-            if (step.getPreviousStepId() == null) {
+            if (step.getPreviousStepId() == 0) {
                 return step;
             }
         }

@@ -28,17 +28,6 @@ public class AlarmScheduler {
         this.nextSurveyAlarmTimeInMillis = 0;
     }
 
-    public void setRelativeSurveyAlarm(int surveyId, long referenceTime, long surveyRelativeStartTimeInMillis) {
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-        Intent intent = new Intent(context, AlarmReceiver.class);
-        intent.putExtra(Config.ALARM_PURPOSE_KEY, Config.PURPOSE_SURVEY_ALARM);
-        String pendingIntentId = surveyId + SURVEY_ALARM_SUFFIX;
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Integer.parseInt(pendingIntentId), intent, PendingIntent.FLAG_ONE_SHOT);
-        pendingIntents.add(pendingIntent);
-        nextSurveyAlarmTimeInMillis = referenceTime + surveyRelativeStartTimeInMillis;
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextSurveyAlarmTimeInMillis, pendingIntent);
-    }
-
     public void setAbsoluteSurveyAlarm(int surveyId, long experimentStartTimeInMillis,
                                        int hour, int minute, int daysOffset) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
