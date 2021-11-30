@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,7 +23,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Observer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -160,6 +158,123 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         return true;
     }
 
+    private void loadExperimentFromExternalStorage() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/zip");
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        ActivityResultLauncher<Intent> loadExperimentIntent = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        getExperimentFromZip(result);
+                    }
+                });
+        new AlertDialog.Builder(this)
+                .setTitle(Config.LOADING_TIME_ALERT_TITLE)
+                .setMessage(Config.LOADING_TIME_ALERT_MESSAGE)
+                .setPositiveButton(Config.OK, (dialog, which) -> loadExperimentIntent.launch(intent))
+                .show();
+    }
+
+    private void getCsvFileFromActivityResult(ActivityResult result) {
+        InternalStorage storage = new InternalStorage(this);
+        String csv = storage.getFileContentString(Config.FILE_NAME_CSV);
+        // Line breaks get deleted in the internal storage and therefore they were replaced by stars(*)
+        // -> Reversing this here
+        csv = csv.replace("*","\n");
+        // The resultData contains a URI for the document or directory that the user selected.
+        if (result != null) {
+            Intent intent = result.getData();
+            if (intent != null) {
+                Uri uri = result.getData().getData();
+                boolean success = false;
+                if (uri != null) {
+                    // Writing csv in selected uri
+                    success = writeFile(uri, csv);
+                }
+                if (success) {
+                    storage.saveFileContentString(Config.FILE_NAME_CSV_STATUS, Config.CSV_SAVED);
+                    Toast toast = Toast.makeText(this, Config.CSV_SAVED_TOAST, Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            }
+        }
+        else {
+            new AlertDialog.Builder(this)
+                    .setTitle(Config.EXTERNAL_WRITE_ALERT_TITLE)
+                    .setMessage(Config.EXTERNAL_WRITE_ALERT_MESSAGE)
+                    .setPositiveButton(Config.OK, null)
+                    .show();
+        }
+    }
+
+    private void getExperimentFromZip(ActivityResult result) {
+        InternalStorage storage = new InternalStorage(this);
+        storage.clear();
+        createInitialStorageFiles(storage);
+        // The resultData contains a URI for the document or directory that the user selected.
+        if (result != null) {
+            Intent intent = result.getData();
+            if (intent != null) {
+                Uri uri = result.getData().getData();
+                if (uri != null) {
+                    try {
+                        InputStream inputStream = getContentResolver().openInputStream(uri);
+                        ZipInputStream zis = new ZipInputStream(inputStream);
+                        ZipEntry zipEntry = zis.getNextEntry();
+                        while (zipEntry != null) {
+                            if (!zipEntry.isDirectory()) {
+                                // Experiment JSON entry
+                                if (!(zipEntry.getName().contains("_Code_Tabelle"))
+                                        && !(zipEntry.getName().contains("resources/"))) {
+                                    StringBuilder experimentJSON = new StringBuilder();
+                                    byte[] buffer = new byte[Config.JSON_UPLOAD_BUFFER_LENGTH];
+                                    int length = zis.read(buffer);
+                                    while (length > 0) {
+                                        String line = new String(buffer, StandardCharsets.UTF_8);
+                                        experimentJSON.append(line);
+                                        length = zis.read(buffer);
+                                    }
+                                    storage.saveFileContentString(Config.FILE_NAME_EXPERIMENT_JSON, experimentJSON.toString());
+                                    // User feedback
+                                    JSONParser parser = new JSONParser(this);
+                                    Experiment experiment = (Experiment) parser.parseJSONString(experimentJSON.toString(), Experiment.class);
+                                    String experimentName = Config.EXPERIMENT_NAME_FIELD_SUFFIX + experiment.getName();
+                                    currentExperimentNameView.setText(experimentName);
+                                }
+                                // Resource entries
+                                if (zipEntry.getName().contains("resources/")) {
+                                    storage.saveZipEntry(zipEntry.getName().replace("resources/", ""), zis);
+                                }
+                            }
+                            zipEntry = zis.getNextEntry();
+                        }
+                        zis.closeEntry();
+                        zis.close();
+                        Toast toast = Toast.makeText(this, Config.EXPERIMENT_LOADED_TOAST, Toast.LENGTH_LONG);
+                        toast.show();
+                    }
+                    catch (Exception e) {
+                        new AlertDialog.Builder(this)
+                                .setTitle(Config.ZIP_READING_ALERT_TITLE)
+                                .setMessage(Config.ZIP_READING_ALERT_MESSAGE)
+                                .setPositiveButton(Config.OK, null)
+                                .show();
+                    }
+                }
+            }
+        }
+        else {
+            // AlertDialog: resultData == null
+            new AlertDialog.Builder(this)
+                    .setTitle(Config.EXTERNAL_READ_ALERT_TITLE)
+                    .setMessage(Config.EXTERNAL_READ_ALERT_MESSAGE)
+                    .setPositiveButton(Config.OK, null)
+                    .show();
+        }
+    }
+
     private void startExperiment(ExperimentGroup group, long startTimeInMs, InternalStorage storage) {
         if (storage.getFileContentString(Config.FILE_NAME_CSV_STATUS).equals(Config.CSV_SAVED)) {
             ExperimentController experimentController = new ExperimentController(this);
@@ -277,137 +392,6 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
     private void cancelAutoExitTimer() {
         AlarmScheduler alarmScheduler = new AlarmScheduler(this);
         alarmScheduler.cancelAdminTimeoutAlarm();
-    }
-
-    private void loadExperimentFromExternalStorage() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("application/zip");
-        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-        ActivityResultLauncher<Intent> loadExperimentIntent = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        getExperimentJsonFromZip(result);
-                    }
-                });
-        loadExperimentIntent.launch(intent);
-    }
-
-    private void getCsvFileFromActivityResult(ActivityResult result) {
-        InternalStorage storage = new InternalStorage(this);
-        String csv = storage.getFileContentString(Config.FILE_NAME_CSV);
-        // Line breaks get deleted in the internal storage and therefore they were replaced by stars(*)
-        // -> Reversing this here
-        csv = csv.replace("*","\n");
-        // The resultData contains a URI for the document or directory that the user selected.
-        if (result != null) {
-            Intent intent = result.getData();
-            if (intent != null) {
-                Uri uri = result.getData().getData();
-                boolean success = false;
-                if (uri != null) {
-                    // Writing csv in selected uri
-                    success = writeFile(uri, csv);
-                }
-                if (success) {
-                    storage.saveFileContentString(Config.FILE_NAME_CSV_STATUS, Config.CSV_SAVED);
-                    Toast toast = Toast.makeText(this, Config.CSV_SAVED_TOAST, Toast.LENGTH_LONG);
-                    toast.show();
-                }
-            }
-        }
-        else {
-            // AlertDialog: resultData == null
-            new AlertDialog.Builder(this)
-                    .setTitle(Config.EXTERNAL_WRITE_ALERT_TITLE)
-                    .setMessage(Config.EXTERNAL_WRITE_ALERT_MESSAGE)
-                    .setPositiveButton(Config.OK, null)
-                    .show();
-        }
-    }
-
-    private void getExperimentJsonFromZip(ActivityResult result) {
-        InternalStorage storage = new InternalStorage(this);
-        storage.clear();
-        createInitialStorageFiles(storage);
-        // The resultData contains a URI for the document or directory that the user selected.
-        if (result != null) {
-            Intent intent = result.getData();
-            if (intent != null) {
-                Uri uri = result.getData().getData();
-                if (uri != null) {
-                    try {
-                        InputStream inputStream = getContentResolver().openInputStream(uri);
-                        ZipInputStream zis = new ZipInputStream(inputStream);
-                        ZipEntry zipEntry = zis.getNextEntry();
-                        while (zipEntry != null) {
-                            if (!zipEntry.isDirectory()) {
-                                // Experiment JSON entry
-                                if (!(zipEntry.getName().contains("_Code_Tabelle"))
-                                        && !(zipEntry.getName().contains("resources/"))) {
-                                    StringBuilder experimentJSON = new StringBuilder();
-                                    byte[] buffer = new byte[1024];
-                                    int length = zis.read(buffer);
-                                    while (length > 0) {
-                                        String line = new String(buffer, StandardCharsets.UTF_8);
-                                        experimentJSON.append(line);
-                                        length = zis.read(buffer);
-                                    }
-                                    storage.saveFileContentString(Config.FILE_NAME_EXPERIMENT_JSON, experimentJSON.toString());
-                                    // User feedback
-                                    JSONParser parser = new JSONParser(this);
-                                    Experiment experiment = (Experiment) parser.parseJSONString(experimentJSON.toString(), Experiment.class);
-                                    String experimentName = Config.EXPERIMENT_NAME_FIELD_SUFFIX + experiment.getName();
-                                    currentExperimentNameView.setText(experimentName);
-                                }
-                                // Resource entries
-                                if (zipEntry.getName().contains("resources/")) {
-                                    storage.saveZipEntry(zipEntry.getName().replace("resources/", ""), zis);
-                                }
-                            }
-                            zipEntry = zis.getNextEntry();
-                        }
-                        zis.closeEntry();
-                        zis.close();
-                        Log.e("fileList", Arrays.toString(this.getFilesDir().list()));
-                        Toast toast = Toast.makeText(this, Config.EXPERIMENT_LOADED_TOAST, Toast.LENGTH_LONG);
-                        toast.show();
-                    }
-                    catch (Exception e) {
-                        Log.e("Exception:", e.toString());
-                    }
-
-
-
-                    /*
-                    // Reading Experiment JSON from user selected uri
-
-                    if (experimentJSON != null) {
-                        Experiment experiment = parseExperimentJSON(experimentJSON);
-                        if (experiment != null) {
-                            // Clean up last experiment
-                            String[] fileNames = this.fileList();
-                            for (String fileName: fileNames) {
-                                storage.deleteFile(fileName);
-                            }
-                            createInitialStorageFiles(storage);
-                            // Load the resources (videos, images)
-                            readResourcesOutOfFile(uri, storage);
-                            experimentJSON = stringifyExperiment(experiment);
-                        }
-                    }*/
-                }
-            }
-        }
-        else {
-            // AlertDialog: resultData == null
-            new AlertDialog.Builder(this)
-                    .setTitle(Config.EXTERNAL_READ_ALERT_TITLE)
-                    .setMessage(Config.EXTERNAL_READ_ALERT_MESSAGE)
-                    .setPositiveButton(Config.OK, null)
-                    .show();
-        }
     }
 
     public void addObserver(Observer observer) {

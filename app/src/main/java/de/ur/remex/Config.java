@@ -11,6 +11,8 @@ public final class Config {
 
     // General app settings
     public static final int ADMIN_TIMEOUT_MIN = 10;
+    public static final int RESOURCE_UPLOAD_BUFFER_LENGTH = 16384;
+    public static final int JSON_UPLOAD_BUFFER_LENGTH = 1;
     // TODO: Change initial password
     //public static final String INITIAL_PASSWORD = "Medbo_TSST";
     public static final String INITIAL_PASSWORD = "";
@@ -24,6 +26,10 @@ public final class Config {
     public static final String INTERNAL_STORAGE_LOADING_ALERT_MESSAGE = "Die angeforderte Datei konnte nicht aus dem internen Appspeicher geladen werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
     public static final String INTERNAL_STORAGE_READING_ALERT_TITLE = "Fehler beim Lesen";
     public static final String INTERNAL_STORAGE_READING_ALERT_MESSAGE = "Die angeforderte Datei aus dem internen Appspeicher konnte nicht gelesen werden. Versuchen Sie es bitte erneut oder kontaktieren Sie den Support.";
+    public static final String ZIP_READING_ALERT_TITLE = "Fehler beim Lesen";
+    public static final String ZIP_READING_ALERT_MESSAGE = "Die ausgewählte .zip Datei konnte nicht gelesen werden. Versuchen Sie es bitte nochmal, erstellen Sie das Experiment neu oder kontaktieren Sie den Support.";
+    public static final String LOADING_TIME_ALERT_TITLE = "Hinweis zur Ladezeit";
+    public static final String LOADING_TIME_ALERT_MESSAGE = "Wenn ein großes Experiment (z.B. mit vielen Videos) ausgewählt wird kann es zu längeren Ladezeiten kommen. Dabei kann es sein, dass der Bildschirm einfriert und/oder schwarz wird. Bei der Auswahl des Experiments ist die Größe des Experiments sichtbar. Es kann mit ca. 1 Minute Ladezeit pro 500 MB gerechnet werden.";
     public static final String PASSWORD_ALERT_TITLE = "Login fehlgeschlagen";
     public static final String PASSWORD_ALERT_MESSAGE = "Das eingegebene Passwort ist falsch.";
     public static final String EXPERIMENT_NOT_FINISHED_ALERT_TITLE = "Experiment läuft noch";

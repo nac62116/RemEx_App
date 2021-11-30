@@ -107,6 +107,7 @@ public class CreateVPActivity extends AppCompatActivity implements View.OnClickL
         datePickerDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             c.set(year, month, dayOfMonth);
             long userSettedTimeInMillis = c.getTimeInMillis();
+            // TODO: Change this
             if (currentTimeInMillis > userSettedTimeInMillis) {
                 // AlertDialog: Picked date lays in the past
                 new AlertDialog.Builder(CreateVPActivity.this)

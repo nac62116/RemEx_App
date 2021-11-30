@@ -2,7 +2,6 @@ package de.ur.remex.model.storage;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.zip.ZipInputStream;
 
 import de.ur.remex.Config;
@@ -50,8 +50,6 @@ public class InternalStorage {
                     .setMessage(Config.INTERNAL_STORAGE_LOADING_ALERT_MESSAGE)
                     .setPositiveButton(Config.OK, null)
                     .show();
-            Log.e("Loading exception", e.getMessage());
-            Log.e("Loading exception", e.toString());
             return null;
         }
         StringBuilder stringBuilder = new StringBuilder();
@@ -76,7 +74,7 @@ public class InternalStorage {
 
     public void saveZipEntry(String fileName, ZipInputStream zis) {
         try (FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE)) {
-            byte[] buffer = new byte[2048];
+            byte[] buffer = new byte[Config.RESOURCE_UPLOAD_BUFFER_LENGTH];
             int length = zis.read(buffer);
             while (length > 0) {
                 fos.write(buffer, 0, length);
@@ -97,7 +95,7 @@ public class InternalStorage {
     }
 
     public void clear() {
-        for (String fileName: context.getFilesDir().list()) {
+        for (String fileName: Objects.requireNonNull(context.getFilesDir().list())) {
             context.deleteFile(fileName);
         }
     }
