@@ -33,7 +33,7 @@ public class NotificationHandler {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, destinationIntent, 0);
         // Create notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.medbo_logo)
+                .setSmallIcon(R.drawable.remex_logo_black)
                 .setContentTitle(Config.NOTIFICATION_HEADER)
                 .setContentText(Config.NOTIFICATION_TEXT)
                 .setStyle(new NotificationCompat.BigTextStyle()

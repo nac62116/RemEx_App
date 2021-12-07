@@ -3,7 +3,7 @@
     <!-- Layout Strings -->
     <string name="app_name">RemEx</string>
     <string name="weiter_button_text">Weiter</string>
-    <string name="medbo_logo_content_description">Medbo Logo</string>
+    <string name="remex_logo_content_description">RemEx Logo</string>
     <string name="header">Header</string>
     <string name="text">Text</string>
     <string name="admin_login_input_hint">Passwort</string>
