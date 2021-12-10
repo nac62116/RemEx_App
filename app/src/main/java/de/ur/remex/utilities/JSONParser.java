@@ -2,19 +2,38 @@ package de.ur.remex.utilities;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.os.Build;
-import android.util.Log;
-
-import androidx.annotation.RequiresApi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Map;
 
 import de.ur.remex.Config;
+
+/*
+MIT License
+
+Copyright (c) 2021 Colin Nash
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 
 public class JSONParser {
 
@@ -33,7 +52,6 @@ public class JSONParser {
                 parsedObject = mapper.readValue(JSONString, targetClass);
             }
             catch (JsonProcessingException e) {
-                Log.e("Parser exception", e.toString());
                 new AlertDialog.Builder(context)
                         .setTitle(Config.JSON_PARSE_ALERT_TITLE)
                         .setMessage(Config.JSON_PARSE_ALERT_MESSAGE)
@@ -42,47 +60,5 @@ public class JSONParser {
             }
         }
         return parsedObject;
-    }
-
-    public void parseInputStream(InputStream inputStream) {
-        // InputStream to jsonMap
-        HashMap<?, ?> jsonMap = new HashMap<>();
-        if (inputStream != null) {
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                jsonMap = mapper.readValue(inputStream, HashMap.class);
-            }
-            catch (Exception e) {
-                new AlertDialog.Builder(context)
-                        .setTitle(Config.JSON_PARSE_ALERT_TITLE)
-                        .setMessage(Config.JSON_PARSE_ALERT_MESSAGE)
-                        .setPositiveButton(Config.OK, null)
-                        .show();
-            }
-        }
-        if (jsonMap != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                jsonMap.forEach((key, value) -> {
-                    Log.e("Key", key.toString());
-                    Log.e("Value", value.toString());
-                });
-            }
-        }
-    }
-
-    public String stringify(Object object) {
-        // Object to JSON-String
-        String jsonString = null;
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            jsonString = mapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            new AlertDialog.Builder(context)
-                    .setTitle(Config.JSON_STRINGIFY_ALERT_TITLE)
-                    .setMessage(Config.JSON_STRINGIFY_ALERT_MESSAGE)
-                    .setPositiveButton(Config.OK, null)
-                    .show();
-        }
-        return jsonString;
     }
 }
