@@ -62,7 +62,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Checking for active experiment
         InternalStorage storage = new InternalStorage(this);
         String experimentActive = storage.getFileContentString(Config.FILE_NAME_SURVEY_ENTRANCE);
-        if (experimentActive.equals(Config.SURVEY_ENTRANCE_OPENED)) {
+        if (experimentActive != null && experimentActive.equals(Config.SURVEY_ENTRANCE_OPENED)) {
             NotificationHandler notificationHandler = new NotificationHandler(this);
             notificationHandler.cancelNotification();
             Intent intent = new Intent(this, SurveyEntranceActivity.class);
